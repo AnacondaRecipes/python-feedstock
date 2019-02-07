@@ -5,14 +5,16 @@ Subject: [PATCH 20/20] Add CondaEcosystemModifyDllSearchPath()
 
 This changes the DLL search order so that C:\Windows\System32 does not
 get searched in before entries in PATH.
+
+Reviewed by Kai Tietz 7.2.2019
 ---
  Modules/main.c | 153 +++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 153 insertions(+)
 
 diff --git a/Modules/main.c b/Modules/main.c
 index 514f809939..2fa3699713 100644
---- a/Modules/main.c
-+++ b/Modules/main.c
+--- a/Modules/main.c	2019-02-07 08:33:27.000000000 -0600
++++ b/Modules/main.c	2019-02-07 09:23:19.000000000 -0600
 @@ -16,6 +16,10 @@
  #  ifdef HAVE_FCNTL_H
  #    include <fcntl.h>
@@ -24,7 +26,7 @@ index 514f809939..2fa3699713 100644
  #endif
  
  #ifdef _MSC_VER
-@@ -3026,9 +3030,158 @@ pymain_init(_PyMain *pymain)
+@@ -3026,9 +3030,155 @@
  }
  
  
@@ -101,69 +103,66 @@ index 514f809939..2fa3699713 100644
 +            if (debug_it) wprintf(L"CondaEcosystemModifyDllSearchPath() :: PATH=%ls\n\b", path_env);
 +            size_t len = wcslen(path_env);
 +            wchar_t *path = (wchar_t *)alloca((len + 1) * sizeof(wchar_t));
-+            if (path != NULL)
++            memcpy(path, path_env, (len + 1) * sizeof(wchar_t));
++            /* Convert any / to \ */
++            wchar_t *path_end;
++            /* Replace slash by backslash */
++            while ((path_end = wcschr(path, L'/')))
++                *path_end = L'\\';
++            /* Remove all double quotes */
++            while ((path_end = wcschr(path, L'"')))
++                memmove(path_end, path_end + 1, sizeof(wchar_t) * (len-- - (path_end - path)));
++            /* Remove all leading and double ';' */
++            while ( *path == L';' )
++                memmove(path, path + 1, sizeof(wchar_t) * len--);
++            while ((path_end = wcsstr(path, L";;")))
++                memmove(path_end, path_end + 1, sizeof(wachar_t) * (len-- - (path_end - path)));
++
++            if (len == 0)
++                return 2;
++
++            /* Count the number of path entries */
++            ssize_t num_entries = 1;
++            path_end = path;
++            while ((path_end = wcschr(path_end, L';')))
 +            {
-+                memcpy(path, path_env, (len + 1) * sizeof(wchar_t));
-+                /* Convert any / to \ */
-+                wchar_t *path_end;
-+                while ((path_end = wcschr(path, L'/')))
-+                    *path_end = L'\\';
-+                /* Remove all double quotes */
-+                while ((path_end = wcschr(path, L'"')))
-+                    memmove(path_end, path_end + 1, len-- - (path_end - path));
-+                /* Remove all double ';' */
-+                while ((path_end = wcsstr(path, L";;")))
-+                    memmove(path_end, path_end + 1, len-- - (path_end - path));
++               ++num_entries;
++               ++path_end;
++            }
 +
-+                if (wcslen(path) == 0)
-+                    return 2;
-+
-+                /* Count the number of path entries */
-+                ssize_t num_entries = 1;
-+                path_end = path;
-+                while ((path_end = wcschr(path_end, L';')))
++            wchar_t **path_entries = (wchar_t **)alloca((num_entries) * sizeof(wchar_t *));
++            path_end = wcschr(path, L';');
++            /* It does not matter what flags are passed to SetDefaultDllDirectories(), only that more than
++               one flag is passed; this seems like an odd API decision.
++            */
++            pSDDD(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
++            ssize_t entry_num = 0;
++            while (path != NULL)
++            {
++                if (path_end != NULL)
 +                {
-+                    ++num_entries;
-+                    ++path_end;
++                    *path_end = L'\0';
++                    /* Hygiene, no \ at the end */
++                    while (path_end > path && path_end[-1] == L'\\')
++                    {
++                        --path_end;
++                        *path_end = L'\0';
++                    }
 +                }
-+
-+                wchar_t **path_entries = (wchar_t **)alloca((num_entries) * sizeof(wchar_t *));
-+                if (path_entries != NULL)
++                if (wcslen(path) != 0)
++                    path_entries[entry_num++] = path;
++                path = path_end;
++                if (path != NULL)
 +                {
++                    while (*path == L'\0')
++                       ++path;
 +                    path_end = wcschr(path, L';');
-+                    /* It does not matter what flags are passed to SetDefaultDllDirectories(), only that more than
-+                       one flag is passed; this seems like an odd API decision.
-+                    */
-+                    pSDDD(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
-+                    ssize_t entry_num = 0;
-+                    while (path != NULL)
-+                    {
-+                        if (path_end != NULL)
-+                        {
-+                            *path_end = L'\0';
-+                            /* Hygiene, no \ at the end */
-+                            while (path_end > path && path_end[-1] == L'\\')
-+                            {
-+                                --path_end;
-+                                *path_end = L'\0';
-+                            }
-+                        }
-+                        if (wcslen(path) != 0)
-+                            path_entries[entry_num++] = path;
-+                        path = path_end;
-+                        if (path != NULL)
-+                        {
-+                            while (*path == L'\0')
-+                                ++path;
-+                            path_end = wcschr(path, L';');
-+                        }
-+                    }
-+                    for (ssize_t i = num_entries - 1; i > -1; --i)
-+                    {
-+                        if (debug_it) wprintf(L"CondaEcosystemModifyDllSearchPath() :: AddDllDirectory(%ls)\n", path_entries[i]);
-+                        pADD(path_entries[i]);
-+                    }
 +                }
++            }
++            for (ssize_t i = num_entries - 1; i > -1; --i)
++            {
++                if (debug_it) wprintf(L"CondaEcosystemModifyDllSearchPath() :: AddDllDirectory(%ls)\n", path_entries[i]);
++                pADD(path_entries[i]);
 +            }
 +        }
 +    }
@@ -183,6 +182,3 @@ index 514f809939..2fa3699713 100644
      int res = pymain_init(pymain);
      if (res == 1) {
          goto done;
--- 
-2.20.1
-
