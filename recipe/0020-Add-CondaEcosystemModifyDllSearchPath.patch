@@ -20,7 +20,7 @@ index 514f809939..2fa3699713 100644
  void _Py_DeactivateActCtx(ULONG_PTR cookie);
  #endif
 -
-+ƒ
++ 
  #ifdef _DEBUG
  #define PYD_DEBUG_SUFFIX "_d"
  #else
