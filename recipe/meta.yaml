@@ -31,13 +31,11 @@ source:
       - 0016-Disable-registry-lookup-unless-CONDA_PY_ALLOW_REG_PA.patch
       - 0017-Unvendor-openssl.patch
       - 0018-Unvendor-sqlite3.patch
+      - 0019-Unvendor-xz.patch
       # https://bugs.python.org/issue35644
-      - 0019-venv-Revert-a-change-from-https-github.com-python-cp.patch
-      - 0020-Add-CondaEcosystemModifyDllSearchPath.patch  # [win]
+      - 0020-venv-Revert-a-change-from-https-github.com-python-cp.patch
+      - 0021-Add-CondaEcosystemModifyDllSearchPath.patch  # [win]
   # TODO :: Depend on our own packages for these:
-  - url: https://github.com/python/cpython-source-deps/archive/xz-5.2.2.zip          # [win]
-    folder: externals/xz-5.2.2                                                       # [win]
-    sha256: 02b6d6f1e0369940e7e1f0d324992e069d09f5f3d32d86e2d22cd8b82ac3fb3f         # [win]
   # Not used as of 3.7b3 (tcltk from cpython-bin- is), but kept for archival and license reasons.
   - url: https://github.com/python/cpython-source-deps/archive/tcl-core-8.6.9.0.zip  # [win]
     folder: externals/tcl-core-8.6.9.0                                               # [win]
@@ -95,7 +93,7 @@ requirements:
   host:
     - bzip2                              # [unix]
     - sqlite
-    - xz                                 # [unix]
+    - xz
     - zlib                               # [unix]
     - openssl
     - readline                           # [unix]

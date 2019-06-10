@@ -1,0 +1,42 @@
+diff --git a/PCbuild/_lzma.vcxproj b/PCbuild/_lzma.vcxproj
+index 3aac1d7..c6bc507 100644
+--- a/PCbuild/_lzma.vcxproj
++++ b/PCbuild/_lzma.vcxproj
+@@ -61,11 +61,11 @@
+   </PropertyGroup>
+   <ItemDefinitionGroup>
+     <ClCompile>
+-      <AdditionalIncludeDirectories>$(lzmaDir)src/liblzma/api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(lzmaDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>WIN32;_FILE_OFFSET_BITS=64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;LZMA_API_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+     </ClCompile>
+     <Link>
+-      <AdditionalDependencies>$(OutDir)liblzma$(PyDebugExt).lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>$(lzmaDir)lib\liblzma$(PyDebugExt).lib;%(AdditionalDependencies)</AdditionalDependencies>
+     </Link>
+   </ItemDefinitionGroup>
+   <ItemGroup>
+@@ -79,10 +79,6 @@
+       <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
+       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+     </ProjectReference>
+-    <ProjectReference Include="liblzma.vcxproj">
+-      <Project>{12728250-16eC-4dc6-94d7-e21dd88947f8}</Project>
+-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+-    </ProjectReference>
+   </ItemGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <ImportGroup Label="ExtensionTargets">
+diff --git a/PCbuild/python.props b/PCbuild/python.props
+index bac9df2..ae853cc 100644
+--- a/PCbuild/python.props
++++ b/PCbuild/python.props
+@@ -48,7 +48,7 @@
+     <ExternalsDir Condition="!HasTrailingSlash($(ExternalsDir))">$(ExternalsDir)\</ExternalsDir>
+     <sqlite3Dir>$(SQLITE3_DIR)\</sqlite3Dir>
+     <bz2Dir>$(ExternalsDir)bzip2-1.0.6\</bz2Dir>
+-    <lzmaDir>$(ExternalsDir)xz-5.2.2\</lzmaDir>
++    <lzmaDir>$(LZMA_DIR)\</lzmaDir>
+     <opensslDir>$(OPENSSL_DIR)\</opensslDir>
+     <opensslOutDir>$(opensslDir)bin</opensslOutDir>
+     <opensslIncludeDir>$(opensslDir)include</opensslIncludeDir>

@@ -15,6 +15,7 @@ if "%ARCH%"=="64" (
    set BUILD_PATH=win32
 )
 
+set "LZMA_DIR=%LIBRARY_PREFIX%"
 set "OPENSSL_DIR=%LIBRARY_PREFIX%"
 set "SQLITE3_DIR=%LIBRARY_PREFIX%"
 for /f "usebackq delims=" %%i in (`conda list -p %PREFIX% sqlite --no-show-channel-urls --json ^| findstr "version"`) do set SQLITE3_VERSION_LINE=%%i
