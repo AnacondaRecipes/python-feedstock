@@ -18,9 +18,8 @@ Fix CondaEcosystemModifyDllSearchPath for users of the Python DLL
  2 files changed, 397 insertions(+), 1 deletion(-)
 
 diff --git a/Modules/main.c b/Modules/main.c
-index a29f2f82ed..37e877a7c0 100644
---- a/Modules/main.c
-+++ b/Modules/main.c
+--- a/Modules/main.c	2022-03-17 12:01:37.043237531 +0300
++++ b/Modules/main.c	2022-03-17 12:01:56.947658223 +0300
 @@ -16,6 +16,10 @@
  #  ifdef HAVE_FCNTL_H
  #    include <fcntl.h>
@@ -32,7 +31,7 @@ index a29f2f82ed..37e877a7c0 100644
  #endif
  
  #ifdef MS_WINDOWS
-@@ -56,6 +60,8 @@ extern "C" {
+@@ -56,6 +60,8 @@
          } \
      } while (0)
  
@@ -41,7 +40,7 @@ index a29f2f82ed..37e877a7c0 100644
  #ifdef MS_WINDOWS
  #define WCSTOK wcstok_s
  #else
-@@ -1278,7 +1284,7 @@ pymain_header(_PyMain *pymain)
+@@ -1278,7 +1284,7 @@
          return;
      }
  
@@ -50,7 +49,7 @@ index a29f2f82ed..37e877a7c0 100644
      if (!Py_NoSiteFlag) {
          fprintf(stderr, "%s\n", COPYRIGHT);
      }
-@@ -3057,9 +3063,395 @@ pymain_init(_PyMain *pymain)
+@@ -3057,9 +3063,395 @@
  }
  
  
@@ -447,10 +446,9 @@ index a29f2f82ed..37e877a7c0 100644
      if (res == 1) {
          goto done;
 diff --git a/Python/dynload_win.c b/Python/dynload_win.c
-index 51325be658..f52efdf46b 100644
---- a/Python/dynload_win.c
-+++ b/Python/dynload_win.c
-@@ -217,6 +217,10 @@ dl_funcptr _PyImport_FindSharedFuncptrWindows(const char *prefix,
+--- a/Python/dynload_win.c	2022-03-17 12:01:37.043237531 +0300
++++ b/Python/dynload_win.c	2022-03-17 12:01:56.947658223 +0300
+@@ -215,6 +215,10 @@
  #endif
          /* We use LoadLibraryEx so Windows looks for dependent DLLs
              in directory of pathname first. */
@@ -461,6 +459,3 @@ index 51325be658..f52efdf46b 100644
          /* XXX This call doesn't exist in Windows CE */
          hDLL = LoadLibraryExW(wpathname, NULL,
                                LOAD_WITH_ALTERED_SEARCH_PATH);
--- 
-2.23.0
-

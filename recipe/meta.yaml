@@ -1,4 +1,4 @@
-{% set version = "3.7.11" %}
+{% set version = "3.7.13" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
@@ -22,8 +22,7 @@ package:
 
 source:
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}.tar.xz
-    # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    md5: b3671d35b61f5422605cedad32f3457a
+    sha256: 99f106275df8899c3e8cb9d7c01ce686c202ef275953301427194693de5bef84
     patches:
       - patches/0001-Fix-off-by-one-error-in-_winapi_WaitForMultipleObjec.patch
       # Unfinished, still runs the whole thing.
@@ -70,9 +69,9 @@ source:
   - url: https://github.com/python/cpython-source-deps/archive/tix-8.4.3.6.zip       # [win]
     folder: externals/tix-8.4.3.6                                                    # [win]
     sha256: e558e3dc5e67ac0942f8fceafce00ca46b177da9ebeaf38ec7fafd9b9913ac56         # [win]
-  - url: https://github.com/python/cpython-source-deps/archive/bzip2-1.0.6.zip       # [win]
-    folder: externals/bzip2-1.0.6                                                    # [win]
-    sha256: c42fd1432a2667b964a74bc423bb7485059c4a6d5dc92946d59dbf9a6bdb988d         # [win]
+  - url: https://github.com/python/cpython-source-deps/archive/bzip2-1.0.8.zip       # [win]
+    folder: externals/bzip2-1.0.8                                                    # [win]
+    sha256: 12c17d15f99e27235529574a722fb484a4e8fdf2427cef53b1b68bdf07e404a9         # [win]
   - url: https://github.com/python/cpython-source-deps/archive/zlib-1.2.11.zip       # [win]
     folder: externals/zlib-1.2.11                                                    # [win]
     sha256: debb1952945fa6c25817a40abe90641b572c83171f244937b70b9fe156f5a63a         # [win]
@@ -103,7 +102,7 @@ build:
     # - lib/python{{ ver2 }}/lib-dynload/_hashlib.cpython-{{ ver2nd }}-x86_64-linux-gnu.so  # [linux]
     - lib/libpython3.dylib  # [osx]
   # match python.org compiler standard
-  skip: True  # [win and int(float(vc)) < 14]
+  skip: True  # [win and int(float(vc)) < 14 or (osx and arm64)]
 {% if 'conda-forge' in channel_targets %}
   string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}_cpython{{ debug }}
 {% else %}

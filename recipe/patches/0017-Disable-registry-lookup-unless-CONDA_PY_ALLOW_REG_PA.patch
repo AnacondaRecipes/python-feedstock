@@ -9,10 +9,9 @@ Subject: [PATCH 17/22] Disable registry lookup unless CONDA_PY_ALLOW_REG_PATHS
  1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/PC/getpathp.c b/PC/getpathp.c
-index dc4e43fe7d..65f38f3884 100644
---- a/PC/getpathp.c
-+++ b/PC/getpathp.c
-@@ -782,9 +782,19 @@ calculate_module_search_path(const _PyCoreConfig *core_config,
+--- a/PC/getpathp.c	2022-03-17 11:56:24.265772188 +0300
++++ b/PC/getpathp.c	2022-03-17 11:58:05.521517317 +0300
+@@ -779,9 +779,19 @@
  {
      int skiphome = calculate->home==NULL ? 0 : 1;
  #ifdef Py_ENABLE_SHARED
@@ -34,6 +33,3 @@ index dc4e43fe7d..65f38f3884 100644
      /* We only use the default relative PYTHONPATH if we haven't
         anything better to use! */
      int skipdefault = (core_config->module_search_path_env != NULL ||
--- 
-2.23.0
-

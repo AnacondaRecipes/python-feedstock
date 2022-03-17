@@ -10,10 +10,36 @@ Subject: [PATCH 19/22] Unvendor sqlite3
  PCbuild/sqlite3.vcxproj  | 12 ++++++------
  4 files changed, 11 insertions(+), 14 deletions(-)
 
+diff --git a/PCbuild/pcbuild.sln b/PCbuild/pcbuild.sln
+index c212d9f8f3..eebeb791fb 100644
+--- a/PCbuild/pcbuild.sln	2022-03-17 23:16:02.423834852 +0300
++++ b/PCbuild/pcbuild.sln	2022-03-17 23:16:18.692237003 +0300
+@@ -55,8 +55,6 @@
+ EndProject
+ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_hashlib", "_hashlib.vcxproj", "{447F05A8-F581-4CAC-A466-5AC7936E207E}"
+ EndProject
+-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite3", "sqlite3.vcxproj", "{A1A295E5-463C-437F-81CA-1F32367685DA}"
+-EndProject
+ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_multiprocessing", "_multiprocessing.vcxproj", "{9E48B300-37D1-11DD-8C41-005056C00008}"
+ EndProject
+ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "python3dll", "python3dll.vcxproj", "{885D4898-D08D-4091-9C40-C700CFE3FC5A}"
+diff --git a/PCbuild/python.props b/PCbuild/python.props
+index e4f36cd397..bac9df2e7b 100644
+--- a/PCbuild/python.props	2022-03-17 23:15:50.927547585 +0300
++++ b/PCbuild/python.props	2022-03-17 23:16:55.601131212 +0300
+@@ -46,7 +46,7 @@
+     <ExternalsDir>$(EXTERNALS_DIR)</ExternalsDir>
+     <ExternalsDir Condition="$(ExternalsDir) == ''">$([System.IO.Path]::GetFullPath(`$(PySourcePath)externals`))</ExternalsDir>
+     <ExternalsDir Condition="!HasTrailingSlash($(ExternalsDir))">$(ExternalsDir)\</ExternalsDir>
+-    <sqlite3Dir>$(ExternalsDir)sqlite-3.31.1.0\</sqlite3Dir>
++    <sqlite3Dir>$(SQLITE3_DIR)\</sqlite3Dir>
+     <bz2Dir>$(ExternalsDir)bzip2-1.0.8\</bz2Dir>
+     <lzmaDir>$(ExternalsDir)xz-5.2.2\</lzmaDir>
+     <opensslDir>$(OPENSSL_DIR)\</opensslDir>
 diff --git a/PCbuild/_sqlite3.vcxproj b/PCbuild/_sqlite3.vcxproj
 index 1f1a1c8cad..7da816f4c8 100644
---- a/PCbuild/_sqlite3.vcxproj
-+++ b/PCbuild/_sqlite3.vcxproj
+--- a/PCbuild/_sqlite3.vcxproj	2022-03-17 23:16:02.423834852 +0300
++++ b/PCbuild/_sqlite3.vcxproj	2022-03-17 23:16:18.692237003 +0300
 @@ -61,9 +61,12 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
@@ -39,36 +65,10 @@ index 1f1a1c8cad..7da816f4c8 100644
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
-diff --git a/PCbuild/pcbuild.sln b/PCbuild/pcbuild.sln
-index c212d9f8f3..eebeb791fb 100644
---- a/PCbuild/pcbuild.sln
-+++ b/PCbuild/pcbuild.sln
-@@ -55,8 +55,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bdist_wininst", "..\PC\bdis
- EndProject
- Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_hashlib", "_hashlib.vcxproj", "{447F05A8-F581-4CAC-A466-5AC7936E207E}"
- EndProject
--Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite3", "sqlite3.vcxproj", "{A1A295E5-463C-437F-81CA-1F32367685DA}"
--EndProject
- Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_multiprocessing", "_multiprocessing.vcxproj", "{9E48B300-37D1-11DD-8C41-005056C00008}"
- EndProject
- Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "python3dll", "python3dll.vcxproj", "{885D4898-D08D-4091-9C40-C700CFE3FC5A}"
-diff --git a/PCbuild/python.props b/PCbuild/python.props
-index e4f36cd397..bac9df2e7b 100644
---- a/PCbuild/python.props
-+++ b/PCbuild/python.props
-@@ -46,7 +46,7 @@
-     <ExternalsDir>$(EXTERNALS_DIR)</ExternalsDir>
-     <ExternalsDir Condition="$(ExternalsDir) == ''">$([System.IO.Path]::GetFullPath(`$(PySourcePath)externals`))</ExternalsDir>
-     <ExternalsDir Condition="!HasTrailingSlash($(ExternalsDir))">$(ExternalsDir)\</ExternalsDir>
--    <sqlite3Dir>$(ExternalsDir)sqlite-3.31.1.0\</sqlite3Dir>
-+    <sqlite3Dir>$(SQLITE3_DIR)\</sqlite3Dir>
-     <bz2Dir>$(ExternalsDir)bzip2-1.0.6\</bz2Dir>
-     <lzmaDir>$(ExternalsDir)xz-5.2.2\</lzmaDir>
-     <opensslDir>$(OPENSSL_DIR)\</opensslDir>
 diff --git a/PCbuild/sqlite3.vcxproj b/PCbuild/sqlite3.vcxproj
 index 4f5b1965d9..59cae10127 100644
---- a/PCbuild/sqlite3.vcxproj
-+++ b/PCbuild/sqlite3.vcxproj
+--- a/PCbuild/sqlite3.vcxproj	2022-03-17 23:16:02.423834852 +0300
++++ b/PCbuild/sqlite3.vcxproj	2022-03-17 23:16:18.692237003 +0300
 @@ -56,12 +56,12 @@
    <PropertyGroup Label="UserMacros" />
    <PropertyGroup>
@@ -88,6 +88,3 @@ index 4f5b1965d9..59cae10127 100644
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
--- 
-2.23.0
-

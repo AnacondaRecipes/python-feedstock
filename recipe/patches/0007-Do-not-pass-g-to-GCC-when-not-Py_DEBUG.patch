@@ -11,9 +11,9 @@ This bloats our exe and our modules a lot.
 
 diff --git a/configure b/configure
 index c807c98e56..3a14b854c3 100755
---- a/configure
-+++ b/configure
-@@ -4251,9 +4251,9 @@ if test "$ac_test_CFLAGS" = set; then
+--- a/configure	2022-03-17 23:06:54.685917004 +0300
++++ b/configure	2022-03-17 23:07:12.798702585 +0300
+@@ -4251,9 +4251,9 @@
    CFLAGS=$ac_save_CFLAGS
  elif test $ac_cv_prog_cc_g = yes; then
    if test "$GCC" = yes; then
@@ -25,7 +25,7 @@ index c807c98e56..3a14b854c3 100755
    fi
  else
    if test "$GCC" = yes; then
-@@ -6875,7 +6875,7 @@ then
+@@ -6877,7 +6877,7 @@
                      OPT="-g -O0 -Wall"
                  fi
  	    else
@@ -36,9 +36,9 @@ index c807c98e56..3a14b854c3 100755
  	*)
 diff --git a/configure.ac b/configure.ac
 index 805c0bba08..2bdc0f35ad 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1533,7 +1533,7 @@ then
+--- a/configure.ac	2022-03-17 23:06:54.685917004 +0300
++++ b/configure.ac	2022-03-17 23:07:12.802702756 +0300
+@@ -1535,7 +1535,7 @@
                      OPT="-g -O0 -Wall"
                  fi
  	    else
@@ -47,6 +47,3 @@ index 805c0bba08..2bdc0f35ad 100644
  	    fi
  	    ;;
  	*)
--- 
-2.23.0
-

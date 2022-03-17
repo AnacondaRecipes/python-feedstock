@@ -12,38 +12,10 @@ Subject: [PATCH 18/22] Unvendor openssl
  PCbuild/pythonw.vcxproj      | 3 +++
  6 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/PCbuild/_ssl.vcxproj b/PCbuild/_ssl.vcxproj
-index aaf95a361c..b59f2d0ab1 100644
---- a/PCbuild/_ssl.vcxproj
-+++ b/PCbuild/_ssl.vcxproj
-@@ -67,9 +67,6 @@
-   </ItemDefinitionGroup>
-   <ItemGroup>
-     <ClCompile Include="..\Modules\_ssl.c" />
--    <ClCompile Include="$(opensslIncludeDir)\applink.c">
--      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
--    </ClCompile>
-   </ItemGroup>
-   <ItemGroup>
-     <ResourceCompile Include="..\PC\python_nt.rc" />
-diff --git a/PCbuild/_ssl.vcxproj.filters b/PCbuild/_ssl.vcxproj.filters
-index bd46b60984..1384aeff1f 100644
---- a/PCbuild/_ssl.vcxproj.filters
-+++ b/PCbuild/_ssl.vcxproj.filters
-@@ -9,9 +9,6 @@
-     <ClCompile Include="..\Modules\_ssl.c">
-       <Filter>Source Files</Filter>
-     </ClCompile>
--    <ClCompile Include="$(opensslIncludeDir)\applink.c">
--      <Filter>Source Files</Filter>
--    </ClCompile>
-   </ItemGroup>
-   <ItemGroup>
-     <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
 index a7e16793c7..af1350cae7 100644
---- a/PCbuild/openssl.props
-+++ b/PCbuild/openssl.props
+--- a/PCbuild/openssl.props	2022-03-17 23:09:33.260232279 +0300
++++ b/PCbuild/openssl.props	2022-03-17 23:09:51.300878161 +0300
 @@ -5,7 +5,7 @@
        <AdditionalIncludeDirectories>$(opensslIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
      </ClCompile>
@@ -55,14 +27,14 @@ index a7e16793c7..af1350cae7 100644
    </ItemDefinitionGroup>
 diff --git a/PCbuild/python.props b/PCbuild/python.props
 index 8be1daa696..e4f36cd397 100644
---- a/PCbuild/python.props
-+++ b/PCbuild/python.props
+--- a/PCbuild/python.props	2022-03-16 16:27:21.000000000 +0300
++++ b/PCbuild/python.props	2022-03-17 23:10:51.522942418 +0300
 @@ -49,9 +49,9 @@
      <sqlite3Dir>$(ExternalsDir)sqlite-3.31.1.0\</sqlite3Dir>
-     <bz2Dir>$(ExternalsDir)bzip2-1.0.6\</bz2Dir>
+     <bz2Dir>$(ExternalsDir)bzip2-1.0.8\</bz2Dir>
      <lzmaDir>$(ExternalsDir)xz-5.2.2\</lzmaDir>
--    <opensslDir>$(ExternalsDir)openssl-1.1.1g\</opensslDir>
--    <opensslOutDir>$(ExternalsDir)openssl-bin-1.1.1g\$(ArchName)\</opensslOutDir>
+-    <opensslDir>$(ExternalsDir)openssl-1.1.1n\</opensslDir>
+-    <opensslOutDir>$(ExternalsDir)openssl-bin-1.1.1n\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir>$(opensslOutDir)include</opensslIncludeDir>
 +    <opensslDir>$(OPENSSL_DIR)\</opensslDir>
 +    <opensslOutDir>$(opensslDir)bin</opensslOutDir>
@@ -72,8 +44,8 @@ index 8be1daa696..e4f36cd397 100644
      
 diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
 index 8b64e364f1..5b0fa34c36 100644
---- a/PCbuild/python.vcxproj
-+++ b/PCbuild/python.vcxproj
+--- a/PCbuild/python.vcxproj	2022-03-17 23:09:33.264232424 +0300
++++ b/PCbuild/python.vcxproj	2022-03-17 23:09:51.300878161 +0300
 @@ -72,6 +72,9 @@
    </ItemGroup>
    <ItemGroup>
@@ -86,8 +58,8 @@ index 8b64e364f1..5b0fa34c36 100644
      <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
 index 19d64a332b..d6d9b14efc 100644
---- a/PCbuild/pythonw.vcxproj
-+++ b/PCbuild/pythonw.vcxproj
+--- a/PCbuild/pythonw.vcxproj	2022-03-17 23:09:33.264232424 +0300
++++ b/PCbuild/pythonw.vcxproj	2022-03-17 23:09:51.300878161 +0300
 @@ -65,6 +65,9 @@
    </ItemGroup>
    <ItemGroup>
@@ -98,6 +70,31 @@ index 19d64a332b..d6d9b14efc 100644
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
--- 
-2.23.0
-
+diff --git a/PCbuild/_ssl.vcxproj b/PCbuild/_ssl.vcxproj
+index aaf95a361c..b59f2d0ab1 100644
+--- a/PCbuild/_ssl.vcxproj	2022-03-17 23:09:33.260232279 +0300
++++ b/PCbuild/_ssl.vcxproj	2022-03-17 23:09:51.300878161 +0300
+@@ -67,9 +67,6 @@
+   </ItemDefinitionGroup>
+   <ItemGroup>
+     <ClCompile Include="..\Modules\_ssl.c" />
+-    <ClCompile Include="$(opensslIncludeDir)\applink.c">
+-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
+-    </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+     <ResourceCompile Include="..\PC\python_nt.rc" />
+diff --git a/PCbuild/_ssl.vcxproj.filters b/PCbuild/_ssl.vcxproj.filters
+index bd46b60984..1384aeff1f 100644
+--- a/PCbuild/_ssl.vcxproj.filters	2022-03-17 23:09:33.260232279 +0300
++++ b/PCbuild/_ssl.vcxproj.filters	2022-03-17 23:09:51.300878161 +0300
+@@ -9,9 +9,6 @@
+     <ClCompile Include="..\Modules\_ssl.c">
+       <Filter>Source Files</Filter>
+     </ClCompile>
+-    <ClCompile Include="$(opensslIncludeDir)\applink.c">
+-      <Filter>Source Files</Filter>
+-    </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+     <ResourceCompile Include="..\PC\python_nt.rc" />
