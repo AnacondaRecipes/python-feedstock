@@ -47,14 +47,13 @@ if [[ ${target_platform} == linux-aarch64 ]]; then
   _OPTIMIZED=no
 fi
 
-PPC_CFLAGS=""
+# ppc64le cdt need to be rebuilt with files in powerpc64le-conda-linux-gnu instead of powerpc64le-conda_cos7-linux-gnu. In the mean time:
+if [ "$(uname -m)" = "ppc64le" ]; then
+  cp --force --archive --update --link $BUILD_PREFIX/powerpc64le-conda_cos7-linux-gnu/. $BUILD_PREFIX/powerpc64le-conda-linux-gnu
+fi
 
 if [[ ${target_platform} == linux-ppc64le ]]; then
   _OPTIMIZED=no
-  CPPFLAGS="${CPPFLAGS} -I${BUILD_PREFIX}/powerpc64le-conda_cos7-linux-gnu/sysroot/usr/include"
-  PPC_CFLAGS="-I${BUILD_PREFIX}/powerpc64le-conda_cos7-linux-gnu/sysroot/usr/include"
-  CXXFLAGS="${CXXFLAGS} -I${BUILD_PREFIX}/powerpc64le-conda_cos7-linux-gnu/sysroot/usr/include"
-  LDFLAGS="${LDFLAGS} -L ${BUILD_PREFIX}/powerpc64le-conda_cos7-linux-gnu/sysroot/usr/lib64"
 fi
 
 declare -a _dbg_opts
@@ -158,7 +157,7 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
      export CC=${CC_FOR_BUILD} \
             CXX=${CXX_FOR_BUILD} \
             CPP="${CC_FOR_BUILD} -E" \
-            CFLAGS="-O2  ${PPC_CFLAGS}" \
+            CFLAGS="-O2" \
             AR="$(${CC_FOR_BUILD} --print-prog-name=ar)" \
             RANLIB="$(${CC_FOR_BUILD} --print-prog-name=ranlib)" \
             LD="$(${CC_FOR_BUILD} --print-prog-name=ld)" && \
