@@ -61,6 +61,7 @@ source:
       - patches/0011-Fix-find_library-so-that-it-looks-in-sys.prefix-lib-.patch
       - patches/0012-Disable-new-dtags-in-unixccompiler.py.patch
       - patches/0013-Fix-cross-compilation-on-Debian-based-distros.patch
+      - patches/0013-Add-CondaEcosystemModifyDllSearchPath.patch 
       - patches/0014-Disable-registry-lookup-unless-CONDA_PY_ALLOW_REG_PA.patch
       - patches/0015-Unvendor-openssl.patch
       - patches/0016-Unvendor-sqlite3.patch
