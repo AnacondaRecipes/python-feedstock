@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ex
 
-cd ${SRC_DIR}
-
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 
@@ -242,6 +240,7 @@ _common_configure_args+=(--enable-ipv6)
 _common_configure_args+=(--with-ensurepip=no)
 _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
+_common_configure_args+=(--with-system-ffi)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
@@ -250,7 +249,7 @@ _common_configure_args+=(--with-platlibdir=lib)
 # Add more optimization flags for the static Python interpreter:
 declare -a PROFILE_TASK=()
 if [[ ${_OPTIMIZED} == yes ]]; then
-  _common_configure_args+=(--with-lto=full)
+  _common_configure_args+=(--with-lto)
   if [[ "$CONDA_BUILD_CROSS_COMPILATION" != "1" ]]; then
     _common_configure_args+=(--enable-optimizations)
     _MAKE_TARGET=profile-opt

@@ -86,6 +86,7 @@ build:
 
 requirements:
   build:
+    skip: true # [not (osx and x86_64)]
 {% if from_source_control == 'yes' %}
     - git
 {% else %}
@@ -99,6 +100,7 @@ outputs:
     script: build_base.sh  # [unix]
     script: build_base.bat  # [win]
     build:
+      skip: true # [not (osx and x86_64)]
       number: {{ build_number }}
       activate_in_script: true
       # Windows has issues updating python if conda is using files itself.
@@ -180,18 +182,19 @@ outputs:
         - binutils_impl_{{ target_platform }}  # [linux]
 {% endif %}
       host:
-        - bzip2 {{ bzip2 }}
-        - sqlite {{ sqlite }}
-        - xz {{ xz }}
-        - zlib {{ zlib }}
-        - openssl {{ openssl }}
-        - readline {{ readline }} # [not win]
-        - tk {{ tk }}
-        - ncurses 6.4 # [unix]
-        - libffi {{ libffi }}
+         - bzip2
+        - sqlite
+        - xz
+        - zlib
+        - openssl
+        - readline  # [not win]
+        - tk
+        - ncurses  # [unix]
+        - libffi 3.4
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
-        - libuuid 1.41.5 # [linux]
+        - libuuid  # [linux]
       run:
+        - libffi >=3.4,<3.5
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
 {% if 'conda-forge' in channel_targets %}
@@ -278,6 +281,7 @@ outputs:
     script: build_static.sh  # [unix]
     script: build_static.bat  # [win]
     build:
+      skip: true # [not (osx and x86_64)]
       number: {{ build_number }}
       activate_in_script: true
 {% if 'conda-forge' in channel_targets %}
