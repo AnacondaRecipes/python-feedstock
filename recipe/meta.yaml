@@ -80,6 +80,7 @@ source:
       {% if (openssl | string).startswith('1.1.1') %}
       - patches/0028-Use-OpenSSL-1_1-instead-of-3.patch
       {% endif %}
+      - patches/0029-Override-configure-LIBFFI
 
 build:
   number: {{ build_number }}
