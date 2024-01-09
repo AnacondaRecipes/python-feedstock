@@ -248,11 +248,13 @@ _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
 _common_configure_args+=(--with-platlibdir=lib)
 
-if [ "$READLINE_MODE" = editline ]; then
+if [[ "${READLINE_MODE}" = readline ]]; then
+  _common_configure_args+=(--with-readline=readline)
+elif [[ "${READLINE_MODE}" = editline ]]; then
   _common_configure_args+=(--with-readline=editline)
-elif [ "$READLINE_MODE" = none ]; then
+elif [[ "${READLINE_MODE}" = none ]]; then
   _common_configure_args+=(--without-readline)
-fi  
+fi
 
 # Add more optimization flags for the static Python interpreter:
 declare -a PROFILE_TASK=()
@@ -459,7 +461,7 @@ pushd "${PREFIX}"/lib/python${VER}
   # Remove osx sysroot as it depends on the build machine
   sed -i.bak "s@-isysroot @@g" sysconfigfile
   # make sure $CONDA_BUILD_SYSROOT is not empty ...
-  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then 
+  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then
     sed -i.bak "s@$CONDA_BUILD_SYSROOT @@g" sysconfigfile
   fi
   # Remove unfilled config option

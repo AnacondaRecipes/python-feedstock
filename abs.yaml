@@ -4,3 +4,10 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
+
+aggregate_check: false
+
+channels:
+  - norl
+
+upload_without_merge: true

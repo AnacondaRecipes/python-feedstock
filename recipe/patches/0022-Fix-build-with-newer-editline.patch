@@ -1,0 +1,102 @@
+From 53122bcf825681487226c041d47763e82e081530 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Mon, 9 Oct 2023 16:01:00 +0200
+Subject: [PATCH] [3.12] gh-109191: Fix build with newer editline (gh-110239)
+ (gh-110562)
+
+gh-109191: Fix build with newer editline (gh-110239)
+(cherry picked from commit f4cb0d27cc08f490c42a22e646eb73cc7072d54a)
+
+Co-authored-by: Bo Anderson <mail@boanderson.me>
+---
+ ...-10-05-11-46-20.gh-issue-109191.imUkVN.rst |  1 +
+ Modules/readline.c                            |  2 +-
+ configure                                     | 19 +++++++++++++++++++
+ configure.ac                                  |  7 +++++++
+ pyconfig.h.in                                 |  3 +++
+ 5 files changed, 31 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Build/2023-10-05-11-46-20.gh-issue-109191.imUkVN.rst
+
+diff --git a/Misc/NEWS.d/next/Build/2023-10-05-11-46-20.gh-issue-109191.imUkVN.rst b/Misc/NEWS.d/next/Build/2023-10-05-11-46-20.gh-issue-109191.imUkVN.rst
+new file mode 100644
+index 00000000000000..27e5df790bc0c6
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2023-10-05-11-46-20.gh-issue-109191.imUkVN.rst
+@@ -0,0 +1 @@
++Fix compile error when building with recent versions of libedit.
+diff --git a/Modules/readline.c b/Modules/readline.c
+index 2824105a187586..9823ebe71da3a5 100644
+--- a/Modules/readline.c
++++ b/Modules/readline.c
+@@ -442,7 +442,7 @@ readline_set_completion_display_matches_hook_impl(PyObject *module,
+        default completion display. */
+     rl_completion_display_matches_hook =
+         readlinestate_global->completion_display_matches_hook ?
+-#if defined(_RL_FUNCTION_TYPEDEF)
++#if defined(HAVE_RL_COMPDISP_FUNC_T)
+         (rl_compdisp_func_t *)on_completion_display_matches_hook : 0;
+ #else
+         (VFunction *)on_completion_display_matches_hook : 0;
+diff --git a/configure b/configure
+index b6f90bcd8c7300..985b3741349e8e 100755
+--- a/configure
++++ b/configure
+@@ -25345,6 +25345,25 @@ printf "%s\n" "#define HAVE_RL_APPEND_HISTORY 1" >>confdefs.h
+ 
+ fi
+ 
++    # in readline as well as newer editline (April 2023)
++    ac_fn_c_check_type "$LINENO" "rl_compdisp_func_t" "ac_cv_type_rl_compdisp_func_t" "
++      #include <stdio.h> /* Must be first for Gnu Readline */
++      #ifdef WITH_EDITLINE
++      # include <editline/readline.h>
++      #else
++      # include <readline/readline.h>
++      # include <readline/history.h>
++      #endif
++
++"
++if test "x$ac_cv_type_rl_compdisp_func_t" = xyes
++then :
++
++printf "%s\n" "#define HAVE_RL_COMPDISP_FUNC_T 1" >>confdefs.h
++
++fi
++
++
+ 
+ 
+ CFLAGS=$save_CFLAGS
+diff --git a/configure.ac b/configure.ac
+index ba768aea930714..2a7a91882640fd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6213,6 +6213,13 @@ AS_VAR_IF([with_readline], [no], [
+       AC_DEFINE([HAVE_RL_APPEND_HISTORY], [1], [Define if readline supports append_history])
+     ])
+ 
++    # in readline as well as newer editline (April 2023)
++    AC_CHECK_TYPE([rl_compdisp_func_t],
++                  [AC_DEFINE([HAVE_RL_COMPDISP_FUNC_T], [1],
++                             [Define if readline supports rl_compdisp_func_t])],
++                  [],
++                  [readline_includes])
++
+     m4_undefine([readline_includes])
+   ])dnl WITH_SAVE_ENV()
+ ])
+diff --git a/pyconfig.h.in b/pyconfig.h.in
+index ada9dccfef1084..9f858b2d3541d0 100644
+--- a/pyconfig.h.in
++++ b/pyconfig.h.in
+@@ -989,6 +989,9 @@
+ /* Define if you can turn off readline's signal handling. */
+ #undef HAVE_RL_CATCH_SIGNAL
+ 
++/* Define if readline supports rl_compdisp_func_t */
++#undef HAVE_RL_COMPDISP_FUNC_T
++
+ /* Define if you have readline 2.2 */
+ #undef HAVE_RL_COMPLETION_APPEND_CHARACTER
+ 
