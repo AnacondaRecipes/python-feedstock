@@ -1,0 +1,95 @@
+From a2fccb5e07017f32e116678ab0bf310abb494fdb Mon Sep 17 00:00:00 2001
+From: Rafael Martins <rmartins@anaconda.com>
+Date: Thu, 1 Feb 2024 23:09:15 +0100
+Subject: [PATCH] Fix build with newer editline
+
+---
+ Modules/readline.c |  2 +-
+ configure          | 17 +++++++++++++++++
+ configure.ac       | 14 ++++++++++++++
+ pyconfig.h.in      |  3 +++
+ 4 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/Modules/readline.c b/Modules/readline.c
+index 1d50672..236b11c 100644
+--- a/Modules/readline.c
++++ b/Modules/readline.c
+@@ -438,7 +438,7 @@ readline_set_completion_display_matches_hook_impl(PyObject *module,
+        default completion display. */
+     rl_completion_display_matches_hook =
+         readlinestate_global->completion_display_matches_hook ?
+-#if defined(_RL_FUNCTION_TYPEDEF)
++#if defined(HAVE_RL_COMPDISP_FUNC_T)
+         (rl_compdisp_func_t *)on_completion_display_matches_hook : 0;
+ #else
+         (VFunction *)on_completion_display_matches_hook : 0;
+diff --git a/configure b/configure
+index 4b71c4e..d5c0e1c 100755
+--- a/configure
++++ b/configure
+@@ -16158,6 +16158,23 @@ if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+ 
+ $as_echo "#define HAVE_RL_APPEND_HISTORY 1" >>confdefs.h
+ 
++fi
++
++
++  # in readline as well as newer editline (April 2023)
++  ac_fn_c_check_type "$LINENO" "rl_compdisp_func_t" "ac_cv_type_rl_compdisp_func_t" "
++#include <stdio.h> /* Must be first for Gnu Readline */
++#ifdef WITH_EDITLINE
++# include <editline/readline.h>
++#else
++# include <readline/readline.h>
++#endif
++
++"
++if test "x$ac_cv_type_rl_compdisp_func_t" = xyes; then :
++
++$as_echo "#define HAVE_RL_COMPDISP_FUNC_T 1" >>confdefs.h
++
+ fi
+ 
+ fi
+diff --git a/configure.ac b/configure.ac
+index ac3be38..87af1e4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5060,6 +5060,20 @@ if test "$py_cv_lib_readline" = yes; then
+   AC_CHECK_LIB($LIBREADLINE, append_history,
+     AC_DEFINE(HAVE_RL_APPEND_HISTORY, 1,
+       [Define if readline supports append_history]),,$READLINE_LIBS)
++
++  # in readline as well as newer editline (April 2023)
++  AC_CHECK_TYPE([rl_compdisp_func_t],
++                [AC_DEFINE([HAVE_RL_COMPDISP_FUNC_T], [1],
++                           [Define if readline supports rl_compdisp_func_t])],
++                [],
++                [
++#include <stdio.h> /* Must be first for Gnu Readline */
++#ifdef WITH_EDITLINE
++# include <editline/readline.h>
++#else
++# include <readline/readline.h>
++#endif
++                ])
+ fi
+ 
+ # End of readline checks: restore LIBS
+diff --git a/pyconfig.h.in b/pyconfig.h.in
+index 57c84e5..6d4f5fc 100644
+--- a/pyconfig.h.in
++++ b/pyconfig.h.in
+@@ -866,6 +866,9 @@
+ /* Define if you can turn off readline's signal handling. */
+ #undef HAVE_RL_CATCH_SIGNAL
+ 
++/* Define if readline supports rl_compdisp_func_t */
++#undef HAVE_RL_COMPDISP_FUNC_T
++
+ /* Define if you have readline 2.2 */
+ #undef HAVE_RL_COMPLETION_APPEND_CHARACTER
+ 
+-- 
+2.39.2 (Apple Git-143)
+

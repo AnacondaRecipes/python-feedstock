@@ -81,11 +81,12 @@ if sys.platform != 'win32':
     import fcntl
     import grp
     import nis
-    import readline
     import resource
     import syslog
     import termios
 
+if os.environ["READLINE_MODE"] != 'none':
+    import readline
 
 if not (armv6l or armv7l or ppc64le or osx105):
     import tkinter

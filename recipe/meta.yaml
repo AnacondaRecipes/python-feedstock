@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "0" %}
+{% set build_number = 1 %}
 {% set channel_targets = ('abc', 'def')  %}
 
 # this makes the linter happy
@@ -36,6 +36,10 @@
 {% else %}
   {% set py_interp_debug = "no" %}
 {% endif %}
+
+{% set rl_string = "" %}       # [win or readline_mode == 'readline']
+{% set rl_string = "el_" %}    # [not win and readline_mode == 'editline']
+{% set rl_string = "norl_" %}  # [not win and readline_mode == 'none']
 
 package:
   name: python-split
@@ -87,9 +91,11 @@ source:
       {% if (openssl | string).startswith('3.0') %}
       - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
+      - patches/0027-Fix-build-with-newer-editline.patch
 
 build:
-  number: {{ build_number }}
+  number: {{ build_number + 100 }}  # [win or readline_mode == 'readline']
+  number: {{ build_number }}        # [not(win or readline_mode == 'readline')]
 
 requirements:
   build:
@@ -106,7 +112,9 @@ outputs:
     script: build_base.sh  # [unix]
     script: build_base.bat  # [win]
     build:
-      number: {{ build_number }}
+      number: {{ build_number + 200 }}  # [win or readline_mode == 'readline']
+      number: {{ build_number + 100 }}  # [not win and readline_mode == 'editline']
+      number: {{ build_number }}        # [not win and readline_mode == 'none']
       activate_in_script: true
       # Windows has issues updating python if conda is using files itself.
       # Copy rather than link.
@@ -127,13 +135,13 @@ outputs:
       #   - lib/python{{ ver2 }}/lib-dynload/_hashlib.cpython-{{ ver2nd }}-x86_64-linux-gnu.so  # [linux]
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard
-      skip: true  # [win and int(float(vc)) < 14]
+      skip: true  # [win and (int(float(vc)) < 14 or readline_mode != 'none')]
 {% if 'conda-forge' in channel_targets %}
       skip_compile_pyc:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
-      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
+      string: {{ dev_ }}h{{ PKG_HASH }}_{{ rl_string }}{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
+      string: h{{ PKG_HASH }}_{{ rl_string }}{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
 {% if 'conda-forge' in channel_targets %}
       run_exports:
         noarch:
@@ -144,6 +152,7 @@ outputs:
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - READLINE_MODE={{ readline_mode }}
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -193,7 +202,8 @@ outputs:
         - xz
         - zlib
         - openssl
-        - readline  # [not win]
+        - readline {{ readline }} # [readline_mode == 'readline']
+        - libedit # [readline_mode == 'editline']
         - tk
         - ncurses  # [unix]
         - libffi 3.4
@@ -290,15 +300,17 @@ outputs:
     script: build_static.sh  # [unix]
     script: build_static.bat  # [win]
     build:
-      number: {{ build_number }}
+      number: {{ build_number + 100 }}  # [win or readline_mode == 'readline']
+      number: {{ build_number }}        # [not(win or readline_mode == 'readline')]
       activate_in_script: true
 {% if 'conda-forge' in channel_targets %}
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython
+      string: h{{ PKG_HASH }}_{{ rl_string }}{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython
 {% else %}
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
+      string: h{{ PKG_HASH }}_{{ rl_string }}{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
 {% endif %}
+      skip: true  # [win and readline_mode != 'none']
     requirements:
       build:
         - {{ compiler('c') }}
