@@ -39,6 +39,15 @@
   {% set py_interp_debug = "no" %}
 {% endif %}
 
+# no-GIL, set using conda_build_config.yaml
+{% if gil_type is defined and gil_type == "disabled" %}
+  {% set py_gil_disabled = "yes" %}
+  {% set gil = "_nogil" %}
+{% else %}
+  {% set py_gil_disabled = "no" %}
+  {% set gil = "" %}
+{% endif %}
+
 package:
   name: python-split
   version: {{ version }}{{ dev }}
@@ -125,7 +134,7 @@ outputs:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
+      string: h{{ PKG_HASH }}{{ gil }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
 {% if 'conda-forge' in channel_targets %}
       run_exports:
         noarch:
@@ -136,6 +145,7 @@ outputs:
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - PY_GIL_DISABLED={{ py_gil_disabled }}
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -285,8 +295,10 @@ outputs:
         - python_abi
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython
 {% else %}
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
+      string: h{{ PKG_HASH }}{{ gil }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
 {% endif %}
+      script_env:
+        - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
       build:
         - {{ compiler('c') }}
