@@ -62,8 +62,15 @@ else
   DBG=
 fi
 
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+  # This Python will not be usable with non-free threading Python modules.
+  THREAD=t
+else
+  THREAD=
+fi
+
 ABIFLAGS=${DBG}
-VERABI=${VER}${DBG}
+VERABI=${VER}${DBG}${THREAD}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -249,6 +256,10 @@ _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
 _common_configure_args+=(--with-platlibdir=lib)
 # TODO build libmpdec as a conda package, https://www.bytereef.org/mpdecimal/
 _common_configure_args+=(--with-system-libmpdec=no)
+
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+    _common_configure_args+=(--disable-gil)
+fi
 
 # Add more optimization flags for the static Python interpreter:
 declare -a PROFILE_TASK=()
