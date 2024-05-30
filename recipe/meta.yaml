@@ -43,9 +43,11 @@
 {% if gil_type is defined and gil_type == "disabled" %}
   {% set py_gil_disabled = "yes" %}
   {% set gil = "_nogil" %}
+  {% set gil_abi = "t" %}
 {% else %}
   {% set py_gil_disabled = "no" %}
   {% set gil = "" %}
+  {% set gil_abi = "" %}
 {% endif %}
 
 package:
@@ -322,9 +324,9 @@ outputs:
       commands:
         - pushd tests                 # [unix]
         - pushd prefix-replacement    # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a  # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a  # [unix]
-        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}/config-${PKG_VERSION%.*}-darwin/libpython${PKG_VERSION%.*}.a  # [osx]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ gil_abi }}.a  # [unix]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ gil_abi }}.nolto.a  # [unix]
+        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}/config-${PKG_VERSION%.*}{{ gil_abi }}-darwin/libpython${PKG_VERSION%.*}{{ gil_abi }}.a  # [osx]
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - popd    # [unix]
