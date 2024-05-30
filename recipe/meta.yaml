@@ -273,7 +273,11 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        - cmake -GNinja -DPY_VER={{ version }}
+       # TODO: cmake does not know about the free-threading ABI and fails to
+       # identify libpython3.13t.dylib as a valid PythonLibs target.
+       # Skip this test for the time being.
+       # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
+       #- cmake -GNinja -DPY_VER={{ version }}
               # --trace --debug-output --debug-trycompile .
         - popd
         - popd
