@@ -10,8 +10,13 @@ if [[ ${DEBUG_PY} == yes ]]; then
 else
   DBG=
 fi
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+  THREAD=t
+else
+  THREAD=
+fi
 VER=${PKG_VERSION%.*}
-VERABI=${VER}${DBG}
+VERABI=${VER}${DBG}${THREAD}
 
 case "$target_platform" in
   linux-64)
@@ -30,9 +35,9 @@ esac
 
 cp -pf ${_buildd_static}/libpython${VERABI}.a ${PREFIX}/lib/libpython${VERABI}.a
 if [[ ${HOST} =~ .*linux.* ]]; then
-  pushd ${PREFIX}/lib/python${VERABI}/config-${VERABI}-${OLD_HOST}
+  pushd ${PREFIX}/lib/python${VER}/config-${VERABI}-${OLD_HOST}
 elif [[ ${HOST} =~ .*darwin.* ]]; then
-  pushd ${PREFIX}/lib/python${VERABI}/config-${VERABI}-darwin
+  pushd ${PREFIX}/lib/python${VER}/config-${VERABI}-darwin
 fi
 ln -s ../../libpython${VERABI}.a libpython${VERABI}.a
 popd
