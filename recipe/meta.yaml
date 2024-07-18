@@ -90,7 +90,6 @@ source:
       - patches/0018-Unvendor-expat.patch
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
-      - patches/0030-skip_broken_tests_nogil.patch  # [gil_type == "disabled"]
 
 build:
   number: {{ build_number }}
