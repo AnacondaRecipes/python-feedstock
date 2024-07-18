@@ -223,7 +223,7 @@ fi
 if [[ ${target_platform} == osx-64 ]]; then
   export MACHDEP=darwin
   export ac_sys_system=Darwin
-  export ac_sys_release=13.4.0
+  export ac_sys_release=20.0.0
   export MACOSX_DEFAULT_ARCH=x86_64
   export ARCHFLAGS="-arch x86_64"
   export CFLAGS="$CFLAGS $ARCHFLAGS"
