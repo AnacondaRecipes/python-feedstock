@@ -199,7 +199,7 @@ fi
 if [[ ${target_platform} == osx-64 ]]; then
   export MACHDEP=darwin
   export ac_sys_system=Darwin
-  export ac_sys_release=13.4.0
+  export ac_sys_release=20.0.0
   export MACOSX_DEFAULT_ARCH=x86_64
   # TODO: check with LLVM 12 if the following hack is needed.
   # https://reviews.llvm.org/D76461 may have fixed the need for the following hack.

@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "0" %}
+{% set build_number = "1" %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
 {% set bootstrap = "false" %}
