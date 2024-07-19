@@ -137,13 +137,11 @@ outputs:
 {% endif %}
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
       string: h{{ PKG_HASH }}{{ gil }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
-{% if 'conda-forge' in channel_targets %}
       run_exports:
         noarch:
           - python
         weak:
-          - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}
-{% endif %}
+          - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}{{ gil_abi }}
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
