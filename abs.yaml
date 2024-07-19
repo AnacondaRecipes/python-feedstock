@@ -4,3 +4,4 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
+aggregate_branch: update_macos_machine
