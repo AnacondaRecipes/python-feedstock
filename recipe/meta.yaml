@@ -135,6 +135,8 @@ outputs:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython_{{ abi_tag }}
+      track_features:     # [gil_type == "disabled"]
+        - free-threading  # [gil_type == "disabled"]
       run_exports:
         noarch:
           - python
