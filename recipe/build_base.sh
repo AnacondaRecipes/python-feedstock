@@ -525,3 +525,9 @@ fi
 # Workaround for old conda versions which fail to install noarch packages for Python 3.10+
 # https://github.com/conda/conda/issues/10969
 ln -s "${PREFIX}/lib/python${VERABI}" "${PREFIX}/lib/python3.1"
+
+# Workaround for old conda versions which fail to install noarch packages into the free-threading lib directory
+# https://github.com/conda/conda/issues/14053
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+    ln -s "${PREFIX}/lib/python${VERABI}" "${PREFIX}/lib/python${VER}"
+fi
