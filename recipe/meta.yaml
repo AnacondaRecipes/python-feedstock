@@ -42,13 +42,12 @@
 # no-GIL, set using conda_build_config.yaml
 {% if gil_type is defined and gil_type == "disabled" %}
   {% set py_gil_disabled = "yes" %}
-  {% set gil = "_nogil" %}
-  {% set gil_abi = "t" %}
+  {% set abi_suffix = "t" %}
 {% else %}
   {% set py_gil_disabled = "no" %}
-  {% set gil = "" %}
-  {% set gil_abi = "" %}
+  {% set abi_suffix = "" %}
 {% endif %}
+{% set abi_tag = "cp" + ver2nd + abi_suffix %}
 
 package:
   name: python-split
@@ -135,13 +134,12 @@ outputs:
       skip_compile_pyc:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
-      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
-      string: h{{ PKG_HASH }}{{ gil }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
+      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython_{{ abi_tag }}
       run_exports:
         noarch:
           - python
         weak:
-          - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}{{ gil_abi }}
+          - python_abi {{ ver2 }}.* *_{{ abi_tag }}
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
@@ -294,13 +292,9 @@ outputs:
     build:
       number: {{ build_number }}
       activate_in_script: true
-{% if 'conda-forge' in channel_targets %}
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython
-{% else %}
-      string: h{{ PKG_HASH }}{{ gil }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
-{% endif %}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython_{{ abi_tag }}
       script_env:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
@@ -326,9 +320,9 @@ outputs:
       commands:
         - pushd tests                 # [unix]
         - pushd prefix-replacement    # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ gil_abi }}.a  # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ gil_abi }}.nolto.a  # [unix]
-        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}{{ gil_abi }}/config-${PKG_VERSION%.*}{{ gil_abi }}-darwin/libpython${PKG_VERSION%.*}{{ gil_abi }}.a  # [osx]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [unix]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.nolto.a  # [unix]
+        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}{{ abi_suffix }}/config-${PKG_VERSION%.*}{{ abi_suffix }}-darwin/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [osx]
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - popd    # [unix]
