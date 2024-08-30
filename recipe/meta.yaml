@@ -233,7 +233,6 @@ outputs:
         - set  # [win]
         - python -V
         - python3 -V            # [not win]
-        - 2to3 -h
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -258,12 +257,9 @@ outputs:
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
-        - if exist %PREFIX%\\Scripts\\2to3 exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
-        - if not exist %PREFIX%\\Scripts\\2to3-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
-        - if not exist %PREFIX%\\Scripts\\2to3.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
         - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1  # [win]
         - pushd tests
