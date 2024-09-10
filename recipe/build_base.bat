@@ -3,6 +3,7 @@ echo on
 
 :: Compile python, extensions and external libraries
 if "%ARCH%"=="64" (
+   set PreferredToolArchitecture=x64
    set PLATFORM=x64
    set VC_PATH=x64
    set BUILD_PATH=amd64
