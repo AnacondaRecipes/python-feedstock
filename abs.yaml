@@ -4,3 +4,6 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
+
+channels:
+  - https://staging.continuum.io/prefect/fs/vs2022-feedstock/pr2/c631724
