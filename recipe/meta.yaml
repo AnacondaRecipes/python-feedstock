@@ -89,6 +89,7 @@ source:
       - patches/0018-Unvendor-expat.patch
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
+      - patches/0022-Unvendor-libmpdec.patch
 
 build:
   number: {{ build_number }}
@@ -200,6 +201,7 @@ outputs:
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
+        - libmpdec-devel
         - expat {{ expat }}
       run:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
