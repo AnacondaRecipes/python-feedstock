@@ -70,7 +70,7 @@ else
 fi
 
 ABIFLAGS=${DBG}
-VERABI=${VER}${DBG}${THREAD}
+VERABI=${VER}${THREAD}${DBG}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -522,12 +522,5 @@ if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi
 
-# Workaround for old conda versions which fail to install noarch packages for Python 3.10+
-# https://github.com/conda/conda/issues/10969
-ln -s "${PREFIX}/lib/python${VERABI}" "${PREFIX}/lib/python3.1"
-
-# Workaround for old conda versions which fail to install noarch packages into the free-threading lib directory
-# https://github.com/conda/conda/issues/14053
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
-    ln -s "${PREFIX}/lib/python${VERABI}" "${PREFIX}/lib/python${VER}"
-fi
+# See ${RECIPE_DIR}/sitecustomize.py
+cp "${RECIPE_DIR}/sitecustomize.py" "${PREFIX}/lib/python${VERABI}/sitecustomize.py"
