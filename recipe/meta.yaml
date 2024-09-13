@@ -327,6 +327,26 @@ outputs:
         - popd    # [unix]
 {% endif %}
 
+  - name: python-freethreading
+    build:
+      noarch: generic
+{% if gil_type == "normal" %}
+      skip: True
+{% endif %}
+    requirements:
+      - python {{ version }}.*
+      - python_abi * *_{{ abi_tag }}
+
+  - name: python-gil
+    build:
+      noarch: generic
+{% if gil_type == "disabled" %}
+      skip: True
+{% endif %}
+    requirements:
+      - python {{ version }}.*
+      - python_abi * *_{{ abi_tag }}
+
 about:
   home: https://www.python.org/
   license: PSF-2.0
