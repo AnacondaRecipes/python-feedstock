@@ -204,6 +204,7 @@ outputs:
         - libmpdec-devel
         - expat {{ expat }}
       run:
+        - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
 {% if 'conda-forge' in channel_targets %}
