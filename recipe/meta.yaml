@@ -135,7 +135,7 @@ outputs:
       skip_compile_pyc:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
-      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython_{{ abi_tag }}
+      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       track_features:     # [gil_type == "disabled"]
         - free-threading  # [gil_type == "disabled"]
       run_exports:
@@ -294,7 +294,7 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython_{{ abi_tag }}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       script_env:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
