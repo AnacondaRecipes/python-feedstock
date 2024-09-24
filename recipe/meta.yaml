@@ -264,18 +264,23 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1  # [win]
+        - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
+        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
+{% if gil_type is defined and gil_type == "disabled" %}
        # TODO: cmake does not know about the free-threading ABI and fails to
        # identify libpython3.13t.dylib as a valid PythonLibs target.
        # Skip this test for the time being.
        # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
-       #- cmake -GNinja -DPY_VER={{ version }}
-              # --trace --debug-output --debug-trycompile .
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || true           # [unix]
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || type nul>nul   # [win]
+{% else %}
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
+{% endif %}
         - popd
         - popd
         - python run_test.py
