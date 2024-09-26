@@ -1,24 +1,18 @@
-From 717e6526e2f32877a9fad11c76df9674b2928424 Mon Sep 17 00:00:00 2001
-From: Nehal J Wani <nehaljw.kkd1@gmail.com>
-Date: Sat, 24 Nov 2018 20:38:02 -0600
-Subject: [PATCH 09/25] Unvendor openssl
+From 99a3ef23a45f3688cf6a78dbf2af78adfcd977c7 Mon Sep 17 00:00:00 2001
+From: Serhii Kupriienko <skupriienko@anaconda.com>
+Date: Tue, 24 Sep 2024 11:53:47 +0300
+Subject: [PATCH] Solve conflict
 
-Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
- Modules/_decimal/libmpdec/mpdecimal.c |  0
- PCbuild/_ssl.vcxproj                  |  3 --
- PCbuild/_ssl.vcxproj.filters          |  3 --
- PCbuild/openssl.props                 | 4 +-
- PCbuild/openssl.vcxproj               | 56 ---------------------------
- PCbuild/python.props                  | 21 +++++-----
- PCbuild/python.vcxproj                |  3 ++
- PCbuild/pythonw.vcxproj               |  3 ++
- 7 files changed, 19 insertions(+), 74 deletions(-)
- mode change 100644 => 100755 Modules/_decimal/libmpdec/mpdecimal.c
+ PCbuild/_ssl.vcxproj         |  3 --
+ PCbuild/_ssl.vcxproj.filters |  3 --
+ PCbuild/openssl.props        | 14 ++-------
+ PCbuild/openssl.vcxproj      | 56 ------------------------------------
+ PCbuild/python.props         | 21 +++++++-------
+ PCbuild/python.vcxproj       |  3 ++
+ PCbuild/pythonw.vcxproj      |  3 ++
+ 7 files changed, 19 insertions(+), 84 deletions(-)
 
-diff --git a/Modules/_decimal/libmpdec/mpdecimal.c b/Modules/_decimal/libmpdec/mpdecimal.c
-old mode 100644
-new mode 100755
 diff --git a/PCbuild/_ssl.vcxproj b/PCbuild/_ssl.vcxproj
 index 4907f49b662..b2c23d5e8cc 100644
 --- a/PCbuild/_ssl.vcxproj
@@ -64,6 +58,22 @@ index a4186f01da2..fc39a0105ab 100644
        <AdditionalDependencies>ws2_32.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
      </Link>
    </ItemDefinitionGroup>
+@@ -21,14 +21,4 @@
+     <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).dll" />
+     <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).pdb" />
+   </ItemGroup>
+-  <Target Name="_CopySSLDLL"
+-          Inputs="@(_SSLDLL)"
+-          Outputs="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')"
+-          Condition="$(SkipCopySSLDLL) == ''"
+-          AfterTargets="Build">
+-    <Copy SourceFiles="@(_SSLDLL)" DestinationFolder="$(OutDir)" />
+-  </Target>
+-  <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
+-    <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
+-  </Target>
+ </Project>
+\ No newline at end of file
 diff --git a/PCbuild/openssl.vcxproj b/PCbuild/openssl.vcxproj
 index 0da6f674958..17eee400ebb 100644
 --- a/PCbuild/openssl.vcxproj
@@ -201,3 +211,4 @@ index e23635e5ea9..525295c76ff 100644
      <ProjectReference Include="pythoncore.vcxproj">
 -- 
 2.46.0
+
