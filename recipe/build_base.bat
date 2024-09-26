@@ -132,9 +132,9 @@ for %%x in (idle pydoc) do (
 
 :: Populate the libs directory
 if not exist %PREFIX%\libs mkdir %PREFIX%\libs
-if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%_D%.lib %PREFIX%\libs\
+if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\libs\
 if errorlevel 1 exit 1
-if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%_D%.lib %PREFIX%\libs\
+if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\libs\
 if errorlevel 1 exit 1
 if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\libs\
 if errorlevel 1 exit 1
