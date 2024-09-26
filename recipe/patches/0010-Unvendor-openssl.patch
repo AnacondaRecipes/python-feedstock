@@ -1,8 +1,9 @@
-From 99a3ef23a45f3688cf6a78dbf2af78adfcd977c7 Mon Sep 17 00:00:00 2001
-From: Serhii Kupriienko <skupriienko@anaconda.com>
-Date: Tue, 24 Sep 2024 11:53:47 +0300
-Subject: [PATCH] Solve conflict
+From 717e6526e2f32877a9fad11c76df9674b2928424 Mon Sep 17 00:00:00 2001
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Date: Sat, 24 Nov 2018 20:38:02 -0600
+Subject: [PATCH 09/25] Unvendor openssl
 
+Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
  PCbuild/_ssl.vcxproj         |  3 --
  PCbuild/_ssl.vcxproj.filters |  3 --
@@ -13,10 +14,10 @@ Subject: [PATCH] Solve conflict
  PCbuild/pythonw.vcxproj      |  3 ++
  7 files changed, 19 insertions(+), 84 deletions(-)
 
-diff --git a/PCbuild/_ssl.vcxproj b/PCbuild/_ssl.vcxproj
-index 4907f49b662..b2c23d5e8cc 100644
---- a/PCbuild/_ssl.vcxproj
-+++ b/PCbuild/_ssl.vcxproj
+Index: CPython/PCbuild/_ssl.vcxproj
+===================================================================
+--- CPython.orig/PCbuild/_ssl.vcxproj	2023-12-14 17:40:12.222521230 -0600
++++ CPython/PCbuild/_ssl.vcxproj	2023-12-14 17:40:20.047423623 -0600
 @@ -99,9 +99,6 @@
    </ItemDefinitionGroup>
    <ItemGroup>
@@ -27,10 +28,10 @@ index 4907f49b662..b2c23d5e8cc 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
-diff --git a/PCbuild/_ssl.vcxproj.filters b/PCbuild/_ssl.vcxproj.filters
-index 716a69a41af..8aef9e03fcc 100644
---- a/PCbuild/_ssl.vcxproj.filters
-+++ b/PCbuild/_ssl.vcxproj.filters
+Index: CPython/PCbuild/_ssl.vcxproj.filters
+===================================================================
+--- CPython.orig/PCbuild/_ssl.vcxproj.filters	2023-12-14 17:35:21.991951190 -0600
++++ CPython/PCbuild/_ssl.vcxproj.filters	2023-12-14 17:40:20.047676583 -0600
 @@ -12,9 +12,6 @@
      <ClCompile Include="..\Modules\_ssl.c">
        <Filter>Source Files</Filter>
@@ -41,10 +42,10 @@ index 716a69a41af..8aef9e03fcc 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
-diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
-index a4186f01da2..fc39a0105ab 100644
---- a/PCbuild/openssl.props
-+++ b/PCbuild/openssl.props
+Index: CPython/PCbuild/openssl.props
+===================================================================
+--- CPython.orig/PCbuild/openssl.props	2023-12-14 17:40:12.223644781 -0600
++++ CPython/PCbuild/openssl.props	2023-12-14 17:40:20.047843251 -0600
 @@ -2,10 +2,10 @@
  <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
    <ItemDefinitionGroup>
@@ -74,10 +75,10 @@ index a4186f01da2..fc39a0105ab 100644
 -  </Target>
  </Project>
 \ No newline at end of file
-diff --git a/PCbuild/openssl.vcxproj b/PCbuild/openssl.vcxproj
-index 0da6f674958..17eee400ebb 100644
---- a/PCbuild/openssl.vcxproj
-+++ b/PCbuild/openssl.vcxproj
+Index: CPython/PCbuild/openssl.vcxproj
+===================================================================
+--- CPython.orig/PCbuild/openssl.vcxproj	2023-12-14 17:40:12.224467080 -0600
++++ CPython/PCbuild/openssl.vcxproj	2023-12-14 17:40:20.048039336 -0600
 @@ -60,64 +60,8 @@
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <Import Project="pyproject.props" />
@@ -143,10 +144,10 @@ index 0da6f674958..17eee400ebb 100644
    <Target Name="Clean" />
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
-diff --git a/PCbuild/python.props b/PCbuild/python.props
-index 49347c2b78d..292d412ff23 100644
---- a/PCbuild/python.props
-+++ b/PCbuild/python.props
+Index: CPython/PCbuild/python.props
+===================================================================
+--- CPython.orig/PCbuild/python.props	2023-12-14 17:40:20.048323797 -0600
++++ CPython/PCbuild/python.props	2023-12-14 17:44:29.935690032 -0600
 @@ -63,22 +63,23 @@
      <ExternalsDir Condition="$(ExternalsDir) == ''">$(EXTERNALS_DIR)</ExternalsDir>
      <ExternalsDir Condition="$(ExternalsDir) == ''">$([System.IO.Path]::GetFullPath(`$(PySourcePath)externals`))</ExternalsDir>
@@ -163,8 +164,8 @@ index 49347c2b78d..292d412ff23 100644
 -    <libffiDir Condition="$(libffiDir) == ''">$(ExternalsDir)libffi-3.4.4\</libffiDir>
 -    <libffiOutDir Condition="$(libffiOutDir) == ''">$(libffiDir)$(ArchName)\</libffiOutDir>
 -    <libffiIncludeDir Condition="$(libffiIncludeDir) == ''">$(libffiOutDir)include</libffiIncludeDir>
--    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.15\</opensslDir>
--    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.15\$(ArchName)\</opensslOutDir>
+-    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.13\</opensslDir>
+-    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.13\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir Condition="$(opensslIncludeDir) == ''">$(opensslOutDir)include</opensslIncludeDir>
 +    <!-- sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.45.1.0\</sqlite3Dir> -->
 +    <!-- bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir> -->
@@ -181,10 +182,10 @@ index 49347c2b78d..292d412ff23 100644
    </PropertyGroup>
  
    <PropertyGroup>
-diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
-index f4640454a73..c1810c7db2b 100644
---- a/PCbuild/python.vcxproj
-+++ b/PCbuild/python.vcxproj
+Index: CPython/PCbuild/python.vcxproj
+===================================================================
+--- CPython.orig/PCbuild/python.vcxproj	2023-12-14 17:40:12.226076385 -0600
++++ CPython/PCbuild/python.vcxproj	2023-12-14 17:40:20.048838759 -0600
 @@ -106,6 +106,9 @@
    </ItemGroup>
    <ItemGroup>
@@ -195,10 +196,10 @@ index f4640454a73..c1810c7db2b 100644
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
-diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
-index e23635e5ea9..525295c76ff 100644
---- a/PCbuild/pythonw.vcxproj
-+++ b/PCbuild/pythonw.vcxproj
+Index: CPython/PCbuild/pythonw.vcxproj
+===================================================================
+--- CPython.orig/PCbuild/pythonw.vcxproj	2023-12-14 17:40:12.226674890 -0600
++++ CPython/PCbuild/pythonw.vcxproj	2023-12-14 17:40:20.049048886 -0600
 @@ -98,6 +98,9 @@
    </ItemGroup>
    <ItemGroup>
@@ -209,6 +210,3 @@ index e23635e5ea9..525295c76ff 100644
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
--- 
-2.46.0
-
