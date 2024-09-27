@@ -42,28 +42,13 @@ index 716a69a41af..8aef9e03fcc 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
-index a4186f01da2..fc39a0105ab 100644
+index a4186f0..3d058d3 100644
 --- a/PCbuild/openssl.props
 +++ b/PCbuild/openssl.props
-@@ -2,10 +2,10 @@
- <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-   <ItemDefinitionGroup>
-     <ClCompile>
--      <AdditionalIncludeDirectories>$(opensslIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-+      <AdditionalIncludeDirectories>$(condaDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-     </ClCompile>
-     <Link>
--      <AdditionalLibraryDirectories>$(opensslOutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-+      <AdditionalLibraryDirectories>$(condaDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-       <AdditionalDependencies>ws2_32.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
-     </Link>
-   </ItemDefinitionGroup>
-@@ -21,14 +21,4 @@
-     <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).dll" />
-     <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).pdb" />
-   </ItemGroup>
--  <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
--    <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
+@@ -30,5 +30,4 @@
+   </Target>
+   <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
+     <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
 -  </Target>
  </Project>
 \ No newline at end of file
