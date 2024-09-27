@@ -62,13 +62,6 @@ index a4186f01da2..fc39a0105ab 100644
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).dll" />
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).pdb" />
    </ItemGroup>
--  <Target Name="_CopySSLDLL"
--          Inputs="@(_SSLDLL)"
--          Outputs="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')"
--          Condition="$(SkipCopySSLDLL) == ''"
--          AfterTargets="Build">
--    <Copy SourceFiles="@(_SSLDLL)" DestinationFolder="$(OutDir)" />
--  </Target>
 -  <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
 -    <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
 -  </Target>
