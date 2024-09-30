@@ -1,6 +1,6 @@
 python:
   - 3.8
-  - 3.8
-  - 3.8
+python_impl:
+  - cpython
 MACOSX_SDK_VERSION:            # [osx and arm64]
   - 11.1                       # [osx and arm64]
