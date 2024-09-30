@@ -59,7 +59,11 @@ Index: CPython/PCbuild/openssl.props
        <AdditionalDependencies>ws2_32.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
      </Link>
    </ItemDefinitionGroup>
-@@ -21,14 +21,4 @@
+diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
+index a4186f0..ca2989e 100644
+--- a/PCbuild/openssl.props
++++ b/PCbuild/openssl.props
+@@ -21,14 +21,6 @@
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).dll" />
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).pdb" />
    </ItemGroup>
@@ -72,7 +76,8 @@ Index: CPython/PCbuild/openssl.props
 -  </Target>
 -  <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
 -    <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
--  </Target>
++  <Target Name="_DummyTarget">
+   </Target>
  </Project>
 \ No newline at end of file
 Index: CPython/PCbuild/openssl.vcxproj
@@ -164,8 +169,8 @@ Index: CPython/PCbuild/python.props
 -    <libffiDir Condition="$(libffiDir) == ''">$(ExternalsDir)libffi-3.4.4\</libffiDir>
 -    <libffiOutDir Condition="$(libffiOutDir) == ''">$(libffiDir)$(ArchName)\</libffiOutDir>
 -    <libffiIncludeDir Condition="$(libffiIncludeDir) == ''">$(libffiOutDir)include</libffiIncludeDir>
--    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.13\</opensslDir>
--    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.13\$(ArchName)\</opensslOutDir>
+-    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.15\</opensslDir>
+-    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.15\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir Condition="$(opensslIncludeDir) == ''">$(opensslOutDir)include</opensslIncludeDir>
 +    <!-- sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.45.1.0\</sqlite3Dir> -->
 +    <!-- bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir> -->
