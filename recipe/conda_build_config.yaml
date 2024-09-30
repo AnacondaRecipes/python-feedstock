@@ -4,3 +4,7 @@ python:
   - 3.8
 MACOSX_SDK_VERSION:            # [osx and arm64]
   - 11.1                       # [osx and arm64]
+c_compiler:
+  - vs2022                     # [win]
+cxx_compiler:
+  - vs2022                     # [win]
