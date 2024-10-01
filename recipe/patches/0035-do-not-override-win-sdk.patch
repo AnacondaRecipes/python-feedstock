@@ -1,0 +1,28 @@
+From 710f54918fd44eca1522bb8e2234aa3e8493ec39 Mon Sep 17 00:00:00 2001
+From: Charles Bousseau <cbousseau@anaconda.com>
+Date: Tue, 1 Oct 2024 15:56:25 +0200
+Subject: [PATCH] do not override win sdk
+
+The python build looks at the registry to find the latest win sdk installed.
+If that SDK is too recent, version 10.0.19041.0 is forced. 
+However, our build does not use the most recent sdk, which makes this check incorrect.
+---
+ PCbuild/python.props | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/PCbuild/python.props b/PCbuild/python.props
+index 68cfb67b445..c3df6577aca 100644
+--- a/PCbuild/python.props
++++ b/PCbuild/python.props
+@@ -114,7 +114,7 @@
+     <_RegistryVersion Condition="$(_RegistryVersion) != '' and !$(_RegistryVersion.EndsWith('.0'))">$(_RegistryVersion).0</_RegistryVersion>
+ 
+     <!-- Avoid upgrading to Windows 11 SDK for now, but assume the latest Win10 SDK is installed -->
+-    <_RegistryVersion Condition="$([System.Version]::Parse($(_RegistryVersion))) >= $([System.Version]::Parse(`10.0.22000.0`))">10.0.19041.0</_RegistryVersion>
++    <!-- <_RegistryVersion Condition="$([System.Version]::Parse($(_RegistryVersion))) >= $([System.Version]::Parse(`10.0.22000.0`))">10.0.19041.0</_RegistryVersion> -->
+ 
+     <!-- The minimum allowed SDK version to use for building -->
+     <DefaultWindowsSDKVersion>10.0.10586.0</DefaultWindowsSDKVersion>
+-- 
+2.40.1
+

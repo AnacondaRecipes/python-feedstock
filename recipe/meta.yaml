@@ -53,6 +53,7 @@ source:
       {% if (openssl | string).startswith('3.0') %}
       - patches/0034-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
+      - patches/0035-do-not-override-win-sdk.patch
 
   # TODO :: Depend on our own packages for these:
   - url: https://github.com/python/cpython-source-deps/archive/xz-5.2.2.zip          # [win]
