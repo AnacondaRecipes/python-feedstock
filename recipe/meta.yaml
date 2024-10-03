@@ -202,7 +202,7 @@ outputs:
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
-        - libmpdec-devel
+        - libmpdec-devel 4.0.0
         - expat {{ expat }}
       run:
         - python_abi * *_{{ abi_tag }}
