@@ -176,13 +176,6 @@ rd /s /q %PREFIX%\Lib\test
 if errorlevel 1 exit 1
 move %PREFIX%\Lib\test_keep %PREFIX%\Lib\test
 if errorlevel 1 exit 1
-rd /s /q %PREFIX%\Lib\lib2to3\tests\
-if errorlevel 1 exit 1
-
-:: bytecode compile the standard library
-
-rd /s /q %PREFIX%\Lib\lib2to3\tests\
-if errorlevel 1 exit 1
 
 :: We need our Python to be found!
 if "%_D%" neq "" copy %PREFIX%\python%_D%.exe %PREFIX%\python.exe
@@ -190,9 +183,6 @@ if "%EXE_T%" neq "" copy %PREFIX%\python%EXE_T%.exe %PREFIX%\python.exe
 
 %PREFIX%\python.exe -Wi %PREFIX%\Lib\compileall.py -f -q -x "bad_coding|badsyntax|py2_" %PREFIX%\Lib
 if errorlevel 1 exit 1
-
-:: Pickle lib2to3 Grammar
-%PREFIX%\python.exe -m lib2to3 --help
 
 :: Ensure that scripts are generated
 :: https://github.com/conda-forge/python-feedstock/issues/384
