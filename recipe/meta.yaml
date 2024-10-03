@@ -1,4 +1,4 @@
-{% set version = "3.8.19" %}
+{% set version = "3.8.20" %}
 {% set linkage_nature = os.environ.get('PY_INTERP_LINKAGE_NATURE', '') %}
 {% set debug = os.environ.get('PY_INTERP_DEBUG', '') %}
 {% if linkage_nature != '' %}
@@ -16,7 +16,7 @@ package:
 
 source:
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}.tar.xz
-    sha256: d2807ac69f69b84fd46a0b93bbd02a4fa48d3e70f4b2835ff0f72a2885040076
+    sha256: 6fb89a7124201c61125c0ab4cf7f6894df339a40c02833bfd28ab4d7691fafb4
     patches:
       - patches/0001-Fix-off-by-one-error-in-_winapi_WaitForMultipleObjec.patch
 {% if 'conda-forge' not in channel_targets %}
@@ -53,6 +53,7 @@ source:
       {% if (openssl | string).startswith('3.0') %}
       - patches/0034-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
+      - patches/0035-do-not-override-win-sdk.patch
 
   # TODO :: Depend on our own packages for these:
   - url: https://github.com/python/cpython-source-deps/archive/xz-5.2.2.zip          # [win]
