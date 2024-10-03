@@ -249,7 +249,6 @@ _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
 _common_configure_args+=(--with-platlibdir=lib)
-# TODO build libmpdec as a conda package, https://www.bytereef.org/mpdecimal/
 _common_configure_args+=(--with-system-libmpdec=yes)
 
 if [[ ${PY_GIL_DISABLED} == yes ]]; then
