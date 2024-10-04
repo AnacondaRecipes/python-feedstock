@@ -42,11 +42,6 @@ else
   _OPTIMIZED=yes
 fi
 
-# Since these take very long to build in our emulated ci, disable for now
-if [[ ${target_platform} == linux-aarch64 ]]; then
-  _OPTIMIZED=no
-fi
-
 if [[ ${target_platform} == linux-ppc64le ]]; then
   _OPTIMIZED=no
   # ppc64le cdt need to be rebuilt with files in powerpc64le-conda-linux-gnu instead of powerpc64le-conda_cos7-linux-gnu. In the mean time:
@@ -62,8 +57,15 @@ else
   DBG=
 fi
 
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+  # This Python will not be usable with non-free threading Python modules.
+  THREAD=t
+else
+  THREAD=
+fi
+
 ABIFLAGS=${DBG}
-VERABI=${VER}${DBG}
+VERABI=${VER}${THREAD}${DBG}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -74,7 +76,7 @@ test "${PY_VER}" = "${VER}"
 unset _PYTHON_SYSCONFIGDATA_NAME
 unset _CONDA_PYTHON_SYSCONFIGDATA_NAME
 
-# Prevent lib/python${VER}/_sysconfigdata_*.py from ending up with full paths to these things
+# Prevent lib/python${VERABI}/_sysconfigdata_*.py from ending up with full paths to these things
 # in _build_env because _build_env will not get found during prefix replacement, only _h_env_placeh ...
 AR=$(basename "${AR}")
 
@@ -247,6 +249,11 @@ _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
 _common_configure_args+=(--with-platlibdir=lib)
+_common_configure_args+=(--with-system-libmpdec=yes)
+
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+    _common_configure_args+=(--disable-gil)
+fi
 
 # Add more optimization flags for the static Python interpreter:
 declare -a PROFILE_TASK=()
@@ -372,15 +379,15 @@ fi
 SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
-    > ${PREFIX}/lib/python${VER}/$(basename ${SYSCONFIG})
-MAKEFILE=$(find ${PREFIX}/lib/python${VER}/ -path "*config-*/Makefile" -print0)
+    > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
+MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${MAKEFILE}
 # Check to see that our differences took.
-# echo diff -urN ${SYSCONFIG} ${PREFIX}/lib/python${VER}/$(basename ${SYSCONFIG})
-# diff -urN ${SYSCONFIG} ${PREFIX}/lib/python${VER}/$(basename ${SYSCONFIG})
+# echo diff -urN ${SYSCONFIG} ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
+# diff -urN ${SYSCONFIG} ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
 
 # Python installs python${VER}m and python${VER}, one as a hardlink to the other. conda-build breaks these
 # by copying. Since the executable may be static it may be very large so change one to be a symlink
@@ -392,12 +399,12 @@ fi
 ln -s ${PREFIX}/bin/python${VER} ${PREFIX}/bin/python
 ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
 # Workaround for https://github.com/conda/conda/issues/10969
-ln -s ${PREFIX}/bin/python3.12 ${PREFIX}/bin/python3.1
+ln -s ${PREFIX}/bin/python3.13 ${PREFIX}/bin/python3.1
 
 # Remove test data to save space
 # Though keep `support` as some things use that.
 # TODO :: Make a subpackage for this once we implement multi-level testing.
-pushd ${PREFIX}/lib/python${VER}
+pushd ${PREFIX}/lib/python${VERABI}
   mkdir test_keep
   mv test/__init__.py test/support test/test_support* test/test_script_helper* test_keep/
   rm -rf test */test
@@ -410,7 +417,7 @@ pushd ${PREFIX}
     chmod +w lib/libpython${VERABI}.a
     ${STRIP} -S lib/libpython${VERABI}.a
   fi
-  CONFIG_LIBPYTHON=$(find lib/python${VER}/config-${VERABI}* -name "libpython${VERABI}.a")
+  CONFIG_LIBPYTHON=$(find lib/python${VERABI}/config-${VERABI}* -name "libpython${VERABI}.a")
   if [[ -f lib/libpython${VERABI}.a ]] && [[ -f ${CONFIG_LIBPYTHON} ]]; then
     chmod +w ${CONFIG_LIBPYTHON}
     rm ${CONFIG_LIBPYTHON}
@@ -436,7 +443,7 @@ esac
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
-pushd "${PREFIX}"/lib/python${VER}
+pushd "${PREFIX}"/lib/python${VERABI}
   # On Python 3.5 _sysconfigdata.py was getting copied in here and compiled for some reason.
   # This breaks our attempt to find the right one as recorded_name.
   find lib-dynload -name "_sysconfigdata*.py*" -exec rm {} \;
@@ -504,11 +511,10 @@ if [[ ${HOST} =~ .*linux.* ]]; then
 fi
 
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
-rm ${PREFIX}/lib/libpython${VER}.a
+rm ${PREFIX}/lib/libpython${VERABI}.a
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi
 
-# Workaround for old conda versions which fail to install noarch packages for Python 3.10+
-# https://github.com/conda/conda/issues/10969
-ln -s "${PREFIX}/lib/python3.12" "${PREFIX}/lib/python3.1"
+# See ${RECIPE_DIR}/sitecustomize.py
+cp "${RECIPE_DIR}/sitecustomize.py" "${PREFIX}/lib/python${VERABI}/sitecustomize.py"

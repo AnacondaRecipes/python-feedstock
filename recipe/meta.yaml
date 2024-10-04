@@ -1,10 +1,10 @@
-{% set version = "3.12.5" %}
-{% set dev = "" %}
+{% set version = "3.13.0" %}
+{% set dev = "rc3" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "1" %}
+{% set build_number = 0 %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
 {% set bootstrap = "false" %}
@@ -39,6 +39,17 @@
   {% set py_interp_debug = "no" %}
 {% endif %}
 
+# no-GIL, set using conda_build_config.yaml
+{% if gil_type is defined and gil_type == "disabled" %}
+  {% set py_gil_disabled = "yes" %}
+  {% set abi_suffix = "t" %}
+{% else %}
+  {% set py_gil_disabled = "no" %}
+  {% set abi_suffix = "" %}
+  {% set build_number = build_number + 100 %}
+{% endif %}
+{% set abi_tag = "cp" + ver2nd + abi_suffix %}
+
 package:
   name: python-split
   version: {{ version }}{{ dev }}
@@ -50,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: fa8a2e12c5e620b09f53e65bcd87550d2e5a1e2e04bf8ba991dcc55113876397
+    sha256: c8bc790185af1cb77b75c01cbc1aa642dfdcf97a370d2d10090bc7baa70da57e
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -79,6 +90,7 @@ source:
       - patches/0018-Unvendor-expat.patch
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
+      - patches/0022-Unvendor-libmpdec.patch
 
 build:
   number: {{ build_number }}
@@ -124,18 +136,18 @@ outputs:
       skip_compile_pyc:
         - '*.py'            # [build_platform != target_platform]
 {% endif %}
-      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython  # ["conda-forge" in (channel_targets or "")]
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}  # ["conda-forge" not in (channel_targets or "")]
-{% if 'conda-forge' in channel_targets %}
+      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      track_features:     # [gil_type == "disabled"]
+        - free-threading  # [gil_type == "disabled"]
       run_exports:
         noarch:
           - python
         weak:
-          - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}
-{% endif %}
+          - python_abi {{ ver2 }}.* *_{{ abi_tag }}
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - PY_GIL_DISABLED={{ py_gil_disabled }}
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -190,8 +202,10 @@ outputs:
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
+        - libmpdec-devel 4.0.0
         - expat {{ expat }}
       run:
+        - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
 {% if 'conda-forge' in channel_targets %}
@@ -223,7 +237,6 @@ outputs:
         - set  # [win]
         - python -V
         - python3 -V            # [not win]
-        - 2to3 -h
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -248,27 +261,32 @@ outputs:
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
-        - if exist %PREFIX%\\Scripts\\2to3 exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
-        - if not exist %PREFIX%\\Scripts\\2to3-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
-        - if not exist %PREFIX%\\Scripts\\2to3.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1  # [win]
+        - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
+        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        - cmake -GNinja -DPY_VER={{ version }}
-              # --trace --debug-output --debug-trycompile .
+{% if gil_type is defined and gil_type == "disabled" %}
+       # TODO: cmake does not know about the free-threading ABI and fails to
+       # identify libpython3.13t.dylib as a valid PythonLibs target.
+       # Skip this test for the time being.
+       # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || true           # [unix]
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || type nul>nul   # [win]
+{% else %}
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
+{% endif %}
         - popd
         - popd
         - python run_test.py
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
-        - test -d "$PREFIX/lib/python3.1/site-packages"  # [unix]
         - python3.1 --version  # [unix]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
@@ -280,13 +298,11 @@ outputs:
     build:
       number: {{ build_number }}
       activate_in_script: true
-{% if 'conda-forge' in channel_targets %}
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_cpython
-{% else %}
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}
-{% endif %}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      script_env:
+        - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
       build:
         - {{ compiler('c') }}
@@ -310,13 +326,33 @@ outputs:
       commands:
         - pushd tests                 # [unix]
         - pushd prefix-replacement    # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a  # [unix]
-        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a  # [unix]
-        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}/config-${PKG_VERSION%.*}-darwin/libpython${PKG_VERSION%.*}.a  # [osx]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [unix]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.nolto.a  # [unix]
+        - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}{{ abi_suffix }}/config-${PKG_VERSION%.*}{{ abi_suffix }}-darwin/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [osx]
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - popd    # [unix]
 {% endif %}
+
+  - name: python-freethreading
+    build:
+      noarch: generic
+{% if gil_type == "normal" %}
+      skip: True
+{% endif %}
+    requirements:
+      - python {{ version }}.*
+      - python_abi * *_{{ abi_tag }}
+
+  - name: python-gil
+    build:
+      noarch: generic
+{% if gil_type == "disabled" %}
+      skip: True
+{% endif %}
+    requirements:
+      - python {{ version }}.*
+      - python_abi * *_{{ abi_tag }}
 
 about:
   home: https://www.python.org/

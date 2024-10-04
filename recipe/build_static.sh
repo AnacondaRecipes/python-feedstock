@@ -10,8 +10,13 @@ if [[ ${DEBUG_PY} == yes ]]; then
 else
   DBG=
 fi
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
+  THREAD=t
+else
+  THREAD=
+fi
 VER=${PKG_VERSION%.*}
-VERABI=${VER}${DBG}
+VERABI=${VER}${DBG}${THREAD}
 
 case "$target_platform" in
   linux-64)
