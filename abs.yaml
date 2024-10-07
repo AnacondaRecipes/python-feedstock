@@ -4,7 +4,3 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
-
-# until release, 3.13 beta and rc go to ad-testing/label/py313
-upload_channels:
-  ad-testing: py313
