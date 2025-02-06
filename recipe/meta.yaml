@@ -1,4 +1,4 @@
-{% set version = "3.12.8" %}
+{% set version = "3.12.9" %}
 {% set build_number = "0" %}
 
 {% set dev = "" %}
@@ -52,7 +52,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: c909157bb25ec114e5869124cc2a9c4a4d4c1e957ca4ff553f1edc692101154e
+    sha256: 7220835d9f90b37c006e9842a8dff4580aaca4318674f947302b8d28f3f81112
 {% endif %}
     patches:
       - patches/0000-branding.patch
