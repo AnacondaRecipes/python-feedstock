@@ -1,0 +1,13 @@
+# the conda-build parameters to use for disabling --skip-existing
+build_parameters:
+  - "--suppress-variables"
+  #- "--skip-existing"
+  - "--error-overlinking"
+  - "--error-overdepending"
+
+aggregate_check: false
+
+channels:
+  - norl
+
+upload_without_merge: true
