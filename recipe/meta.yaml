@@ -1,4 +1,4 @@
-{% set version = "3.13.2" %}
+{% set version = "3.13.3" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: d984bcc57cd67caab26f7def42e523b1c015bbc5dc07836cf4f0b63fa159eb56
+    sha256: 40f868bcbdeb8149a3149580bb9bfd407b3321cd48f0be631af955ac92c0e041
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -77,7 +77,7 @@ source:
       - patches/0007-Add-CondaEcosystemModifyDllSearchPath.patch
       - patches/0008-Doing-d1trimfile.patch
       # https://github.com/python/cpython/pull/23523
-      - patches/0009-cross-compile-darwin.patch
+      - patches/0009-Allow-cross-compiling-for-Darwin.patch
       - patches/0010-Fix-TZPATH-on-windows.patch
       # https://github.com/python/cpython/pull/24324
       - patches/0011-Make-dyld-search-work-with-SYSTEM_VERSION_COMPAT-1.patch
@@ -118,7 +118,10 @@ outputs:
         - DLLs/_ctypes.pyd  # [win]
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
-        - {{ compiler('cxx') }}  # [unix]
+        - {{ compiler('cxx') }}  # [unix]        
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11
+        - xorg-xorgproto
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -177,8 +180,6 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - sed  # [unix]
-        - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
-        - {{ cdt('libx11-devel') }}  # [linux]
         - make  # [not win]
         - libtool  # [unix]
         - pkg-config  # [not win]
@@ -198,6 +199,9 @@ outputs:
         - openssl {{ openssl }}
         - readline {{ readline }} # [not win]
         - tk {{ tk }}
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
         - ncurses 6.4 # [unix]
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]

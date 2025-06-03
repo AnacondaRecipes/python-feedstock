@@ -1,7 +1,7 @@
-From 1a4191e435d45d8790546929817ed8c4ad18d5a5 Mon Sep 17 00:00:00 2001
+From 3be7cda6e0b58051fcf761a694fd6065dc9d84a1 Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
-Subject: [PATCH] branding
+Subject: [PATCH 01/22] branding
 
 ---
  Lib/platform.py     | 2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH] branding
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/platform.py b/Lib/platform.py
-index 5958382276..64b50068bb 100755
+index 8895177e326..df25c2c04b4 100755
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
-@@ -1190,7 +1190,7 @@ def _sys_version(sys_version=None):
+@@ -1191,7 +1191,7 @@ def _sys_version(sys_version=None):
      else:
          # CPython
          cpython_sys_version_parser = re.compile(
@@ -22,7 +22,7 @@ index 5958382276..64b50068bb 100755
              r'\(#?([^,]+)'  # "(#buildno"
              r'(?:,\s*([\w ]*)'  # ", builddate"
 diff --git a/Python/getversion.c b/Python/getversion.c
-index 226b2f999a..0c7ff16325 100644
+index 226b2f999a6..0c7ff163257 100644
 --- a/Python/getversion.c
 +++ b/Python/getversion.c
 @@ -6,7 +6,7 @@
@@ -46,6 +46,3 @@ index 226b2f999a..0c7ff16325 100644
  #endif
      PyOS_snprintf(version, sizeof(version), buildinfo_format,
                    PY_VERSION, Py_GetBuildInfo(), Py_GetCompiler());
--- 
-2.39.3 (Apple Git-146)
-

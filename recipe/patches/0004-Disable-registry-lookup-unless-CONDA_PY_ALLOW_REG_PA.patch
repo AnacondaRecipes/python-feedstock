@@ -1,7 +1,7 @@
-From 16990721bbde2c53abd58f490a847c8827f8d6d0 Mon Sep 17 00:00:00 2001
+From 27c50d3e1469817ec1cd8379118484f4689f427b Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 27 Oct 2018 18:48:30 +0100
-Subject: [PATCH 04/21] Disable registry lookup unless CONDA_PY_ALLOW_REG_PATHS
+Subject: [PATCH 05/22] Disable registry lookup unless CONDA_PY_ALLOW_REG_PATHS
  is not 0
 
 Co-authored-by: Isuru Fernando<isuruf@gmail.com>
@@ -13,7 +13,7 @@ Co-authored-by: Isuru Fernando<isuruf@gmail.com>
  create mode 100644 PC/getpathp.c
 
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index abed139028..d5d89409f1 100644
+index d0128b20fae..e7cfeba25ec 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
 @@ -945,6 +945,7 @@ _PyConfig_InitPathConfig(PyConfig *config, int compute_path_config)
@@ -25,10 +25,10 @@ index abed139028..d5d89409f1 100644
          !progname_to_dict(dict, "real_executable") ||
          !library_to_dict(dict, "library") ||
 diff --git a/Modules/getpath.py b/Modules/getpath.py
-index bc7053224a..16d00c2281 100644
+index 1f1bfcb4f64..344900c05e7 100644
 --- a/Modules/getpath.py
 +++ b/Modules/getpath.py
-@@ -51,6 +51,7 @@
+@@ -52,6 +52,7 @@
  # ENV_PYTHONHOME          -- [in] getenv(...)
  # ENV_PYTHONEXECUTABLE    -- [in] getenv(...)
  # ENV___PYVENV_LAUNCHER__ -- [in] getenv(...)
@@ -36,7 +36,7 @@ index bc7053224a..16d00c2281 100644
  
  # ** Values calculated at runtime **
  # config            -- [in/out] dict of the PyConfig structure
-@@ -679,7 +680,7 @@ def search_up(prefix, *landmarks, test=isfile):
+@@ -681,7 +682,7 @@ def search_up(prefix, *landmarks, test=isfile):
      else:
          pythonpath.append(joinpath(prefix, ZIP_LANDMARK))
  
@@ -47,7 +47,7 @@ index bc7053224a..16d00c2281 100644
          # {HKCU,HKLM}\Software\Python\PythonCore\{winver}\PythonPath
 diff --git a/PC/getpathp.c b/PC/getpathp.c
 new file mode 100644
-index 0000000000..a73ea8a0e9
+index 00000000000..a73ea8a0e91
 --- /dev/null
 +++ b/PC/getpathp.c
 @@ -0,0 +1,1145 @@
@@ -1196,6 +1196,3 @@ index 0000000000..a73ea8a0e9
 +    }
 +    return hPython3 != NULL;
 +}
--- 
-2.39.3 (Apple Git-146)
-
