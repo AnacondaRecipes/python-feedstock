@@ -1,10 +1,10 @@
-{% set version = "3.9.21" %}
+{% set version = "3.9.23" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "1" %}
+{% set build_number = "0" %}
 {% set channel_targets = ('abc', 'def')  %}
 
 # Sanitize build system env. var tweak parameters
@@ -44,7 +44,7 @@ source:
     git_tag: v{{ version }}{{ dev }}
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
-    sha256: 3126f59592c9b0d798584755f2bf7b081fa1ca35ce7a6fea980108d752a05bb1
+    sha256: 61a42919e13d539f7673cf11d1c404380e28e540510860b9d242196e165709c9
 {% endif %}
     patches:
       ## - patches/0000-Fix-off-by-one-error-in-_winapi_WaitForMultipleObjec.patch
@@ -75,6 +75,12 @@ source:
       - patches/0023-egg-debugging-with-Windows-debug-builds.patch
       # - patches/0024-Add-CONDA_DLL_SEARCH_MODIFICATION_KEEP_GIL-to-aid-de.patch
       - patches/0025-cross-compile-darwin.patch
+      - patches/0026-Unvendor-bzip2.patch
+      - patches/0027-Unvendor-libffi.patch
+      - patches/0028-Unvendor-tcltk.patch
+      - patches/0029-unvendor-xz.patch
+      - patches/0030-unvendor-zlib.patch
+      - patches/0031-Unvendor-expat.patch
       - patches/0032-Fix-TZPATH-on-windows.patch
       - patches/0033-gh24324.patch
       - patches/0034-have-pyunicode-decodeunicodeescape.patch
@@ -86,37 +92,6 @@ source:
 {% if 'conda-forge' not in channel_targets %}
       - patches/9999-Add-Anaconda-Distribution-version-logic.patch  # [not win]
 {% endif %}
-
-  # TODO :: Depend on our own packages for these:
-  - url: https://github.com/python/cpython-source-deps/archive/xz-5.2.5.zip          # [win]
-    folder: externals/xz-5.2.5                                                       # [win]
-    sha256: 6a4389cc05143beb2679b1299cecee71b02baa55e70f68a88b44dc01ad495424         # [win]
-  # Not used as of 3.7b3 (tcltk from cpython-bin- is), but kept for archival and license reasons.
-  - url: https://github.com/python/cpython-source-deps/archive/tcl-core-8.6.12.0.zip  # [win]
-    folder: externals/tcl-core-8.6.12.0                                               # [win]
-    sha256: 0682e059dd2ec77b16384a98a65b93e5e719958863506b37235a3a26e9f47773         # [win]
-  # Not used as of 3.7b3 (tcltk from cpython-bin- is), but kept for archival and license reasons.
-  - url: https://github.com/python/cpython-source-deps/archive/tk-8.6.12.0.zip        # [win]
-    folder: externals/tk-8.6.12.0                                                     # [win]
-    sha256: 7d61434b941b395526b09f65273212df86681afc835b36494ca7c5bd9d8d3d50         # [win]
-  - url: https://github.com/python/cpython-bin-deps/archive/tcltk-8.6.12.0.zip       # [win]
-    folder: externals/tcltk-8.6.12.0                                                 # [win]
-    sha256: 3a55e9e9fcb754b5a484a22d54841153f7624dd30f7b0c81b1cb05f38e2b5216         # [win]
-  - url: https://github.com/python/cpython-source-deps/archive/tix-8.4.3.6.zip       # [win]
-    folder: externals/tix-8.4.3.6                                                    # [win]
-    sha256: e558e3dc5e67ac0942f8fceafce00ca46b177da9ebeaf38ec7fafd9b9913ac56         # [win]
-  - url: https://github.com/python/cpython-source-deps/archive/bzip2-1.0.8.zip       # [win]
-    folder: externals/bzip2-1.0.8                                                    # [win]
-    sha256: 12c17d15f99e27235529574a722fb484a4e8fdf2427cef53b1b68bdf07e404a9         # [win]
-  - url: https://github.com/python/cpython-source-deps/archive/zlib-1.3.1.zip       # [win]
-    folder: externals/zlib-1.3.1                                                    # [win]
-    sha256: a8f166f0f819ff084042554f39d763c41de5f19f8e9cdc68bc3e7f373cfba036         # [win]
-  - url: https://github.com/python/cpython-bin-deps/archive/nasm-2.11.06.zip         # [win]
-    folder: externals/nasm-2.11.06                                                   # [win]
-    sha256: de3c87b26a80e789986d8e6950c6304175d3829afe9c6c7211eb7257266ab0ac         # [win]
-  - url: https://github.com/python/cpython-bin-deps/archive/libffi-3.3.0.zip         # [win]
-    folder: externals/libffi-3.3.0                                                   # [win]
-    sha256: 69e3f7235108a75033cb9325a0a3535ba271d144ec66fccefe134eda27d7bcfe         # [win]
 
 build:
   number: {{ build_number }}
@@ -158,6 +133,9 @@ outputs:
         - gxx_linux-ppc64le  # [linuxppc64le]
         - gxx_linux-s390x    # [linuxs390x]
         - libstdcxx-ng       # [linux and aarch64]
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -219,8 +197,6 @@ outputs:
         - {{ ccache('native') }}  # [unix]
         - ripgrep
         - sed  # [unix]
-        - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
-        - {{ cdt('libx11-devel') }}  # [linux]
         - {{ cdt('libuuid-devel') }}  # [linux and not (ppc64le or aarch64)]
         - make  # [not win]
         - libtool  # [unix]
@@ -232,19 +208,22 @@ outputs:
         - binutils_impl_{{ target_platform }}  # [linux]
 {% endif %}
       host:
-        - bzip2  # [not win]
-        - sqlite
-        - xz     # [not win]
+        - bzip2 {{ bzip2 }}
+        - sqlite {{ sqlite }}
+        - xz {{ xz }}
         - unzip  # [not win]
-        - zlib   # [not win]
-        - openssl
-        - readline  # [not win]
-        - tk  # [not win]
+        - zlib {{ zlib }}
+        - openssl {{ openssl }}
+        - readline {{ readline }} # [not win]
+        - tk {{ tk }}
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
         - ncurses  # [unix]
-        - libffi 3.4   # [not win]
+        - libffi {{ libffi }}
         - ld_impl_{{ target_platform }}  # [linux]
+        - expat {{ expat }}
       run:
-        - libffi >=3.4,<3.5   # [not win]
         - ld_impl_{{ target_platform }}  # [linux]
         - tzdata
 {% if 'conda-forge' in channel_targets %}
