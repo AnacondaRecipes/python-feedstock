@@ -118,23 +118,11 @@ outputs:
       # Copy rather than link.
       no_link:
         - DLLs/_ctypes.pyd  # [win]
-      ignore_run_exports:   # [unix]
-        # We delete the shared bzip2 library
-        - bzip2             # [unix]
+      ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
-        # It would be nice to split ignore_run_exports into two:
-        # ignore_run_exports/from and ignore_run_exports/of, that way
-        # we could just use ignore_run_exports/from: {{ compiler('cxx') }}
-        # here instead of this nonsense:
-        - clangxx_osx-64  # [osx]
-        - clangxx_osx-aarch64  # [osxaarch64]
-        - gxx_linux-64  # [linux64]
-        - gxx_linux-aarch64  # [linux and aarch64]
-        - gxx_linux-ppc64le  # [linuxppc64le]
-        - gxx_linux-s390x    # [linuxs390x]
-        - libstdcxx-ng       # [linux and aarch64]
+        - {{ compiler('cxx') }}  # [unix]        
         # These two are just to get the headers needed for tk.h, but is unused
-        - xorg-libx11  # [linux]
+        - xorg-libx11     # [linux]
         - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
