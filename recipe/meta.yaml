@@ -120,8 +120,8 @@ outputs:
         # C++ only installed so CXX is defined for distutils/sysconfig.
         - {{ compiler('cxx') }}  # [unix]        
         # These two are just to get the headers needed for tk.h, but is unused
-        - xorg-libx11
-        - xorg-xorgproto
+        - xorg-libx11         # [linux]
+        - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
