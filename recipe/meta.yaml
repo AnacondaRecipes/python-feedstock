@@ -1,4 +1,4 @@
-{% set version = "3.12.9" %}
+{% set version = "3.12.11" %}
 {% set build_number = "0" %}
 
 {% set dev = "" %}
@@ -52,16 +52,13 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 7220835d9f90b37c006e9842a8dff4580aaca4318674f947302b8d28f3f81112
+    sha256: c30bb24b7f1e9a19b11b55a546434f74e739bb4c271a3e3a80ff4380d49f7adb
 {% endif %}
     patches:
       - patches/0000-branding.patch
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
       - patches/0002-Win32-Do-not-download-externals.patch
       - patches/0003-Fix-find_library-so-that-it-looks-in-sys.prefix-lib-.patch
-      # https://github.com/python/cpython/pull/28397
-      # Patch doesn't apply, but is Debian-specific anyway.
-      # - patches/0008-bpo-22699-Allow-compiling-on-debian-ubuntu-with-a-di.patch
       - patches/0004-Disable-registry-lookup-unless-CONDA_PY_ALLOW_REG_PA.patch
       - patches/0005-Unvendor-openssl.patch
       - patches/0006-Unvendor-sqlite3.patch
@@ -81,6 +78,8 @@ source:
       - patches/0018-Unvendor-expat.patch
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
+      - patches/0022-Allow-linking-ncursesw-panelw-on-macOS-if-available.patch
+      - patches/0023-Do-not-define-pid_t-as-it-might-conflict-with-the-ac.patch
 
 build:
   number: {{ build_number }}
@@ -109,6 +108,9 @@ outputs:
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
         - {{ compiler('cxx') }}  # [unix]
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -167,8 +169,6 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - sed  # [unix]
-        - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
-        - {{ cdt('libx11-devel') }}  # [linux]
         - make  # [not win]
         - libtool  # [unix]
         - pkg-config  # [not win]
@@ -188,6 +188,9 @@ outputs:
         - openssl {{ openssl }}
         - readline {{ readline }} # [not win]
         - tk {{ tk }}
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
         - ncurses 6.4 # [unix]
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
@@ -196,11 +199,8 @@ outputs:
       run:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
-{% if 'conda-forge' in channel_targets %}
-        - ncurses  # [unix]
       run_constrained:
         - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}
-{% endif %}
     test:
 {% if 'conda-forge' in channel_targets %}
       downstreams:
@@ -274,6 +274,8 @@ outputs:
         - python3.1 --version  # [unix]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
+        # Test for wide character supported via ncursesw
+        - TERM=xterm >/dev/null python -c "import curses; scr = curses.initscr(); curses.unget_wch('x'); assert 'x' ==  scr.get_wch()"  # [unix]
 
 {% if bootstrap != "true" %}
   - name: libpython-static

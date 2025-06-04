@@ -1,7 +1,7 @@
-From 0f8e9aef6c845d89471aa936bb2ac75996256b9b Mon Sep 17 00:00:00 2001
+From 39c25affe5f1c9e2d2eea88e3bb47c4cefbb4070 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 16 Aug 2017 11:45:28 +0100
-Subject: [PATCH 24/24] Do not pass -g to GCC when not Py_DEBUG
+Subject: [PATCH 17/23] Do not pass -g to GCC when not Py_DEBUG
 
 This bloats our exe and our modules a lot.
 ---
@@ -10,10 +10,10 @@ This bloats our exe and our modules a lot.
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/configure b/configure
-index 2b863be108..c0c12acda1 100755
+index c82e082b4a0..89a608e08b3 100755
 --- a/configure
 +++ b/configure
-@@ -4898,9 +4898,9 @@ if test "$ac_test_CFLAGS" = set; then
+@@ -5469,9 +5469,9 @@ if test $ac_test_CFLAGS; then
    CFLAGS=$ac_save_CFLAGS
  elif test $ac_cv_prog_cc_g = yes; then
    if test "$GCC" = yes; then
@@ -25,7 +25,7 @@ index 2b863be108..c0c12acda1 100755
    fi
  else
    if test "$GCC" = yes; then
-@@ -8553,7 +8553,7 @@ then
+@@ -9352,7 +9352,7 @@ then
  	    if test "$Py_DEBUG" = 'true' ; then
  		OPT="-g $PYDEBUG_CFLAGS -Wall"
  	    else
@@ -35,10 +35,10 @@ index 2b863be108..c0c12acda1 100755
  	    ;;
  	*)
 diff --git a/configure.ac b/configure.ac
-index 786d3414eb..cd2943acf6 100644
+index 24d7c29aabf..8ed2b866754 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2215,7 +2215,7 @@ then
+@@ -2279,7 +2279,7 @@ then
  	    if test "$Py_DEBUG" = 'true' ; then
  		OPT="-g $PYDEBUG_CFLAGS -Wall"
  	    else
@@ -47,6 +47,3 @@ index 786d3414eb..cd2943acf6 100644
  	    fi
  	    ;;
  	*)
--- 
-2.32.1 (Apple Git-133)
-
