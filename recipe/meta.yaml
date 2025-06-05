@@ -1,4 +1,4 @@
-{% set version = "3.11.11" %}
+{% set version = "3.11.13" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -50,7 +50,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3
+    sha256: 8fb5f9fbc7609fa822cb31549884575db7fd9657cbffb89510b5d7975963a83a
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -88,6 +88,7 @@ source:
       {% if (openssl | string).startswith('1.1.1') %}
       - patches/0026-Use-OpenSSL-1_1-instead-of-3.patch
       {% endif %}
+      - patches/0027-Unvendor-expat.patch
 
 build:
   number: {{ build_number }}
@@ -116,6 +117,9 @@ outputs:
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
         - {{ compiler('cxx') }}  # [unix]
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -173,8 +177,6 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - sed  # [unix]
-        - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
-        - {{ cdt('libx11-devel') }}  # [linux]
         - make  # [not win]
         - libtool  # [unix]
         - pkg-config  # [not win]
@@ -194,10 +196,14 @@ outputs:
         - openssl
         - readline  # [not win]
         - tk
+        # These two are just to get the headers needed for tk.h, but is unused
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
         - ncurses  # [unix]
         - libffi 3.4
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid  # [linux]
+        - expat {{ expat }}
       run:
         - libffi >=3.4,<3.5
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
