@@ -75,12 +75,6 @@ test "${PY_VER}" = "${VER}"
 unset _PYTHON_SYSCONFIGDATA_NAME
 unset _CONDA_PYTHON_SYSCONFIGDATA_NAME
 
-# Remove bzip2's shared library if present,
-# as we only want to link to it statically.
-# This is important in cases where conda
-# tries to update bzip2.
-find "${PREFIX}/lib" -name "libbz2*${SHLIB_EXT}*" | xargs rm -fv {}
-
 # Prevent lib/python${VER}/_sysconfigdata_*.py from ending up with full paths to these things
 # in _build_env because _build_env will not get found during prefix replacement, only _h_env_placeh ...
 AR=$(basename "${AR}")
@@ -267,6 +261,7 @@ _common_configure_args+=(--with-ensurepip=no)
 _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-ffi)
+_common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
