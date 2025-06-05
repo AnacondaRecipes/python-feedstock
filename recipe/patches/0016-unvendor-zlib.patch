@@ -1,7 +1,7 @@
-From 7752b6b98f2d8a9f88e8c32b032877654dadf28a Mon Sep 17 00:00:00 2001
+From 41612968e57ecae50198fdb7f97c68c68c99e952 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
-Subject: [PATCH 25/25] unvendor zlib
+Subject: [PATCH 16/23] unvendor zlib
 
 ---
  PCbuild/pythoncore.vcxproj         | 33 ++-------------
@@ -9,7 +9,7 @@ Subject: [PATCH 25/25] unvendor zlib
  2 files changed, 4 insertions(+), 95 deletions(-)
 
 diff --git a/PCbuild/pythoncore.vcxproj b/PCbuild/pythoncore.vcxproj
-index c4cb39c821..2161449eab 100644
+index 9390c4d7d76..b36c48abb36 100644
 --- a/PCbuild/pythoncore.vcxproj
 +++ b/PCbuild/pythoncore.vcxproj
 @@ -82,7 +82,7 @@
@@ -37,7 +37,7 @@ index c4cb39c821..2161449eab 100644
      </Link>
    </ItemDefinitionGroup>
    <ItemGroup>
-@@ -330,19 +331,6 @@
+@@ -353,19 +354,6 @@
      <ClInclude Include="..\Python\stdlib_module_names.h" />
      <ClInclude Include="..\Python\thread_nt.h" />
    </ItemGroup>
@@ -57,7 +57,7 @@ index c4cb39c821..2161449eab 100644
    <ItemGroup>
      <ClCompile Include="..\Modules\_abc.c" />
      <ClCompile Include="..\Modules\_bisectmodule.c" />
-@@ -542,19 +530,6 @@
+@@ -577,19 +565,6 @@
    </ItemGroup>
    <ItemGroup Condition="$(IncludeExternals)">
      <ClCompile Include="..\Modules\zlibmodule.c" />
@@ -78,10 +78,10 @@ index c4cb39c821..2161449eab 100644
    <ItemGroup>
      <ClCompile Include="..\PC\dl_nt.c" />
 diff --git a/PCbuild/pythoncore.vcxproj.filters b/PCbuild/pythoncore.vcxproj.filters
-index e3fe9271dd..334cb226e2 100644
+index 67a32f653de..9c064964b55 100644
 --- a/PCbuild/pythoncore.vcxproj.filters
 +++ b/PCbuild/pythoncore.vcxproj.filters
-@@ -651,39 +651,6 @@
+@@ -717,39 +717,6 @@
      <ClInclude Include="..\Include\internal\pycore_unionobject.h">
        <Filter>Include\internal</Filter>
      </ClInclude>
@@ -121,7 +121,7 @@ index e3fe9271dd..334cb226e2 100644
      <ClInclude Include="..\Include\internal\pycore_structseq.h">
        <Filter>Include\internal</Filter>
      </ClInclude>
-@@ -1208,39 +1175,6 @@
+@@ -1307,39 +1274,6 @@
      <ClCompile Include="..\Modules\_contextvarsmodule.c">
        <Filter>Modules</Filter>
      </ClCompile>
@@ -161,6 +161,3 @@ index e3fe9271dd..334cb226e2 100644
      <ClCompile Include="..\Python\hamt.c">
        <Filter>Python</Filter>
      </ClCompile>
--- 
-2.32.1 (Apple Git-133)
-
