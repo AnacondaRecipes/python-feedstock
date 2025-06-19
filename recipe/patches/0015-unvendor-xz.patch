@@ -1,14 +1,14 @@
-From a77e9e4513e9c2e85ea106cbde7d3b669f36e27d Mon Sep 17 00:00:00 2001
+From e251031e7ef2e06994620aaf4bf30721e170eb47 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Sat, 25 Sep 2021 10:07:05 -0700
-Subject: [PATCH 16/22] unvendor xz
+Subject: [PATCH 15/22] unvendor xz
 
 ---
  PCbuild/_lzma.vcxproj | 10 +++-------
  1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/PCbuild/_lzma.vcxproj b/PCbuild/_lzma.vcxproj
-index 321f41d8d27..bd7d6c64b10 100644
+index 321f41d8d27..6811fd1709e 100644
 --- a/PCbuild/_lzma.vcxproj
 +++ b/PCbuild/_lzma.vcxproj
 @@ -93,15 +93,15 @@
@@ -41,3 +41,6 @@ index 321f41d8d27..bd7d6c64b10 100644
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
+-- 
+2.39.5 (Apple Git-154)
+

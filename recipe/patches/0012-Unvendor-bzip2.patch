@@ -1,7 +1,7 @@
-From 14478b1496481d6cb9acde6325a3a6f26f6fb180 Mon Sep 17 00:00:00 2001
+From b91e4b7f2ab182759b9f84f7875aaef3208e8e48 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 16 Aug 2021 02:56:27 -0700
-Subject: [PATCH 13/22] Unvendor bzip2
+Subject: [PATCH 12/22] Unvendor bzip2
 
 ---
  PCbuild/_bz2.vcxproj         | 15 +++++----------
@@ -85,3 +85,6 @@ index 7c0b5162537..c1f960608c3 100644
        <Filter>Header Files\bzip2</Filter>
      </ClInclude>
    </ItemGroup>
+-- 
+2.39.5 (Apple Git-154)
+

@@ -398,8 +398,10 @@ if [[ -f ${PREFIX}/bin/python${VER}m ]]; then
 fi
 ln -s ${PREFIX}/bin/python${VER} ${PREFIX}/bin/python
 ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
-# Workaround for https://github.com/conda/conda/issues/10969
-ln -s ${PREFIX}/bin/python3.13 ${PREFIX}/bin/python3.1
+# Workaround for https://github.com/conda/conda/issues/10969 -
+# specifically for conda<=4.10
+# https://github.com/conda/conda/issues/11423#issuecomment-1104253815
+ln -s ${PREFIX}/bin/python3.14 ${PREFIX}/bin/python3.1
 
 # Remove test data to save space
 # Though keep `support` as some things use that.

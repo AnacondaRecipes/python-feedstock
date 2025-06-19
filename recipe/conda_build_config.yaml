@@ -1,5 +1,5 @@
 python:
-  - 3.13
+  - 3.14
 python_impl:
   - cpython
 numpy:

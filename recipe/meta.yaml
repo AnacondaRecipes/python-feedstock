@@ -1,5 +1,5 @@
-{% set version = "3.13.5" %}
-{% set dev = "" %}
+{% set version = "3.14.0" %}
+{% set dev = "b2" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
@@ -61,10 +61,9 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 93e583f243454e6e9e4588ca2c2662206ad961659863277afcdb96801647d640
+    sha256: 7ac9e84844bbc0a5a8f1f79a37a68b3b8caf2a58b4aa5999c49227cb36e70ea6
 {% endif %}
     patches:
-      - patches/0000-branding.patch
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
       - patches/0002-Win32-Do-not-download-externals.patch
       - patches/0003-Fix-find_library-so-that-it-looks-in-sys.prefix-lib-.patch
@@ -91,6 +90,7 @@ source:
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
       - patches/0022-Unvendor-libmpdec.patch
+      - patches/0023-branding.patch
 
 build:
   number: {{ build_number }}
@@ -195,6 +195,7 @@ outputs:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
         - xz {{ xz }}
+        - zlib-ng {{ zlib_ng }}
         - zlib {{ zlib }}
         - openssl {{ openssl }}
         - readline {{ readline }} # [not win]
@@ -208,6 +209,7 @@ outputs:
         - libuuid 1.41.5 # [linux]
         - libmpdec-devel 4.0.0
         - expat {{ expat }}
+        - zstd 1.5.6
       run:
         - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
