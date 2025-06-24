@@ -1,7 +1,7 @@
-From d9535423ad32a0dfb33f2f41d4013f196a7d8092 Mon Sep 17 00:00:00 2001
+From b940ba1889a9cee03c3b5f9c5d7a46bdfb2e42cf Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 16 Aug 2021 03:07:40 -0700
-Subject: [PATCH 14/22] Unvendor libffi
+Subject: [PATCH 13/21] Unvendor libffi
 
 ---
  PCbuild/libffi.props | 17 ++++-------------
@@ -34,6 +34,5 @@ index 22c9550e2c0..40ddb08d2b0 100644
 -  <Target Name="_CleanLIBFFIDLL" BeforeTargets="Clean">
 -    <Delete Files="@(_LIBFFIDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
 -  </Target>
--</Project>
+ </Project>
 \ No newline at end of file
-+</Project>

@@ -1,7 +1,7 @@
-From 539b014ee0738478475ee6332d320830dbe79463 Mon Sep 17 00:00:00 2001
+From c02504903c369ab1d35fd9c30257b0256305c16d Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Thu, 26 Nov 2020 18:47:37 +0000
-Subject: [PATCH 09/22] Allow cross compiling for Darwin
+Subject: [PATCH 09/21] Allow cross compiling for Darwin
 
 ---
  configure    | 3 +++

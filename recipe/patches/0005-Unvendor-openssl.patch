@@ -1,16 +1,16 @@
-From 310bb28a5bdd7bc2bb9bda56c78d535d987b7eb1 Mon Sep 17 00:00:00 2001
+From b8062de7c0f2d8f970ea4721eb1a16f79d408494 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
-Subject: [PATCH 05/22] Unvendor openssl
+Subject: [PATCH 05/21] Unvendor openssl
 
 Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
  PCbuild/openssl.props   | 14 ++------------
  PCbuild/openssl.vcxproj | 32 --------------------------------
- PCbuild/python.props    | 27 ++++++++++++++-------------
+ PCbuild/python.props    | 25 ++++++++++++-------------
  PCbuild/python.vcxproj  |  3 +++
  PCbuild/pythonw.vcxproj |  3 +++
- 5 files changed, 22 insertions(+), 57 deletions(-)
+ 5 files changed, 20 insertions(+), 57 deletions(-)
 
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
 index 5fd708b211e..044cefd95ea 100644
@@ -90,10 +90,10 @@ index 7ca750dda8f..17eee400ebb 100644
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
 diff --git a/PCbuild/python.props b/PCbuild/python.props
-index ddc7696d276..fd194f6b465 100644
+index ddc7696d276..6b07246b229 100644
 --- a/PCbuild/python.props
 +++ b/PCbuild/python.props
-@@ -69,25 +69,26 @@
+@@ -69,25 +69,24 @@
      <ExternalsDir Condition="$(ExternalsDir) == ''">$(EXTERNALS_DIR)</ExternalsDir>
      <ExternalsDir Condition="$(ExternalsDir) == ''">$([System.IO.Path]::GetFullPath(`$(PySourcePath)externals`))</ExternalsDir>
      <ExternalsDir Condition="!HasTrailingSlash($(ExternalsDir))">$(ExternalsDir)\</ExternalsDir>
@@ -128,8 +128,6 @@ index ddc7696d276..fd194f6b465 100644
 -    <zlibNgDir Condition="$(zlibNgDir) == ''">$(ExternalsDir)\zlib-ng-2.2.4\</zlibNgDir>
 -    <zstdDir Condition="$(zstdDir) == ''">$(ExternalsDir)\zstd-1.5.7\</zstdDir>
 +    <!--<zlibDir Condition="$(zlibDir) == ''">$(ExternalsDir)\zlib-1.3.1\</zlibDir>-->
-+    <!--<zlibNgDir Condition="$(zlibNgDir) == ''">$(ExternalsDir)\zlib-ng-2.2.4\</zlibNgDir>-->
-+    <!--<zstdDir Condition="$(zstdDir) == ''">$(ExternalsDir)\zstd-1.5.7\</zstdDir>-->
    </PropertyGroup>
  
    <PropertyGroup>

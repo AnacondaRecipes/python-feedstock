@@ -1,7 +1,7 @@
-From 13ad3d47e5d9497c2a924e4e9086297c9b613194 Mon Sep 17 00:00:00 2001
+From 21ae3f8bd72b486adfa021db419a49815b5a602e Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
-Subject: [PATCH 16/22] unvendor zlib
+Subject: [PATCH 16/21] unvendor zlib
 
 ---
  PCbuild/pythoncore.vcxproj         |  8 ++--
@@ -9,7 +9,7 @@ Subject: [PATCH 16/22] unvendor zlib
  2 files changed, 4 insertions(+), 70 deletions(-)
 
 diff --git a/PCbuild/pythoncore.vcxproj b/PCbuild/pythoncore.vcxproj
-index 8896480bb49..446de0ba66a 100644
+index d2e1f77e9ad..9f0130576b6 100644
 --- a/PCbuild/pythoncore.vcxproj
 +++ b/PCbuild/pythoncore.vcxproj
 @@ -82,7 +82,7 @@
@@ -25,9 +25,9 @@ index 8896480bb49..446de0ba66a 100644
      <ClCompile>
        <AdditionalOptions>/d1trimfile:%SRC_DIR%</AdditionalOptions>
        <AdditionalIncludeDirectories>$(PySourcePath)Modules\_hacl\include;$(PySourcePath)Modules\_hacl\internal;$(PySourcePath)Python;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(zlibNgDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(zlibDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 +      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(condaDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-       <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";ZLIB_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(IncludeExternals)">_Py_HAVE_ZLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="'$(UseJIT)' == 'true'">_Py_JIT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 @@ -111,8 +111,8 @@

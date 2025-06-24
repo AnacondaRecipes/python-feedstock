@@ -1,7 +1,7 @@
-From 1b04b821934613f59f7a5a1be23c859b0b87b205 Mon Sep 17 00:00:00 2001
+From 57382dd38380799a2fba016c7563494724403b04 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Tue, 5 Oct 2021 12:42:06 -0700
-Subject: [PATCH 06/22] Unvendor sqlite3
+Subject: [PATCH 06/21] Unvendor sqlite3
 
 ---
  PCbuild/_sqlite3.vcxproj | 11 +++++------
@@ -13,7 +13,7 @@ diff --git a/PCbuild/_sqlite3.vcxproj b/PCbuild/_sqlite3.vcxproj
 index 9ae0a0fc3a0..f482734ba1d 100644
 --- a/PCbuild/_sqlite3.vcxproj
 +++ b/PCbuild/_sqlite3.vcxproj
-@@ -93,9 +93,12 @@
+@@ -93,8 +93,11 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -27,7 +27,7 @@ index 9ae0a0fc3a0..f482734ba1d 100644
    </ItemDefinitionGroup>
    <ItemGroup>
      <ClInclude Include="..\Modules\_sqlite\connection.h" />
-@@ -127,11 +130,7 @@
+@@ -127,12 +130,8 @@
        <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
      </ProjectReference>
