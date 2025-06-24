@@ -13,7 +13,7 @@ diff --git a/PCbuild/_sqlite3.vcxproj b/PCbuild/_sqlite3.vcxproj
 index 9ae0a0fc3a0..f482734ba1d 100644
 --- a/PCbuild/_sqlite3.vcxproj
 +++ b/PCbuild/_sqlite3.vcxproj
-@@ -93,8 +93,11 @@
+@@ -93,9 +93,12 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -39,6 +39,8 @@ index 9ae0a0fc3a0..f482734ba1d 100644
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
    </ImportGroup>
+ </Project>
+\ No newline at end of file
 diff --git a/PCbuild/pcbuild.sln b/PCbuild/pcbuild.sln
 index 7296ea75301..a7f716ff105 100644
 --- a/PCbuild/pcbuild.sln
