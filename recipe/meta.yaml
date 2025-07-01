@@ -197,8 +197,10 @@ outputs:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
         - xz {{ xz }}
-        - zlib-ng {{ zlib_ng }}
+        # Although we might like to use zlib-ng something else is
+        # pulling in zlib and we get an overlinking error
         - zlib {{ zlib }}
+        #- zlib-ng {{ zlib_ng }}
         - openssl {{ openssl }}
         - readline {{ readline }} # [not win]
         - tk {{ tk }}
