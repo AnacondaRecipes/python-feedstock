@@ -18,7 +18,7 @@ index 7a5327bf016..8518722b941 100644
    <ItemGroup>
      <!-- Static libraries for use later in the build -->
 -    <Projects Include="zlib-ng.vcxproj" Condition="$(zlibNgDir) != '' and Exists('$(zlibNgDir)\zlib-ng.h.in')" />
-+    <Projects Include="zlib-ng.vcxproj" Condition="$(condaDir) != '' and Exists('$(condaDir)\zlib-ng.h')" />
++    <Projects Include="zlib-ng.vcxproj" Condition="$(condaDir) != '' and Exists('$(condaDir)\include\zlib.h')" />
      <!-- pythonXY.dll -->
      <!--
      Parallel build is explicitly disabled for this project because it
@@ -26,6 +26,16 @@ diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
 index de1698ae718..3b318010188 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
+@@ -73,9 +73,6 @@
+   </PropertyGroup>
+   <Import Project="python.props" />
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+-  <PropertyGroup Label="Configuration">
+-    <ConfigurationType>StaticLibrary</ConfigurationType>
+-  </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+   </ImportGroup>
 @@ -94,7 +94,7 @@
        <DisableSpecificWarnings>4206;4054;4324</DisableSpecificWarnings>
        <LanguageStandard_C>stdc11</LanguageStandard_C>

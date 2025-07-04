@@ -15,7 +15,7 @@ index f93b98dd681..f86ae6c08a6 100644
      if os.name == 'nt':
          _init_non_posix(_CONFIG_VARS)
          _CONFIG_VARS['VPATH'] = sys._vpath
-+        _CONFIG_VARS['TZPATH'] = os.path.join(_PREFIX, "share", "zoneinfo")
++        _CONFIG_VARS['TZPATH'] = os.path.join(prefix, "share", "zoneinfo")
      if _HAS_USER_BASE:
          # Setting 'userbase' is done below the call to the
          # init function to enable using 'get_config_var' in

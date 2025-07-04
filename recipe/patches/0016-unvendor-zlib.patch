@@ -17,7 +17,7 @@ index d2e1f77e9ad..9f0130576b6 100644
      <KillPython>true</KillPython>
      <RequireProfileData>true</RequireProfileData>
 -    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(zlibNgDir)\zlib-ng.h.in')">true</IncludeExternals>
-+    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(condaDir)\include\zlib-ng.h)">true</IncludeExternals>
++    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(condaDir)\include\zlib.h')">true</IncludeExternals>
      <IncludeExternals Condition="$(IncludeExternals) == ''">false</IncludeExternals>
    </PropertyGroup>
    <ImportGroup Label="PropertySheets">
@@ -36,7 +36,7 @@ index d2e1f77e9ad..9f0130576b6 100644
      <Link>
 -      <AdditionalDependencies>version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
 -      <AdditionalDependencies Condition="$(IncludeExternals)">zlib-ng$(PyDebugExt).lib;%(AdditionalDependencies)</AdditionalDependencies>
-+      <AdditionalDependencies>version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;$(condaDir)\lib\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
 +      <AdditionalLibraryDirectories>$(condaDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
      </Link>
    </ItemDefinitionGroup>
