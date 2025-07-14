@@ -1,4 +1,4 @@
-From b940ba1889a9cee03c3b5f9c5d7a46bdfb2e42cf Mon Sep 17 00:00:00 2001
+From 47000d974cfd7c056100f02a3c80da04624c1c15 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 16 Aug 2021 03:07:40 -0700
 Subject: [PATCH 13/21] Unvendor libffi
@@ -36,3 +36,6 @@ index 22c9550e2c0..40ddb08d2b0 100644
 -  </Target>
  </Project>
 \ No newline at end of file
+-- 
+2.39.5 (Apple Git-154)
+

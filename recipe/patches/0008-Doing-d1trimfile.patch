@@ -1,4 +1,4 @@
-From 4a289c4d9253884c170f89aa2000acc2fde59472 Mon Sep 17 00:00:00 2001
+From a7d0d49a6f6574faad3edf38b5d5e195877522ba Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 31 Dec 2019 21:47:47 +0100
 Subject: [PATCH 08/21] Doing d1trimfile
@@ -34,7 +34,7 @@ Subject: [PATCH 08/21] Doing d1trimfile
  PCbuild/python.vcxproj              |  4 ++++
  PCbuild/python3dll.vcxproj          |  6 +++++-
  PCbuild/python_uwp.vcxproj          |  2 +-
- PCbuild/pythoncore.vcxproj          |  7 +++----
+ PCbuild/pythoncore.vcxproj          |  6 +++---
  PCbuild/pythonw.vcxproj             | 12 ++++++++++++
  PCbuild/pythonw_uwp.vcxproj         |  2 +-
  PCbuild/pywlauncher.vcxproj         |  6 +++++-
@@ -45,7 +45,7 @@ Subject: [PATCH 08/21] Doing d1trimfile
  PCbuild/winsound.vcxproj            | 14 +++++++++++++-
  PCbuild/xxlimited.vcxproj           |  6 ++++++
  PCbuild/xxlimited_35.vcxproj        |  6 ++++++
- 41 files changed, 369 insertions(+), 21 deletions(-)
+ 41 files changed, 369 insertions(+), 20 deletions(-)
 
 diff --git a/PCbuild/_asyncio.vcxproj b/PCbuild/_asyncio.vcxproj
 index 76b0ffd660d..1402860e19b 100644
@@ -651,23 +651,24 @@ index 3f8772d30b4..d80968e351a 100644
      <Link>
        <AdditionalDependencies>windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
 diff --git a/PCbuild/pythoncore.vcxproj b/PCbuild/pythoncore.vcxproj
-index 32a8f2dbad3..d2e1f77e9ad 100644
+index 32a8f2dbad3..95d892ab548 100644
 --- a/PCbuild/pythoncore.vcxproj
 +++ b/PCbuild/pythoncore.vcxproj
-@@ -99,10 +99,9 @@
+@@ -99,11 +99,11 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
 -      <AdditionalOptions>/Zm200  %(AdditionalOptions)</AdditionalOptions>
--      <AdditionalIncludeDirectories>$(PySourcePath)Modules\_hacl;$(PySourcePath)Modules\_hacl\include;$(PySourcePath)Python;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(zlibNgDir);$(GeneratedZlibNgDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
--      <AdditionalIncludeDirectories Condition="'$(UseJIT)' == 'true'">$(GeneratedJitStencilsDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 +      <AdditionalOptions>/d1trimfile:%SRC_DIR%</AdditionalOptions>
-+      <AdditionalIncludeDirectories>$(PySourcePath)Modules\_hacl\include;$(PySourcePath)Modules\_hacl\internal;$(PySourcePath)Python;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <AdditionalIncludeDirectories>$(PySourcePath)Modules\_hacl;$(PySourcePath)Modules\_hacl\include;$(PySourcePath)Python;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(zlibNgDir);$(GeneratedZlibNgDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 +      <AdditionalIncludeDirectories Condition="$(IncludeExternals)">$(zlibDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-       <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";ZLIB_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <AdditionalIncludeDirectories Condition="'$(UseJIT)' == 'true'">$(GeneratedJitStencilsDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";ZLIB_COMPAT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(IncludeExternals)">_Py_HAVE_ZLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="'$(UseJIT)' == 'true'">_Py_JIT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <PreprocessorDefinitions Condition="'$(UseTIER2)' != '' and '$(UseTIER2)' != '0'">_Py_TIER2=$(UseTIER2);%(PreprocessorDefinitions)</PreprocessorDefinitions>
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
 index 8645a7bf438..345ef48dfe2 100644
 --- a/PCbuild/pythonw.vcxproj

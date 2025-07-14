@@ -1,4 +1,4 @@
-From af06bbd42feeda176d0852052afb8b8e49ef6288 Mon Sep 17 00:00:00 2001
+From f7dc444938b2f0770ea4bf2ba686d1adeb68f3c5 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Mar 2023 23:07:10 -0500
 Subject: [PATCH 18/21] Unvendor expat
@@ -58,7 +58,7 @@ diff --git a/PCbuild/_elementtree.vcxproj.filters b/PCbuild/_elementtree.vcxproj
 index a5368024cce..7cc8e9a3b9b 100644
 --- a/PCbuild/_elementtree.vcxproj.filters
 +++ b/PCbuild/_elementtree.vcxproj.filters
-@@ -17,66 +17,13 @@
+@@ -17,67 +17,14 @@
        <UniqueIdentifier>{f99990ba-cd06-40cc-8f28-d2d424ec13be}</UniqueIdentifier>
      </Filter>
    </ItemGroup>
@@ -125,6 +125,8 @@ index a5368024cce..7cc8e9a3b9b 100644
        <Filter>Resource Files</Filter>
      </ResourceCompile>
    </ItemGroup>
+ </Project>
+\ No newline at end of file
 diff --git a/PCbuild/pyexpat.vcxproj b/PCbuild/pyexpat.vcxproj
 index 3bcef600a3e..ec5d4b64b3c 100644
 --- a/PCbuild/pyexpat.vcxproj
@@ -194,3 +196,6 @@ index fd22fc8c477..41c73b434b9 100644
    </ItemGroup>
  </Project>
 \ No newline at end of file
+-- 
+2.39.5 (Apple Git-154)
+
