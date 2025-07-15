@@ -7,6 +7,3 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
-
-channels:
-  - https://staging.continuum.io/prefect/fs/python_abi-feedstock/pr2/d4f2204
