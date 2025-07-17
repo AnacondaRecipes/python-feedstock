@@ -1,14 +1,14 @@
-From f7dc444938b2f0770ea4bf2ba686d1adeb68f3c5 Mon Sep 17 00:00:00 2001
+From 122ccba556dd1de01e6adaf636c217fef90e307b Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Mar 2023 23:07:10 -0500
-Subject: [PATCH 18/21] Unvendor expat
+Subject: [PATCH 18/24] Unvendor expat
 
 ---
- PCbuild/_elementtree.vcxproj         | 24 ++----------
- PCbuild/_elementtree.vcxproj.filters | 55 +---------------------------
- PCbuild/pyexpat.vcxproj              | 12 ++----
- PCbuild/pyexpat.vcxproj.filters      | 19 +---------
- 4 files changed, 10 insertions(+), 100 deletions(-)
+ PCbuild/_elementtree.vcxproj         | 24 +++----------
+ PCbuild/_elementtree.vcxproj.filters | 53 ----------------------------
+ PCbuild/pyexpat.vcxproj              | 12 +++----
+ PCbuild/pyexpat.vcxproj.filters      | 17 ---------
+ 4 files changed, 8 insertions(+), 98 deletions(-)
 
 diff --git a/PCbuild/_elementtree.vcxproj b/PCbuild/_elementtree.vcxproj
 index 920656f2ee2..f47bcd8e4e6 100644
@@ -55,10 +55,10 @@ index 920656f2ee2..f47bcd8e4e6 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/_elementtree.vcxproj.filters b/PCbuild/_elementtree.vcxproj.filters
-index a5368024cce..7cc8e9a3b9b 100644
+index a5368024cce..88a13faa683 100644
 --- a/PCbuild/_elementtree.vcxproj.filters
 +++ b/PCbuild/_elementtree.vcxproj.filters
-@@ -17,67 +17,14 @@
+@@ -17,63 +17,10 @@
        <UniqueIdentifier>{f99990ba-cd06-40cc-8f28-d2d424ec13be}</UniqueIdentifier>
      </Filter>
    </ItemGroup>
@@ -122,11 +122,6 @@ index a5368024cce..7cc8e9a3b9b 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
-       <Filter>Resource Files</Filter>
-     </ResourceCompile>
-   </ItemGroup>
- </Project>
-\ No newline at end of file
 diff --git a/PCbuild/pyexpat.vcxproj b/PCbuild/pyexpat.vcxproj
 index 3bcef600a3e..ec5d4b64b3c 100644
 --- a/PCbuild/pyexpat.vcxproj
@@ -160,10 +155,10 @@ index 3bcef600a3e..ec5d4b64b3c 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/pyexpat.vcxproj.filters b/PCbuild/pyexpat.vcxproj.filters
-index fd22fc8c477..41c73b434b9 100644
+index fd22fc8c477..b8280b4049c 100644
 --- a/PCbuild/pyexpat.vcxproj.filters
 +++ b/PCbuild/pyexpat.vcxproj.filters
-@@ -11,31 +11,14 @@
+@@ -11,27 +11,10 @@
        <UniqueIdentifier>{f1dbbdb5-41e5-4a88-bf8e-13da010c0ce4}</UniqueIdentifier>
      </Filter>
    </ItemGroup>
@@ -191,11 +186,6 @@ index fd22fc8c477..41c73b434b9 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
-       <Filter>Resource Files</Filter>
-     </ResourceCompile>
-   </ItemGroup>
- </Project>
-\ No newline at end of file
 -- 
 2.39.5 (Apple Git-154)
 

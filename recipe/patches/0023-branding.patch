@@ -1,7 +1,7 @@
-From c8a284a4a71ef3146d3167a6295400c13af03bf8 Mon Sep 17 00:00:00 2001
+From 108abc49505950944bd4f1528312f8b4c3bded87 Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
-Subject: [PATCH 22/22] branding
+Subject: [PATCH 22/24] branding
 
 ---
  Lib/platform.py     | 2 +-

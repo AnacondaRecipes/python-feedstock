@@ -1,16 +1,16 @@
-From db397724f2d70f58d158331d0e510f995ce5dd89 Mon Sep 17 00:00:00 2001
+From 194e5611bb6f8d45f5e055f489c6c97a3c71b6ff Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
-Subject: [PATCH] Unvendor zlib-ng
+Subject: [PATCH 23/24] Unvendor zlib-ng
 
 ---
  PCbuild/pcbuild.proj            |   2 +-
- PCbuild/zlib-ng.vcxproj         | 119 +----------------
+ PCbuild/zlib-ng.vcxproj         | 122 +----------------
  PCbuild/zlib-ng.vcxproj.filters | 228 --------------------------------
- 3 files changed, 2 insertions(+), 347 deletions(-)
+ 3 files changed, 2 insertions(+), 350 deletions(-)
 
 diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
-index 7a5327bf016..8518722b941 100644
+index 7a5327bf016..cde688ef534 100644
 --- a/PCbuild/pcbuild.proj
 +++ b/PCbuild/pcbuild.proj
 @@ -48,7 +48,7 @@
@@ -23,7 +23,7 @@ index 7a5327bf016..8518722b941 100644
      <!--
      Parallel build is explicitly disabled for this project because it
 diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
-index de1698ae718..3b318010188 100644
+index de1698ae718..e3c9b16f6ef 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
 @@ -73,9 +73,6 @@
@@ -36,7 +36,7 @@ index de1698ae718..3b318010188 100644
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
    <ImportGroup Label="ExtensionSettings">
    </ImportGroup>
-@@ -94,7 +94,7 @@
+@@ -94,7 +91,7 @@
        <DisableSpecificWarnings>4206;4054;4324</DisableSpecificWarnings>
        <LanguageStandard_C>stdc11</LanguageStandard_C>
        <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -45,7 +45,7 @@ index de1698ae718..3b318010188 100644
        <PreprocessorDefinitions>%(PreprocessorDefinitions);ZLIB_COMPAT;WITH_GZFILEOP;NO_FSEEKO;HAVE_BUILTIN_ASSUME_ALIGNED;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Platform) == 'Win32' or $(Platform) == 'x64'">%(PreprocessorDefinitions);X86_FEATURES;X86_HAVE_XSAVE_INTRIN;X86_SSE2;X86_SSSE3;X86_SSE42;X86_PCLMULQDQ_CRC;X86_AVX2;X86_AVX512;X86_AVX512VNNI;X86_VPCLMULQDQ_CRC</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Configuration) == 'Debug'">%(PreprocessorDefinitions);ZLIB_DEBUG</PreprocessorDefinitions>
-@@ -102,132 +102,15 @@
+@@ -102,132 +99,15 @@
      </ClCompile>
    </ItemDefinitionGroup>
    <ItemGroup>
