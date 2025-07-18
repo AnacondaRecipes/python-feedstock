@@ -7,4 +7,4 @@ numpy:
 gil_type:
   - normal
   # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855
-  # - disabled # [not (s390x or (osx and x86_64))]
+  - disabled # [not (s390x or (osx and x86_64))]
