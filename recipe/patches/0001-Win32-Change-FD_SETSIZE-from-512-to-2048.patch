@@ -1,4 +1,4 @@
-From 0adc9657ce714773e928468ecf7872d4cc4d8984 Mon Sep 17 00:00:00 2001
+From f78a3ee5e350290bdd7b09ffb5a644459e60ad5f Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 16 Aug 2017 11:53:55 +0100
 Subject: [PATCH 01/24] Win32: Change FD_SETSIZE from 512 to 2048

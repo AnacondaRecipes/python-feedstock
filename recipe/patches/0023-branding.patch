@@ -1,4 +1,4 @@
-From 108abc49505950944bd4f1528312f8b4c3bded87 Mon Sep 17 00:00:00 2001
+From 048572485e1fcb5dad1061503a863723d03f8cfb Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
 Subject: [PATCH 22/24] branding
@@ -9,7 +9,7 @@ Subject: [PATCH 22/24] branding
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/platform.py b/Lib/platform.py
-index 55e211212d4..25dbdc11ec6 100644
+index 7dd64de6025..95d46668492 100644
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
 @@ -1197,7 +1197,7 @@ def _sys_version(sys_version=None):
@@ -18,11 +18,11 @@ index 55e211212d4..25dbdc11ec6 100644
          cpython_sys_version_parser = re.compile(
 -            r'([\w.+]+)\s*'  # "version<space>"
 +            r'([\w.+]+)\s*(?:\ \|\ packaged\ by\ Anaconda,\ Inc\.\ \|)?\s*'  # version<space>"
-             r'(?:experimental free-threading build\s+)?' # "free-threading-build<space>"
+             r'(?:free-threading build\s+)?' # "free-threading-build<space>"
              r'\(#?([^,]+)'  # "(#buildno"
              r'(?:,\s*([\w ]*)'  # ", builddate"
 diff --git a/Python/getversion.c b/Python/getversion.c
-index 226b2f999a6..0c7ff163257 100644
+index 8d8bc6ea700..eee07cd5c82 100644
 --- a/Python/getversion.c
 +++ b/Python/getversion.c
 @@ -6,7 +6,7 @@
@@ -38,8 +38,8 @@ index 226b2f999a6..0c7ff163257 100644
      }
      initialized = 1;
  #ifdef Py_GIL_DISABLED
--    const char *buildinfo_format = "%.80s experimental free-threading build (%.80s) %.80s";
-+    const char *buildinfo_format = "%.80s | packaged by Anaconda, Inc. | experimental free-threading build (%.80s) %.80s";
+-    const char *buildinfo_format = "%.80s free-threading build (%.80s) %.80s";
++    const char *buildinfo_format = "%.80s | packaged by Anaconda, Inc. | free-threading build (%.80s) %.80s";
  #else
 -    const char *buildinfo_format = "%.80s (%.80s) %.80s";
 +    const char *buildinfo_format = "%.80s | packaged by Anaconda, Inc. | (%.80s) %.80s";
