@@ -1,7 +1,7 @@
-From 27c50d3e1469817ec1cd8379118484f4689f427b Mon Sep 17 00:00:00 2001
+From 4b668bafef3fc56075b1b4330c0cdacac03642c5 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 27 Oct 2018 18:48:30 +0100
-Subject: [PATCH 05/22] Disable registry lookup unless CONDA_PY_ALLOW_REG_PATHS
+Subject: [PATCH 04/24] Disable registry lookup unless CONDA_PY_ALLOW_REG_PATHS
  is not 0
 
 Co-authored-by: Isuru Fernando<isuruf@gmail.com>
@@ -13,10 +13,10 @@ Co-authored-by: Isuru Fernando<isuruf@gmail.com>
  create mode 100644 PC/getpathp.c
 
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index d0128b20fae..e7cfeba25ec 100644
+index 1e75993480a..ff96c8e1990 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -945,6 +945,7 @@ _PyConfig_InitPathConfig(PyConfig *config, int compute_path_config)
+@@ -937,6 +937,7 @@ _PyConfig_InitPathConfig(PyConfig *config, int compute_path_config)
          !env_to_dict(dict, "ENV_PATH", 0) ||
          !env_to_dict(dict, "ENV_PYTHONHOME", 0) ||
          !env_to_dict(dict, "ENV_PYTHONEXECUTABLE", 0) ||
@@ -25,7 +25,7 @@ index d0128b20fae..e7cfeba25ec 100644
          !progname_to_dict(dict, "real_executable") ||
          !library_to_dict(dict, "library") ||
 diff --git a/Modules/getpath.py b/Modules/getpath.py
-index 1f1bfcb4f64..344900c05e7 100644
+index b89d7427e3f..21df0efac12 100644
 --- a/Modules/getpath.py
 +++ b/Modules/getpath.py
 @@ -52,6 +52,7 @@
@@ -36,9 +36,9 @@ index 1f1bfcb4f64..344900c05e7 100644
  
  # ** Values calculated at runtime **
  # config            -- [in/out] dict of the PyConfig structure
-@@ -681,7 +682,7 @@ def search_up(prefix, *landmarks, test=isfile):
+@@ -704,7 +705,7 @@ def search_up(prefix, *landmarks, test=isfile):
      else:
-         pythonpath.append(joinpath(prefix, ZIP_LANDMARK))
+         pythonpath.append(joinpath(base_prefix, ZIP_LANDMARK))
  
 -    if os_name == 'nt' and use_environment and winreg:
 +    if os_name == 'nt' and use_environment and winreg and ENV_CONDA_PY_ALLOW_REG_PATHS and ENV_CONDA_PY_ALLOW_REG_PATHS != '0':
@@ -1196,3 +1196,6 @@ index 00000000000..a73ea8a0e91
 +    }
 +    return hPython3 != NULL;
 +}
+-- 
+2.39.5 (Apple Git-154)
+

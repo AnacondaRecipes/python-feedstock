@@ -1,7 +1,7 @@
-From 20df89dab23139f045f741d658d8ed6320bfb7f2 Mon Sep 17 00:00:00 2001
+From 242ff4271f75eba5c919f8e3b9e252fa501131b1 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 25 Jan 2021 03:28:08 -0600
-Subject: [PATCH 12/22] Make dyld search work with SYSTEM_VERSION_COMPAT=1
+Subject: [PATCH 11/24] Make dyld search work with SYSTEM_VERSION_COMPAT=1
 
 In macOS Big Sur, if the executable was compiled with `MACOSX_DEPLOYMENT_TARGET=10.15`
 or below, then SYSTEM_VERSION_COMPAT=1 is the default which means that Big Sur
@@ -15,10 +15,10 @@ as that part is compiled with `MACOSX_DEPLOYMENT_TARGET=11.0`)
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Modules/_ctypes/callproc.c b/Modules/_ctypes/callproc.c
-index f9864ebb735..c413621f01b 100644
+index 856b0376e5e..2c09548ec1c 100644
 --- a/Modules/_ctypes/callproc.c
 +++ b/Modules/_ctypes/callproc.c
-@@ -1489,7 +1489,7 @@ copy_com_pointer(PyObject *self, PyObject *args)
+@@ -1509,7 +1509,7 @@ copy_com_pointer(PyObject *self, PyObject *args)
  #ifdef HAVE_DYLD_SHARED_CACHE_CONTAINS_PATH
  #  ifdef HAVE_BUILTIN_AVAILABLE
  #    define HAVE_DYLD_SHARED_CACHE_CONTAINS_PATH_RUNTIME \
@@ -27,3 +27,6 @@ index f9864ebb735..c413621f01b 100644
  #  else
  #    define HAVE_DYLD_SHARED_CACHE_CONTAINS_PATH_RUNTIME \
           (_dyld_shared_cache_contains_path != NULL)
+-- 
+2.39.5 (Apple Git-154)
+

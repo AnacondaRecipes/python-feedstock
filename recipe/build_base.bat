@@ -118,7 +118,7 @@ xcopy /s /y %SRC_DIR%\Include %PREFIX%\include\
 if errorlevel 1 exit 1
 
 :: Copy generated pyconfig.h
-copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\pyconfig.h %PREFIX%\include\
+copy /Y %SRC_DIR%\PC\pyconfig.h %PREFIX%\include\
 if errorlevel 1 exit 1
 
 :: Populate the Scripts directory
@@ -203,7 +203,17 @@ echo "Testing import of os (no DLL needed) does not print: The specified module 
 %CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import os" 2>&1 | findstr /r /c:"The specified module could not be found"
 if %errorlevel% neq 1 exit /b 1
 
-echo "Testing import of _sqlite3 (DLL located via PATH needed) does not print: The specified module could not be found"
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import _sqlite3" 2>&1
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import _sqlite3" 2>&1 | findstr /r /c:"The specified module could not be found"
-if %errorlevel% neq 1 exit /b 1
+echo "Testing import of %%m (DLL located via PATH needed) does not print: The specified module could not be found"
+:: The names are our unvendored modules mapped to ...\DLLs\X.pyd
+:: missing: libffi, expat, zlib(-ng)
+
+:: Also %errorlevel% will not be updated round the loop so use && to
+:: catch a successfull findstr, ie. a failure to load the underlying DLL
+for %%m in (_ssl _sqlite3 _bz2 _tkinter _lzma _decimal _zstd) do (
+   %CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -c "import %%m" 2>&1 | findstr /r /c:"The specified module could not be found" && (
+      %CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import %%m"
+      exit /b 1
+   )
+)
+
+echo build_base complete!
