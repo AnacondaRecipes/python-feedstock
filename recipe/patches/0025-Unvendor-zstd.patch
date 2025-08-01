@@ -1,4 +1,4 @@
-From 15c80aa5e88f5983c55f5de176edce609d6253b8 Mon Sep 17 00:00:00 2001
+From b78f59c8207bccb6b07a2f6863c746dc2ca5d763 Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:42:39 +0100
 Subject: [PATCH 24/24] Unvendor zstd

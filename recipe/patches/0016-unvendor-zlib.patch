@@ -1,4 +1,4 @@
-From 46d4aadadc437ba1d18f74abdbd2195bc2bd2b5f Mon Sep 17 00:00:00 2001
+From a157b76ba81df099d540375e19b72e7ae1c86276 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
 Subject: [PATCH 16/24] unvendor zlib
