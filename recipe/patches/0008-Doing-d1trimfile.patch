@@ -1,4 +1,4 @@
-From 522a0c8d7a602433f0cfa80489886f44634a91c7 Mon Sep 17 00:00:00 2001
+From 07ac08946afd61c3a69d5fb8b856b7fcdb5e787e Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 31 Dec 2019 21:47:47 +0100
 Subject: [PATCH 08/24] Doing d1trimfile
@@ -862,5 +862,5 @@ index 3f4d4463f24..2572449ba0c 100644
        <AdditionalDependencies>wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
      </Link>
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

@@ -1,7 +1,5 @@
 upload_channels:
-  ad-testing: py314
-
-upload_without_merge: True
+  - ad-testing/label/py314
 
 # the conda-build parameters to use for disabling --skip-existing
 build_parameters:

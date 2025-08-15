@@ -1,4 +1,4 @@
-From b73718cd6928a94823556ed8f0e021e7efec2ea9 Mon Sep 17 00:00:00 2001
+From d6dc3aa5c67080ff477383c6f9a3f32619d794fe Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
 Subject: [PATCH 22/24] branding
@@ -47,5 +47,5 @@ index 8d8bc6ea700..eee07cd5c82 100644
      PyOS_snprintf(version, sizeof(version), buildinfo_format,
                    PY_VERSION, Py_GetBuildInfo(), Py_GetCompiler());
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

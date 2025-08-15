@@ -1,4 +1,4 @@
-From 9e95367328d9643710b41eb9aca830b495a864bd Mon Sep 17 00:00:00 2001
+From a8b3711b69b5fc0f32a32bdedb708c020139f245 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 5 Dec 2017 22:47:59 +0000
 Subject: [PATCH 03/24] Fix find_library so that it looks in sys.prefix/lib
@@ -72,5 +72,5 @@ index 99504911a3d..108bb43c9ab 100644
  
  # Listing loaded libraries on other systems will try to use
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

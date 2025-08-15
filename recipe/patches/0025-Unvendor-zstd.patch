@@ -1,4 +1,4 @@
-From b78f59c8207bccb6b07a2f6863c746dc2ca5d763 Mon Sep 17 00:00:00 2001
+From d0071abf571fbb17c27cd135424ba9856545bfcf Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:42:39 +0100
 Subject: [PATCH 24/24] Unvendor zstd
@@ -268,5 +268,5 @@ index eec666e5eaf..a2aa391f393 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 
