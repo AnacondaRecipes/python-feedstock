@@ -1,4 +1,4 @@
-From 25ff9b805238aa52d8fe6195271ed2f8e2b72d8d Mon Sep 17 00:00:00 2001
+From 6ad8365199c579090391bcb4fce65ae62b18b3e5 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Thu, 26 Nov 2020 18:47:37 +0000
 Subject: [PATCH 09/24] Allow cross compiling for Darwin
@@ -37,5 +37,5 @@ index d6059471771..8b71e1450c2 100644
  		ac_sys_system=Cygwin
  		;;
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

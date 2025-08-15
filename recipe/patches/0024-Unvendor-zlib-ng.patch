@@ -1,4 +1,4 @@
-From 98a49315ec563e348f7b34c4dd1d28e693d75673 Mon Sep 17 00:00:00 2001
+From b4782d44a575928c56ad3408062963a01fdeecfe Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
 Subject: [PATCH 23/24] Unvendor zlib-ng
@@ -426,5 +426,5 @@ index addbd45f880..0280369b001 100644
    <ItemGroup>
      <Filter Include="Source Files">
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

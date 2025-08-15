@@ -1,4 +1,4 @@
-From 68fc9d38ce5f01909b49660f531e086e934be37d Mon Sep 17 00:00:00 2001
+From 4ac6ced0ef8596ff4145c9f41bc1ea7f742d67fc Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 20 Aug 2021 10:23:51 -0700
 Subject: [PATCH 14/24] Unvendor tcltk
@@ -43,5 +43,5 @@ index d26b36ba98e..4780ff5e531 100644
      <tclWin32Exe Condition="$(Platform) != 'Win32'">$(tcltkDir)\..\win32\bin\tclsh$(TclMajorVersion)$(TclMinorVersion)t.exe</tclWin32Exe>
      <tclExternalTommath Condition="$(TclMajorVersion) == '9'">TCL_WITH_EXTERNAL_TOMMATH;</tclExternalTommath>
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

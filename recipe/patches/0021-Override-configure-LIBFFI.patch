@@ -1,4 +1,4 @@
-From 6dd038b2791b882a978bd859d3fe798a7f79967f Mon Sep 17 00:00:00 2001
+From 3bde12e2938b6c420e2517629ca0108bdd738a62 Mon Sep 17 00:00:00 2001
 From: "Uwe L. Korn" <uwe.korn@quantco.com>
 Date: Tue, 5 Sep 2023 21:51:31 +0200
 Subject: [PATCH 20/24] Override configure LIBFFI
@@ -21,5 +21,5 @@ index 221023ac808..36676cf4858 100755
  
  fi
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 

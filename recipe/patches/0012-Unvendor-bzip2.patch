@@ -1,4 +1,4 @@
-From caa65e7fdee92911c8c8846358ffa8f33f856f3f Mon Sep 17 00:00:00 2001
+From 82af82f1e66c4fbf0c57fd0b060192b0cfa61352 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 16 Aug 2021 02:56:27 -0700
 Subject: [PATCH 12/24] Unvendor bzip2
@@ -86,5 +86,5 @@ index 7c0b5162537..c1f960608c3 100644
      </ClInclude>
    </ItemGroup>
 -- 
-2.39.5 (Apple Git-154)
+2.45.2
 
