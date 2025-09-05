@@ -1,4 +1,4 @@
-{% set version = "3.13.5" %}
+{% set version = "3.13.7" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 93e583f243454e6e9e4588ca2c2662206ad961659863277afcdb96801647d640
+    sha256: 5462f9099dfd30e238def83c71d91897d8caa5ff6ebc7a50f14d4802cdaaa79a
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -177,6 +177,7 @@ outputs:
 
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - sed  # [unix]
@@ -228,6 +229,7 @@ outputs:
         - cmake-no-system
         - make  # [unix]
         - ninja-base
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         # Tried to use enable_language(C) to avoid needing this. It does not work.
         - {{ compiler('cxx') }}
@@ -309,6 +311,7 @@ outputs:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
 {% if from_source_control == 'yes' %}
