@@ -88,20 +88,6 @@ index 7ca750dda8f..17eee400ebb 100644
    <Target Name="Clean" />
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
-diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
-index 4a99ffc677c..b125e63687a 100644
---- a/PCbuild/python.vcxproj
-+++ b/PCbuild/python.vcxproj
-@@ -110,6 +110,9 @@
-   </ItemGroup>
-   <ItemGroup>
-     <ClCompile Include="..\Programs\python.c" />
-+	<ClCompile Include="$(condaDir)include\openssl\applink.c">
-+		<PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
-+	</ClCompile>
-   </ItemGroup>
-   <ItemGroup>
-     <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/python.props b/PCbuild/python.props
 index 62f42d0ce9c..75d3524f127 100644
 --- a/PCbuild/python.props
@@ -142,6 +128,20 @@ index 62f42d0ce9c..75d3524f127 100644
    </PropertyGroup>
  
    <PropertyGroup>
+diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
+index 4a99ffc677c..b125e63687a 100644
+--- a/PCbuild/python.vcxproj
++++ b/PCbuild/python.vcxproj
+@@ -110,6 +110,9 @@
+   </ItemGroup>
+   <ItemGroup>
+     <ClCompile Include="..\Programs\python.c" />
++	<ClCompile Include="$(condaDir)include\openssl\applink.c">
++		<PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
++	</ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+     <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
 index d08c210ef8a..87f71ca59d1 100644
 --- a/PCbuild/pythonw.vcxproj
