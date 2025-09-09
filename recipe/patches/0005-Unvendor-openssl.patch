@@ -13,7 +13,7 @@ Co-authored-by: Isuru Fernando <isuruf@gmail.com>
  5 files changed, 20 insertions(+), 55 deletions(-)
 
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
-index 5fd708b211e..044cefd95ea 100644
+index 5fd708b211e..ff051114365 100644
 --- a/PCbuild/openssl.props
 +++ b/PCbuild/openssl.props
 @@ -2,10 +2,10 @@
@@ -90,7 +90,7 @@ index 7ca750dda8f..17eee400ebb 100644
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
 diff --git a/PCbuild/python.props b/PCbuild/python.props
-index 42f11754218..fbfe80a4124 100644
+index 62f42d0ce9c..75d3524f127 100644
 --- a/PCbuild/python.props
 +++ b/PCbuild/python.props
 @@ -63,23 +63,24 @@
@@ -103,7 +103,7 @@ index 42f11754218..fbfe80a4124 100644
    <Import Project="$(ExternalProps)" Condition="$(ExternalProps) != '' and Exists('$(ExternalProps)')" />
  
    <PropertyGroup>
--    <sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.49.1.0\</sqlite3Dir>
+-    <sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.50.4.0\</sqlite3Dir>
 -    <bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir>
 -    <lzmaDir Condition="$(lzmaDir) == ''">$(ExternalsDir)xz-5.2.5\</lzmaDir>
 -    <libffiDir Condition="$(libffiDir) == ''">$(ExternalsDir)libffi-3.4.4\</libffiDir>
@@ -113,7 +113,7 @@ index 42f11754218..fbfe80a4124 100644
 -    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.16\</opensslDir>
 -    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.16.2\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir Condition="$(opensslIncludeDir) == ''">$(opensslOutDir)include</opensslIncludeDir>
-+    <!--<sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.49.1.0\</sqlite3Dir>-->
++    <!--<sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.50.4.0\</sqlite3Dir>-->
 +    <!--<bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir>-->
 +    <!--<lzmaDir Condition="$(lzmaDir) == ''">$(ExternalsDir)xz-5.2.5\</lzmaDir>-->
 +    <!--<libffiDir Condition="$(libffiDir) == ''">$(ExternalsDir)libffi-3.4.4\</libffiDir>-->
@@ -130,21 +130,21 @@ index 42f11754218..fbfe80a4124 100644
  
    <PropertyGroup>
 diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
-index 4a99ffc677c..203c1712e87 100644
+index 4a99ffc677c..b125e63687a 100644
 --- a/PCbuild/python.vcxproj
 +++ b/PCbuild/python.vcxproj
 @@ -110,6 +110,9 @@
    </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Programs\python.c" />
-+    <ClCompile Include="$(condaDir)include\openssl\applink.c">
-+        <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
-+    </ClCompile>
++	<ClCompile Include="$(condaDir)include\openssl\applink.c">
++		<PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
++	</ClCompile>
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
-index d08c210ef8a..6023781339d 100644
+index d08c210ef8a..87f71ca59d1 100644
 --- a/PCbuild/pythonw.vcxproj
 +++ b/PCbuild/pythonw.vcxproj
 @@ -102,6 +102,9 @@
@@ -152,7 +152,7 @@ index d08c210ef8a..6023781339d 100644
    <ItemGroup>
      <ClCompile Include="..\PC\WinMain.c" />
 +    <ClCompile Include="$(condaDir)include\openssl\applink.c">
-+        <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
 +    </ClCompile>
    </ItemGroup>
    <ItemGroup>
