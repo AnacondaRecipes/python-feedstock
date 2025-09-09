@@ -325,7 +325,7 @@ outputs:
       files:
         - tests/prefix-replacement/*
       requires:
-        - {{ stdlib('c') }}  # [linux]
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         # Tried to use enable_language(C) to avoid needing this. It does not work.
         - {{ compiler('cxx') }}

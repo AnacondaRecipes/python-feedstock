@@ -29,7 +29,7 @@ index 5fd708b211e..ff051114365 100644
        <AdditionalDependencies>ws2_32.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
      </Link>
    </ItemDefinitionGroup>
-@@ -21,13 +21,6 @@
+@@ -21,14 +21,4 @@
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).dll" />
      <_SSLDLL Include="$(opensslOutDir)\libssl$(_DLLSuffix).pdb" />
    </ItemGroup>
@@ -40,9 +40,10 @@ index 5fd708b211e..ff051114365 100644
 -          AfterTargets="Build">
 -    <Copy SourceFiles="@(_SSLDLL)" DestinationFolder="$(OutDir)" />
 -  </Target>
-   <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
-     <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
-   </Target>
+-  <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
+-    <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
+-  </Target>
+ </Project>
 diff --git a/PCbuild/openssl.vcxproj b/PCbuild/openssl.vcxproj
 index 7ca750dda8f..17eee400ebb 100644
 --- a/PCbuild/openssl.vcxproj
