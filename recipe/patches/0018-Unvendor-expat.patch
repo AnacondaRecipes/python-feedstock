@@ -1,4 +1,4 @@
-From 7639b29017cb09253390c21c5e8633c741e21d92 Mon Sep 17 00:00:00 2001
+From 1b81a67fbfe1a84ab9c33307634936f56e2f9380 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Mar 2023 23:07:10 -0500
 Subject: [PATCH 18/24] Unvendor expat
@@ -187,5 +187,5 @@ index fd22fc8c477..b8280b4049c 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
 -- 
-2.45.2
+2.50.1 (Apple Git-155)
 

@@ -1,4 +1,4 @@
-From 0550434d103a2de13093bca9a9251c076bebe0f6 Mon Sep 17 00:00:00 2001
+From b1e5e1311eb575f508ce809e6e87b9f9dd5ba653 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
 Subject: [PATCH 05/24] Unvendor openssl
@@ -162,5 +162,5 @@ index c6a5b8ce90a..8645a7bf438 100644
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 -- 
-2.45.2
+2.50.1 (Apple Git-155)
 
