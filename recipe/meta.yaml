@@ -178,6 +178,7 @@ outputs:
 
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - sed  # [unix]
@@ -314,6 +315,7 @@ outputs:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
 {% if from_source_control == 'yes' %}
