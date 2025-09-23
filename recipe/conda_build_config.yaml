@@ -1,9 +1,10 @@
 python:
-  - 3.14
+  # PBP is picking this up accidentally, we don't need it
+  - 3.13
 python_impl:
   - cpython
 numpy:
-  - 1.26
+  - 2.1
 gil_type:
   - normal
   # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855
