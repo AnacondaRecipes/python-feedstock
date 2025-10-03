@@ -354,7 +354,7 @@ outputs:
       skip: True
 {% endif %}
     requirements:
-      - python {{ version }}.*
+      - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
 
   - name: python-gil
@@ -364,7 +364,7 @@ outputs:
       skip: True
 {% endif %}
     requirements:
-      - python {{ version }}.*
+      - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
 
 about:
