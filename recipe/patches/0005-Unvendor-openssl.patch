@@ -1,4 +1,4 @@
-From b1e5e1311eb575f508ce809e6e87b9f9dd5ba653 Mon Sep 17 00:00:00 2001
+From 04cfcc1728485e2fbdd04f1c34425e8377b72c61 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
 Subject: [PATCH 05/24] Unvendor openssl
@@ -90,7 +90,7 @@ index 7ca750dda8f..17eee400ebb 100644
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
 diff --git a/PCbuild/python.props b/PCbuild/python.props
-index e1c2ff3fe3c..fd194f6b465 100644
+index d4d9a54248d..fd194f6b465 100644
 --- a/PCbuild/python.props
 +++ b/PCbuild/python.props
 @@ -69,25 +69,26 @@
@@ -110,8 +110,8 @@ index e1c2ff3fe3c..fd194f6b465 100644
 -    <libffiOutDir Condition="$(libffiOutDir) == ''">$(libffiDir)$(ArchName)\</libffiOutDir>
 -    <libffiIncludeDir Condition="$(libffiIncludeDir) == ''">$(libffiOutDir)include</libffiIncludeDir>
 -    <mpdecimalDir Condition="$(mpdecimalDir) == ''">$(ExternalsDir)\mpdecimal-4.0.0\</mpdecimalDir>
--    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.16\</opensslDir>
--    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.16.2\$(ArchName)\</opensslOutDir>
+-    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.0.18\</opensslDir>
+-    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.0.18\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir Condition="$(opensslIncludeDir) == ''">$(opensslOutDir)include</opensslIncludeDir>
 +    <!--<sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.49.1.0\</sqlite3Dir>-->
 +    <!--<bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir>-->
