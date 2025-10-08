@@ -1,4 +1,4 @@
-From e5971ef3eaad780da09a6425dbef65d2b7d39f51 Mon Sep 17 00:00:00 2001
+From fa3201b09afbcd6430ccb2bcb5bb2068c5d02c25 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 16 Aug 2024 21:34:43 -0500
 Subject: [PATCH 21/24] Unvendor libmpdec
@@ -84,5 +84,5 @@ index e9d60b4db1a..0f49d7923f5 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 -- 
-2.45.2
+2.50.1 (Apple Git-155)
 

@@ -1,4 +1,4 @@
-From 3b6029c5eb9d933f4f380cfcc70406e393cc14d5 Mon Sep 17 00:00:00 2001
+From f37440af098a1b53f2498f15aed5182b9ebc4e14 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
 Subject: [PATCH 16/24] unvendor zlib
@@ -126,5 +126,5 @@ index 0e6d42cc959..144a0e3425a 100644
        <Filter>Python</Filter>
      </ClCompile>
 -- 
-2.45.2
+2.50.1 (Apple Git-155)
 

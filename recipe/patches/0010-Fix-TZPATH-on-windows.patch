@@ -1,4 +1,4 @@
-From a579d2a5a2c04cf600370d50237c4f2691a30abd Mon Sep 17 00:00:00 2001
+From ee8572ef005809c79a2ec53eccdc79ea6a42e071 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 7 Oct 2020 10:08:30 -0500
 Subject: [PATCH 10/24] Fix TZPATH on windows
@@ -20,5 +20,5 @@ index f93b98dd681..7bb48a84602 100644
          # Setting 'userbase' is done below the call to the
          # init function to enable using 'get_config_var' in
 -- 
-2.45.2
+2.50.1 (Apple Git-155)
 

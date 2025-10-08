@@ -4,7 +4,7 @@ dirs_to_add = []
 # Workaround for https://github.com/conda/conda/issues/14053
 # Older conda versions install noarch: python packages in wrong places.
 # For example python3.1 because older conda assumed python minor version
-# will have only one digit. noarhc pkgs for freethreading builds are supposed
+# will have only one digit. noarch pkgs for freethreading builds are supposed
 # to be installed into <prefix>/lib/python3.14t/site-packages, but conda
 # installs them to <prefix>/lib/python3.14/site-packages.
 # The workaround is to add all these wrong paths to sys.path using
