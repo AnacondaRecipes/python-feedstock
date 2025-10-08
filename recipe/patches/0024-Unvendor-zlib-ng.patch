@@ -1,4 +1,4 @@
-From abe0b6462216d3c5df2c0b41b43dd5f0863ad249 Mon Sep 17 00:00:00 2001
+From 19e6cbb71ce911498ab4dd6c235195562314bcef Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
 Subject: [PATCH 23/24] Unvendor zlib-ng

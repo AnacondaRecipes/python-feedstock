@@ -1,4 +1,4 @@
-From 663d1aea1a44d020f8e38795b9c802d9f6266023 Mon Sep 17 00:00:00 2001
+From a2054d6e5d86c729547a5e23ef1509f70565c4a3 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Thu, 26 Nov 2020 18:47:37 +0000
 Subject: [PATCH 09/24] Allow cross compiling for Darwin
@@ -9,7 +9,7 @@ Subject: [PATCH 09/24] Allow cross compiling for Darwin
  2 files changed, 6 insertions(+)
 
 diff --git a/configure b/configure
-index 6383271b477..76920a9b4b4 100755
+index d31c24dffa2..63aba6d8004 100755
 --- a/configure
 +++ b/configure
 @@ -4110,6 +4110,9 @@ then
@@ -23,7 +23,7 @@ index 6383271b477..76920a9b4b4 100755
  		ac_sys_system=Cygwin
  		;;
 diff --git a/configure.ac b/configure.ac
-index 42d94776cc7..6b15cef1f17 100644
+index af7a9623d7b..5f6a0622f37 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -324,6 +324,9 @@ then
