@@ -1,4 +1,4 @@
-{% set version = "3.9.23" %}
+{% set version = "3.9.24" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -44,7 +44,7 @@ source:
     git_tag: v{{ version }}{{ dev }}
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
-    sha256: 61a42919e13d539f7673cf11d1c404380e28e540510860b9d242196e165709c9
+    sha256: 668391afabd5083faafa4543753d190f82f33ce6ba22d6e9ac728b43644b278a
 {% endif %}
     patches:
       ## - patches/0000-Fix-off-by-one-error-in-_winapi_WaitForMultipleObjec.patch
@@ -120,7 +120,7 @@ outputs:
         - DLLs/_ctypes.pyd  # [win]
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
-        - {{ compiler('cxx') }}  # [unix]        
+        - {{ compiler('cxx') }}  # [unix]
         # These two are just to get the headers needed for tk.h, but is unused
         - xorg-libx11     # [linux]
         - xorg-xorgproto  # [linux]
