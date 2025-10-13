@@ -185,7 +185,6 @@ outputs:
         - {{ ccache('native') }}  # [unix]
         - ripgrep
         - sed  # [unix]
-        - {{ cdt('libuuid-devel') }}  # [linux and not (ppc64le or aarch64)]
         - make  # [not win]
         - libtool  # [unix]
         - pkg-config  # [not win]
@@ -211,6 +210,7 @@ outputs:
         - libffi {{ libffi }}
         - ld_impl_{{ target_platform }}  # [linux]
         - expat {{ expat }}
+        - libuuid 1.41.5 # [linux]
       run:
         - ld_impl_{{ target_platform }}  # [linux]
         - tzdata
