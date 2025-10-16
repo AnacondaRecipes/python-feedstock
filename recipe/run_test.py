@@ -80,7 +80,6 @@ if sys.platform != 'win32':
     import crypt
     import fcntl
     import grp
-    import nis
     import readline
     import resource
     import syslog
