@@ -1,4 +1,4 @@
-{% set version = "3.13.7" %}
+{% set version = "3.13.9" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 5462f9099dfd30e238def83c71d91897d8caa5ff6ebc7a50f14d4802cdaaa79a
+    sha256: ed5ef34cda36cfa2f3a340f07cac7e7814f91c7f3c411f6d3562323a866c5c66
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -118,7 +118,7 @@ outputs:
         - DLLs/_ctypes.pyd  # [win]
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
-        - {{ compiler('cxx') }}  # [unix]        
+        - {{ compiler('cxx') }}  # [unix]
         # These two are just to get the headers needed for tk.h, but is unused
         - xorg-libx11         # [linux]
         - xorg-xorgproto  # [linux]
