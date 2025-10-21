@@ -211,6 +211,7 @@ outputs:
         - ld_impl_{{ target_platform }}  # [linux]
         - expat {{ expat }}
         - libuuid 1.41.5 # [linux]
+        - libnsl {{ libnsl }}  # [linux]
       run:
         - ld_impl_{{ target_platform }}  # [linux]
         - tzdata
