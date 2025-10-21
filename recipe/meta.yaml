@@ -205,6 +205,7 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid  # [linux]
         - expat {{ expat }}
+        - libnsl {{ libnsl }}  # [linux]
       run:
         - libffi >=3.4,<3.5
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
