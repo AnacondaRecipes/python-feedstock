@@ -1,5 +1,5 @@
 {% set version = "3.12.12" %}
-{% set build_number = "0" %}
+{% set build_number = "1" %}
 
 {% set dev = "" %}
 {% set dev_ = "" %}
@@ -196,6 +196,7 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
         - expat {{ expat }}
+        - libnsl {{ libnsl }}  # [linux]
       run:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
