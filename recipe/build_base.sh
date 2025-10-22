@@ -531,7 +531,7 @@ fi
 # <prefix>/lib/python3.13t/site-packages.
 # Note that these directories are not added to sys.path if they do not exist.
 SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
-if [[ ${PY_FREETHREADING} == yes ]]; then
+if [[ ${PY_GIL_DISABLED} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
 # Workaround for https://github.com/conda/conda/issues/10969
