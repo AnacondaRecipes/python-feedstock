@@ -3,9 +3,13 @@ python:
 python_impl:
   - cpython
 libffi:  # [win]
-  - 3.4  # [win] 
+  - 3.4  # [win]
 numpy:
   - 1.21
+readline_mode:
+  - readline
+  - editline
+  - none
 MACOSX_SDK_VERSION:  # [osx and x86_64]
   - 10.14            # [osx and x86_64]
 CONDA_BUILD_SYSROOT:  # [osx and x86_64]
