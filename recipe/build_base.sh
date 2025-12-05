@@ -6,6 +6,22 @@ cd ${SRC_DIR}
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 
+# https://docs.python.org/3.14/using/configure.html#cmdoption-enable-experimental-jit
+# says we want a python>=3.11 to build python.  Let's only install if
+# we have to.
+if [[ $(python -V) =~ 3\.([0-9]+)\..* ]] ; then
+    if [[ ${BASH_REMATCH[1]} -lt 11 ]] ; then
+	echo "ERROR: $(python -V) is too old to build Python with" >&2
+	if [[ ! -d ${SRC_DIR}/python-bin ]]; then
+	    CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
+	    export PATH=${SRC_DIR}/python-bin/bin:${PATH}
+	fi
+    fi
+else
+    echo "WARNING: $(python -V) is not matched" >&2
+    exit 1
+fi
+
 # The LTO/PGO information was sourced from @pitrou and the Debian rules file in:
 # http://http.debian.net/debian/pool/main/p/python3.6/python3.6_3.6.2-2.debian.tar.xz
 # https://packages.debian.org/source/sid/python3.6
@@ -250,6 +266,12 @@ _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
+
+if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+ _common_configure_args+=(--enable-experimental-jit=no)
+else
+ _common_configure_args+=(--enable-experimental-jit=yes-off)
+fi
 
 if [[ ${PY_GIL_DISABLED} == yes ]]; then
     _common_configure_args+=(--disable-gil)
