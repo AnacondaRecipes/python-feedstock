@@ -375,6 +375,9 @@ outputs:
     script: install_jit_activation.sh   # [not win]
     script: install_jit_activation.bat  # [win]
     build:
+{% if gil_type == "disabled" %}
+      skip: True
+{% endif %}
       skip: true  # [py<313]
       noarch: generic
     requirements:
