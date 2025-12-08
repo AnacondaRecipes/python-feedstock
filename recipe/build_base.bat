@@ -49,7 +49,7 @@ if "%PY_GIL_DISABLED%" == "yes" (
   set "THREAD=t"
   set "EXE_T=%VER%t"
 ) else (
-  set "FREETHREADING="
+  set "FREETHREADING=--experimental-jit-off"
   set "THREAD="
   set "EXE_T="
 )
