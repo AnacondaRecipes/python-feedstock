@@ -7,19 +7,10 @@ cd ${SRC_DIR}
 cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 
 # https://docs.python.org/3.14/using/configure.html#cmdoption-enable-experimental-jit
-# says we want a python>=3.11 to build python.  Let's only install if
-# we have to.
-if [[ $(python -V) =~ 3\.([0-9]+)\..* ]] ; then
-    if [[ ${BASH_REMATCH[1]} -lt 11 ]] ; then
-	echo "ERROR: $(python -V) is too old to build Python with" >&2
-	if [[ ! -d ${SRC_DIR}/python-bin ]]; then
-	    CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
-	    export PATH=${SRC_DIR}/python-bin/bin:${PATH}
-	fi
-    fi
-else
-    echo "WARNING: $(python -V) is not matched" >&2
-    exit 1
+# says we want a python>=3.11 to build python.
+if [[ ! -d ${SRC_DIR}/python-bin ]]; then
+    CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
+    export PATH=${SRC_DIR}/python-bin/bin:${PATH}
 fi
 
 # The LTO/PGO information was sourced from @pitrou and the Debian rules file in:
