@@ -264,6 +264,11 @@ else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
 fi
 
+if [[ "${target_platform}" == osx-* ]]; then
+    # This should only be used with clang 20.1+
+    _common_configure_args+=(--with-tail-call-interp)
+fi
+
 if [[ ${PY_GIL_DISABLED} == yes ]]; then
     _common_configure_args+=(--disable-gil)
 fi
