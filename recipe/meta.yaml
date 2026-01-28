@@ -195,8 +195,8 @@ outputs:
         # "LLVM version 21 is the officially supported version"
         - clang-19         # [not win]
         - llvm-tools-19    # [not win]
-        - clang 19.*       # [win]
-        - llvm-tools 19.*  # [win]
+        - clang 20.*       # [win]
+        - llvm-tools 20.*  # [win]
       host:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
