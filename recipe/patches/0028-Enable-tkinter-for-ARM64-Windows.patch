@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Anaconda Package Builder <builder@anaconda.com>
+Date: Thu, 30 Jan 2026 12:00:00 -0700
+Subject: [PATCH 28/28] Enable _tkinter for ARM64 Windows
+
+The upstream Python build system excludes _tkinter for ARM and ARM64
+platforms due to historical lack of Tcl/Tk support. Since we now have
+Tcl/Tk packages built for win-arm64, enable _tkinter on ARM64.
+
+Keep the ARM (32-bit) exclusion as that platform is not targeted.
+---
+ PCbuild/pcbuild.proj | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
+index 1234567890..abcdefghij 100644
+--- a/PCbuild/pcbuild.proj
++++ b/PCbuild/pcbuild.proj
+@@ -60,7 +60,7 @@
+     <!-- _ssl will build _socket as well, which may cause conflicts in parallel builds -->
+     <ExtensionModules Include="_socket" Condition="!$(IncludeSSL) or !$(IncludeExternals)" />
+     <ExternalModules Include="_ssl;_hashlib" Condition="$(IncludeSSL)" />
+-    <ExternalModules Include="_tkinter" Condition="$(IncludeTkinter) and $(Platform) != 'ARM' and $(Platform) != 'ARM64'" />
++    <ExternalModules Include="_tkinter" Condition="$(IncludeTkinter) and $(Platform) != 'ARM'" />
+     <ExtensionModules Include="@(ExternalModules->'%(Identity)')" Condition="$(IncludeExternals)" />
+     <Projects Include="@(ExtensionModules->'%(Identity).vcxproj')" Condition="$(IncludeExtensions)" />
+     <!-- Test modules -->
+-- 
+2.32.1 (Apple Git-133)
+

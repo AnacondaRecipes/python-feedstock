@@ -88,6 +88,7 @@ source:
       - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
       - patches/0027-Unvendor-expat.patch
+      - patches/0028-Enable-tkinter-for-ARM64-Windows.patch  # [win]
 
 build:
   number: {{ build_number }}
