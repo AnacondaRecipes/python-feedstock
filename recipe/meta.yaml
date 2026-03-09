@@ -93,6 +93,7 @@ source:
       - patches/0023-branding.patch
       - patches/0024-Unvendor-zlib-ng.patch
       - patches/0025-Unvendor-zstd.patch
+      - patches/0026-Allow-setting-llvm-version.patch
 
 build:
   number: {{ build_number }}
