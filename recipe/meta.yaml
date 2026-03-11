@@ -1,4 +1,4 @@
-{% set version = "3.10.19" %}
+{% set version = "3.10.20" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -48,7 +48,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: c8f4a596572201d81dd7df91f70e177e19a70f1d489968b54b5fbbf29a97c076
+    sha256: de6517421601e39a9a3bc3e1bc4c7b2f239297423ee05e282598c83ec0647505
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
