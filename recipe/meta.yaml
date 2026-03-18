@@ -196,7 +196,6 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
         - expat {{ expat }}
-        - libnsl {{ libnsl }}  # [linux]
       run:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
