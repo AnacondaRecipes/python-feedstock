@@ -1,4 +1,4 @@
-{% set version = "3.12.12" %}
+{% set version = "3.12.13" %}
 {% set build_number = "1" %}
 
 {% set dev = "" %}
@@ -52,7 +52,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: fb85a13414b028c49ba18bbd523c2d055a30b56b18b92ce454ea2c51edc656c4
+    sha256: c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -196,7 +196,6 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - libuuid 1.41.5 # [linux]
         - expat {{ expat }}
-        - libnsl {{ libnsl }}  # [linux]
       run:
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
