@@ -78,7 +78,6 @@ if sys.platform != 'win32':
     if not (ppc64le or armv7l):
         import _curses
         import _curses_panel
-    import crypt
     import fcntl
     import grp
     import nis
