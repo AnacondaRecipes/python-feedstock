@@ -1,5 +1,5 @@
 anaconda_config_version: 1
 upstream_sources:
   - webpage:
-      url: https://www.python.org/ftp/python/{}/Python-{}.tar.xz
-      regex: (3.9[\d\.]+)
+      url: https://www.python.org/ftp/python/
+      regex: href="(\d+(?:\.\d+)+)/"
