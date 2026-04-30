@@ -3,4 +3,4 @@ upstream_sources:
   - webpage:
       url: https://www.python.org/ftp/python/
       regex: href="(\d+(?:\.\d+)+)/"
-      include_regex: ^3\.8\.\d+(?:[a-z][a-z0-9]*)?$
+      include_regex: ^3\.9\.\d+(?:[a-z][a-z0-9]*)?$
