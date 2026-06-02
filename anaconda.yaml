@@ -3,3 +3,9 @@ upstream_sources:
   - webpage:
       url: https://www.python.org/ftp/python/
       regex: href="(\d+(?:\.\d+)+)/"
+    packages:
+      - libpython-static
+      - python
+      - python-freethreading
+      - python-gil
+      - python-jit
