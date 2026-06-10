@@ -239,6 +239,7 @@ outputs:
         - tests/cython/*
         - tests/prefix-replacement/*
         - run_test.py
+        - regression_openssl_ctypes.py
       commands:
         - echo on  # [win]
         - set  # [win]
@@ -290,6 +291,7 @@ outputs:
         - popd
         - popd
         - python run_test.py
+        - python regression_openssl_ctypes.py
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
         - test -d "$PREFIX/lib/python3.1/site-packages"  # [unix]
