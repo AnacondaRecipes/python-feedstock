@@ -42,11 +42,32 @@ def _openssl_ge(version: tuple[int, int, int]) -> bool:
     return tuple(map(int, m.groups())) >= version
 
 
+# CPython Lib/test/capath/4e1295a3.0 (Neuronio CA).  Embedded so the test does
+# not depend on the stdlib test tree being installed in the conda package.
+_EMBEDDED_CA_PEM = """\
+-----BEGIN CERTIFICATE-----
+MIICLDCCAdYCAQAwDQYJKoZIhvcNAQEEBQAwgaAxCzAJBgNVBAYTAlBUMRMwEQYD
+VQQIEwpRdWVlbnNsYW5kMQ8wDQYDVQQHEwZMaXNib2ExFzAVBgNVBAoTDk5ldXJv
+bmlvLCBMZGEuMRgwFgYDVQQLEw9EZXNlbnZvbHZpbWVudG8xGzAZBgNVBAMTEmJy
+dXR1cy5uZXVyb25pby5wdDEbMBkGCSqGSIb3DQEJARYMc2FtcG9AaWtpLmZpMB4X
+DTk2MDkwNTAzNDI0M1oXDTk2MTAwNTAzNDI0M1owgaAxCzAJBgNVBAYTAlBUMRMw
+EQYDVQQIEwpRdWVlbnNsYW5kMQ8wDQYDVQQHEwZMaXNib2ExFzAVBgNVBAoTDk5l
+dXJvbmlvLCBMZGEuMRgwFgYDVQQLEw9EZXNlbnZvbHZpbWVudG8xGzAZBgNVBAMT
+EmJydXR1cy5uZXVyb25pby5wdDEbMBkGCSqGSIb3DQEJARYMc2FtcG9AaWtpLmZp
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAL7+aty3S1iBA/+yxjxv4q1MUTd1kjNw
+L4lYKbpzzlmC5beaQXeQ2RmGMTXU+mDvuqItjVHOK3DvPK7lTcSGftUCAwEAATAN
+BgkqhkiG9w0BAQQFAANBAFqPEKFjk6T6CKTHvaQeEAsX0/8YHPHqH/9AnhSjrwuX
+9EBc0n6bVGhN7XaXd6sJ7dym9sbsWxb+pJdurnkxjx4=
+-----END CERTIFICATE-----
+"""
+
+
 def _load_test_ca_pem() -> str:
     import sysconfig
 
     stdlib = sysconfig.get_path("stdlib")
     candidates = [
+        os.path.join(stdlib, "test", "capath", "4e1295a3.0"),
         os.path.join(stdlib, "test", "certdata", "capath", "5ed36f99.0"),
         os.path.join(stdlib, "test", "certdata", "keycert.pem"),
     ]
@@ -54,9 +75,7 @@ def _load_test_ca_pem() -> str:
         if os.path.isfile(path):
             with open(path, encoding="ascii") as f:
                 return f.read()
-    raise FileNotFoundError(
-        "No test CA PEM found under %s; install the python test suite" % stdlib
-    )
+    return _EMBEDDED_CA_PEM
 
 
 def test_ssl_der_eof_single_cert() -> tuple[str, str, str]:
@@ -171,15 +190,16 @@ def main() -> int:
     for test in TESTS:
         try:
             name, status, detail = test()
-        except Exception:
+        except Exception as exc:
             failed += 1
-            print("FAIL  %s" % test.__name__)
-            traceback.print_exc()
+            print("FAIL  %s  -  %s: %s" % (test.__name__, type(exc).__name__, exc))
+            if os.environ.get("REGRESSION_DEBUG"):
+                traceback.print_exc()
             print()
             continue
         line = "%-4s  %s" % (status, name)
         if detail:
-            line += "  —  %s" % detail
+            line += "  -  %s" % detail
         print(line)
         if status == "FAIL":
             failed += 1
