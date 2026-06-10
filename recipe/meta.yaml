@@ -79,7 +79,6 @@ source:
       # https://github.com/pypa/distutils/pull/53
       - patches/0019-Fix-LDSHARED-when-CC-is-overriden-on-Linux-too.patch
       - patches/0020-Unvendor-bzip2.patch
-      # also sets USING_MALLOC_CLOSURE_DOT_C=1 on _ctypes.vcxproj (gh-29791)
       - patches/0021-Unvendor-libffi.patch
       - patches/0022-Unvendor-tcltk.patch
       - patches/0023-unvendor-xz.patch

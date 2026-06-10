@@ -7,7 +7,7 @@ Backport https://github.com/python/cpython/pull/29791 (bpo-45898) for
 Windows builds that link against an external libffi DLL instead of the
 vendored copy.  Delay fielddesc initialization and remove duplicate
 ffi_type definitions from cfield.c.  (FFI_BUILDING is replaced with
-USING_MALLOC_CLOSURE_DOT_C=1 in 0021-Unvendor-libffi.patch.)
+USING_MALLOC_CLOSURE_DOT_C=1 in 0015-Doing-d1trimfile.patch.)
 ---
 diff --git a/Modules/_ctypes/cfield.c b/Modules/_ctypes/cfield.c
 index 534ec94..240b73c 100644
