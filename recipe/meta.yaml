@@ -89,7 +89,7 @@ source:
       {% endif %}
       - patches/0027-Unvendor-expat.patch
       # https://github.com/python/cpython/pull/100373 (OpenSSL 3.5.7 Windows cert-store fix)
-      - patches/0028-Fix-ssl-DER-EOF-detection-for-openssl-3.5.7.patch
+      # - patches/0028-Fix-ssl-DER-EOF-detection-for-openssl-3.5.7.patch
       # https://github.com/python/cpython/pull/29791
       - patches/0029-Fix-ctypes-fielddesc-init-for-external-libffi.patch
 
