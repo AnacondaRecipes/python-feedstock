@@ -79,6 +79,7 @@ source:
       # https://github.com/pypa/distutils/pull/53
       - patches/0019-Fix-LDSHARED-when-CC-is-overriden-on-Linux-too.patch
       - patches/0020-Unvendor-bzip2.patch
+      # also sets USING_MALLOC_CLOSURE_DOT_C=1 on _ctypes.vcxproj (gh-29791)
       - patches/0021-Unvendor-libffi.patch
       - patches/0022-Unvendor-tcltk.patch
       - patches/0023-unvendor-xz.patch
@@ -88,6 +89,10 @@ source:
       - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
       - patches/0027-Unvendor-expat.patch
+      # https://github.com/python/cpython/pull/100373 (OpenSSL 3.5.7 Windows cert-store fix)
+      - patches/0028-Fix-ssl-DER-EOF-detection-for-openssl-3.5.7.patch
+      # https://github.com/python/cpython/pull/29791
+      - patches/0029-Fix-ctypes-fielddesc-init-for-external-libffi.patch
 
 build:
   number: {{ build_number }}

@@ -4,9 +4,17 @@ Date: Mon, 16 Aug 2021 03:07:40 -0700
 Subject: [PATCH 21/25] Unvendor libffi
 
 ---
- PCbuild/libffi.props | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ PCbuild/_ctypes.vcxproj |  2 +-
+ PCbuild/libffi.props    | 15 +++------------
+ 2 files changed, 4 insertions(+), 13 deletions(-)
 
+diff --git a/PCbuild/_ctypes.vcxproj b/PCbuild/_ctypes.vcxproj
+index 69e4271a9b..a8f3c2b1d4 100644
+--- a/PCbuild/_ctypes.vcxproj
++++ b/PCbuild/_ctypes.vcxproj
+@@ -97 +97 @@
+-      <PreprocessorDefinitions>FFI_BUILDING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>USING_MALLOC_CLOSURE_DOT_C=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 diff --git a/PCbuild/libffi.props b/PCbuild/libffi.props
 index 975c4a0d35..97fb5966bf 100644
 --- a/PCbuild/libffi.props
