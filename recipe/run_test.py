@@ -99,3 +99,10 @@ import ssl
 print('OPENSSL_VERSION:', ssl.OPENSSL_VERSION)
 CONDA_OPENSSL_VERSION = os.getenv("openssl")
 assert CONDA_OPENSSL_VERSION in ssl.OPENSSL_VERSION
+
+# xref https://github.com/conda-forge/openssl-feedstock/issues/237
+from pathlib import Path
+pem = Path(__file__).with_name("test-cert.pem").read_text()
+der = ssl.PEM_cert_to_DER_cert(pem)
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ctx.load_verify_locations(cadata=der)
