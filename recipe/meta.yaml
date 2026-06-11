@@ -236,6 +236,7 @@ outputs:
         - tests/cython/*
         - tests/prefix-replacement/*
         - run_test.py
+        - test-cert.pem
       commands:
         - echo on  # [win]
         - set  # [win]
