@@ -1,11 +1,52 @@
 anaconda_config_version: 1
 upstream_sources:
-  - webpage:
-      url: https://www.python.org/ftp/python/
-      regex: href="(\d+(?:\.\d+)+)/"
+  - github:
+      identifier: python/cpython
+      use_max_tag: true
+      include_regex: ^v\d+\.\d+\.\d+$
+      from_pattern: ^v(\d+\.\d+\.\d+)$
+      to_pattern: \1
     packages:
       - libpython-static
       - python
       - python-freethreading
       - python-gil
       - python-jit
+  - webpage:
+      url: https://www.python.org/ftp/python/
+      regex: href="(3\.13\.\d+)/"
+    packages:
+      - libpython-static
+      - python
+      - python-freethreading
+      - python-gil
+    feedstock_branch: 'main-3.13'
+    version_matchspec: '>=3.13,<3.14'
+    supported: true
+  - webpage:
+      url: https://www.python.org/ftp/python/
+      regex: href="(3\.12\.\d+)/"
+    packages:
+      - libpython-static
+      - python
+    feedstock_branch: 'main-3.12'
+    version_matchspec: '>=3.12,<3.13'
+    supported: true
+  - webpage:
+      url: https://www.python.org/ftp/python/
+      regex: href="(3\.11\.\d+)/"
+    packages:
+      - libpython-static
+      - python
+    feedstock_branch: 'main-3.11'
+    version_matchspec: '>=3.11,<3.12'
+    supported: true
+  - webpage:
+      url: https://www.python.org/ftp/python/
+      regex: href="(3\.10\.\d+)/"
+    packages:
+      - libpython-static
+      - python
+    feedstock_branch: 'main-3.10'
+    version_matchspec: '>=3.10,<3.11'
+    supported: true
