@@ -101,7 +101,8 @@ index 69e4271a9b..f28002d190 100644
 @@ -95,6 +95,10 @@
    <ItemDefinitionGroup>
      <ClCompile>
-       <PreprocessorDefinitions>FFI_BUILDING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <PreprocessorDefinitions>FFI_BUILDING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>USING_MALLOC_CLOSURE_DOT_C=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 +      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
 +      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='PGInstrument|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
 +      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='PGUpdate|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
