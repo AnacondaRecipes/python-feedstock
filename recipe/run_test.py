@@ -96,5 +96,6 @@ if not (armv6l or armv7l or ppc64le or osx105):
 
 import ssl
 print('OPENSSL_VERSION:', ssl.OPENSSL_VERSION)
-CONDA_OPENSSL_VERSION = os.getenv("openssl")
-assert CONDA_OPENSSL_VERSION in ssl.OPENSSL_VERSION
+# OPENSSL_VERSION is the libssl loaded at runtime, not the build-time link version.
+assert ssl.OPENSSL_VERSION.startswith("OpenSSL 3."), (
+    f"expected OpenSSL 3.x, got {ssl.OPENSSL_VERSION!r}")

@@ -84,9 +84,7 @@ source:
       - patches/0023-unvendor-xz.patch
       - patches/0024-unvendor-zlib.patch
       - patches/0025-Do-not-pass-g-to-GCC-when-not-Py_DEBUG.patch
-      {% if (openssl | string).startswith('3.0') %}
-      - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch
-      {% endif %}
+      - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch  # [win]
       # https://github.com/python/cpython/pull/100373 (OpenSSL 3.5.7 Windows cert-store fix)
       - patches/0027-Fix-ssl-DER-EOF-detection-for-openssl-3.5.7.patch
       # https://github.com/python/cpython/pull/29791 (external libffi on Windows)
@@ -197,7 +195,8 @@ outputs:
         - sqlite
         - xz
         - zlib
-        - openssl
+        - openssl >=3.0,<3.1  # [win]
+        - openssl  # [not win]
         - readline  # [not win]
         - tk
         # These two are just to get the headers needed for tk.h, but is unused
