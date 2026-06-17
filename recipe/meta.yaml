@@ -91,6 +91,7 @@ source:
       - patches/0019-Remove-unused-readelf.patch
       - patches/0021-Override-configure-LIBFFI.patch
       - patches/0022-Unvendor-libmpdec.patch
+      - patches/0023-Win32-fallback-expat-HashSalt16Bytes.patch
 
 build:
   number: {{ build_number }}
