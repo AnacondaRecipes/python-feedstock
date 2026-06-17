@@ -11,10 +11,9 @@ until libexpat is rebuilt (gh-149018).
  1 file changed, 11 insertions(+)
 
 diff --git a/Modules/pyexpat.c b/Modules/pyexpat.c
-index 00000000000..11111111111 100644
 --- a/Modules/pyexpat.c
 +++ b/Modules/pyexpat.c
-@@ -1463,7 +1463,14 @@ newxmlparser(XmlparserObject *self, PyObject *args, PyObject *kwds)
+@@ -1463,7 +1463,14 @@
      }
  #if XML_COMBINED_VERSION >= 20800
      /* This feature was added upstream in libexpat 2.8.0. */
@@ -29,7 +28,7 @@ index 00000000000..11111111111 100644
  #elif XML_COMBINED_VERSION >= 20100
      /* This feature was added upstream in libexpat 2.1.0. */
      XML_SetHashSalt(self->itself,
-@@ -2327,7 +2334,11 @@ PyInit_pyexpat(void)
+@@ -2327,7 +2334,11 @@
      capi->SetHashSalt = NULL;
  #endif
  #if XML_COMBINED_VERSION >= 20800
