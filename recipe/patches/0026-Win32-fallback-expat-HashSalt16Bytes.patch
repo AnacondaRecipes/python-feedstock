@@ -11,7 +11,6 @@ until libexpat is rebuilt (gh-149018).
  1 file changed, 11 insertions(+)
 
 diff --git a/Modules/pyexpat.c b/Modules/pyexpat.c
-index 00000000000..11111111111 100644
 --- a/Modules/pyexpat.c
 +++ b/Modules/pyexpat.c
 @@ -1495,7 +1495,14 @@ newxmlparser(XmlparserObject *self, PyObject *args, PyObject *kwds)
