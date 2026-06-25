@@ -1,8 +1,3 @@
-# filename: run_test.py
-# Placement: recipe root, next to meta.yaml. conda-build auto-discovers a file
-#   named run_test.py and executes it in the *test* environment after the build.
-# Purpose: validate a Python 3.15.0bN build and probe the 3.15 PEP feature set.
-#
 # Design contract:
 #   - HARD checks (interpreter identity, core stdlib, ABI/build sanity) -> failure
 #     fails the conda-build test phase (non-zero exit).
