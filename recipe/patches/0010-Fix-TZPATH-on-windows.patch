@@ -1,4 +1,4 @@
-From 6a6f59eed43a4ef714df3b63a9d640f5c5c99ea3 Mon Sep 17 00:00:00 2001
+From 6c068469e0422e69e53b589fcb73aca7d429eb94 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 7 Oct 2020 10:08:30 -0500
 Subject: [PATCH 10/24] Fix TZPATH on windows
@@ -8,10 +8,10 @@ Subject: [PATCH 10/24] Fix TZPATH on windows
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
-index 2ecbff222fe..54d37a5d4e7 100644
+index 47415adce04..78659c358db 100644
 --- a/Lib/sysconfig/__init__.py
 +++ b/Lib/sysconfig/__init__.py
-@@ -555,6 +555,7 @@ def _init_config_vars():
+@@ -550,6 +550,7 @@ def _init_config_vars():
      if os.name == 'nt':
          _init_non_posix(_CONFIG_VARS)
          _CONFIG_VARS['VPATH'] = sys._vpath
@@ -20,5 +20,5 @@ index 2ecbff222fe..54d37a5d4e7 100644
          # Setting 'userbase' is done below the call to the
          # init function to enable using 'get_config_var' in
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

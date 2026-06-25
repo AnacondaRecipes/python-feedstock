@@ -1,4 +1,4 @@
-From 0eebd158398783bc754a17de1585648bea86f6b1 Mon Sep 17 00:00:00 2001
+From 4513e4447567bbd85ecba7c09e1951b7bb79824a Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
 Subject: [PATCH 22/24] branding
@@ -9,10 +9,10 @@ Subject: [PATCH 22/24] branding
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/platform.py b/Lib/platform.py
-index 784b6b749b7..b24c0acf5fd 100644
+index 36489d4fdd9..56c79ffe547 100644
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
-@@ -1208,7 +1208,7 @@ def _sys_version(sys_version=None):
+@@ -1139,7 +1139,7 @@ def _sys_version(sys_version=None):
      else:
          # CPython
          cpython_sys_version_parser = re.compile(
@@ -47,5 +47,5 @@ index 8d8bc6ea700..eee07cd5c82 100644
      PyOS_snprintf(version, sizeof(version), buildinfo_format,
                    PY_VERSION, Py_GetBuildInfo(), Py_GetCompiler());
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

@@ -1,16 +1,16 @@
-From 19e6cbb71ce911498ab4dd6c235195562314bcef Mon Sep 17 00:00:00 2001
+From bd0276b98bafd18a8e6b29ef336136ea8691178d Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
 Subject: [PATCH 23/24] Unvendor zlib-ng
 
 ---
  PCbuild/pcbuild.proj            |   2 +-
- PCbuild/zlib-ng.vcxproj         | 122 +----------------
+ PCbuild/zlib-ng.vcxproj         | 124 +----------------
  PCbuild/zlib-ng.vcxproj.filters | 228 --------------------------------
- 3 files changed, 2 insertions(+), 350 deletions(-)
+ 3 files changed, 2 insertions(+), 352 deletions(-)
 
 diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
-index 7a5327bf016..cde688ef534 100644
+index 9d077bbd3f0..bed07aefa7f 100644
 --- a/PCbuild/pcbuild.proj
 +++ b/PCbuild/pcbuild.proj
 @@ -48,7 +48,7 @@
@@ -23,7 +23,7 @@ index 7a5327bf016..cde688ef534 100644
      <!--
      Parallel build is explicitly disabled for this project because it
 diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
-index de1698ae718..e3c9b16f6ef 100644
+index ffe8e70f2db..e3c9b16f6ef 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
 @@ -73,9 +73,6 @@
@@ -45,7 +45,7 @@ index de1698ae718..e3c9b16f6ef 100644
        <PreprocessorDefinitions>%(PreprocessorDefinitions);ZLIB_COMPAT;WITH_GZFILEOP;NO_FSEEKO;HAVE_BUILTIN_ASSUME_ALIGNED;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Platform) == 'Win32' or $(Platform) == 'x64'">%(PreprocessorDefinitions);X86_FEATURES;X86_HAVE_XSAVE_INTRIN;X86_SSE2;X86_SSSE3;X86_SSE42;X86_PCLMULQDQ_CRC;X86_AVX2;X86_AVX512;X86_AVX512VNNI;X86_VPCLMULQDQ_CRC</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Configuration) == 'Debug'">%(PreprocessorDefinitions);ZLIB_DEBUG</PreprocessorDefinitions>
-@@ -102,132 +99,15 @@
+@@ -102,134 +99,15 @@
      </ClCompile>
    </ItemDefinitionGroup>
    <ItemGroup>
@@ -166,13 +166,15 @@ index de1698ae718..e3c9b16f6ef 100644
 -    <PropertyGroup>
 -      <Text>$([System.IO.File]::ReadAllText('$(zlibNgDir)\zlib.h.in').Replace('@ZLIB_SYMBOL_PREFIX@', ''))</Text>
 -    </PropertyGroup>
--    <WriteLinesToFile File="$(IntDir)zlib.h" Lines="$(Text)" />
+-    <MakeDir Directories="$(GeneratedZlibNgDir)" />
+-    <WriteLinesToFile File="$(GeneratedZlibNgDir)zlib.h" Lines="$(Text)" />
 -  </Target>
 -  <Target Name="_EnsureZlibNgH" Inputs="$(zlibNgDir)\zlib-ng.h.in" Outputs="$(IntDir)zlib-ng.h">
 -    <PropertyGroup>
 -      <Text>$([System.IO.File]::ReadAllText('$(zlibNgDir)\zlib-ng.h.in').Replace('@ZLIB_SYMBOL_PREFIX@', ''))</Text>
 -    </PropertyGroup>
--    <WriteLinesToFile File="$(IntDir)zlib-ng.h" Lines="$(Text)" />
+-    <MakeDir Directories="$(GeneratedZlibNgDir)" />
+-    <WriteLinesToFile File="$(GeneratedZlibNgDir)zlib-ng.h" Lines="$(Text)" />
 -  </Target>
 -
 -  <Target Name="_EnsureZlibNgHeaders" BeforeTargets="PrepareForBuild"
@@ -426,5 +428,5 @@ index addbd45f880..0280369b001 100644
    <ItemGroup>
      <Filter Include="Source Files">
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

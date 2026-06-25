@@ -1,4 +1,4 @@
-From d5656337151f4e876436e7baa7dc01b4f907c5b6 Mon Sep 17 00:00:00 2001
+From 3f1f9787e7e3a15dd7e490666d338fd4aaf9ed5f Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Tue, 5 Oct 2021 12:42:06 -0700
 Subject: [PATCH 06/24] Unvendor sqlite3
@@ -39,10 +39,10 @@ index 9ae0a0fc3a0..9baaafed518 100644
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
    <ImportGroup Label="ExtensionTargets">
 diff --git a/PCbuild/pcbuild.sln b/PCbuild/pcbuild.sln
-index 7296ea75301..a7f716ff105 100644
+index 09a989d3864..086ca1132c0 100644
 --- a/PCbuild/pcbuild.sln
 +++ b/PCbuild/pcbuild.sln
-@@ -98,8 +98,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyexpat", "pyexpat.vcxproj"
+@@ -99,8 +99,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyexpat", "pyexpat.vcxproj"
  EndProject
  Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_hashlib", "_hashlib.vcxproj", "{447F05A8-F581-4CAC-A466-5AC7936E207E}"
  EndProject
@@ -75,5 +75,5 @@ index f12ec348b37..f9e5e449a49 100644
    <ItemDefinitionGroup>
      <ClCompile>
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

@@ -1,4 +1,4 @@
-From 9acbf2d73db9c5cbca2c31d913411994b809cf89 Mon Sep 17 00:00:00 2001
+From 9ecc3565406cd6fb0c9d1c8844e5612a2cd434d2 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 24 Dec 2019 18:37:17 +0100
 Subject: [PATCH 07/24] Add CondaEcosystemModifyDllSearchPath()
@@ -33,10 +33,10 @@ Co-authored-by: Isuru Fernando <isuruf@gmail.com>
  1 file changed, 95 insertions(+)
 
 diff --git a/Python/pylifecycle.c b/Python/pylifecycle.c
-index 352787c6495..4fd4fcb0f6e 100644
+index 3933c321ed2..9a4a8c5a024 100644
 --- a/Python/pylifecycle.c
 +++ b/Python/pylifecycle.c
-@@ -80,6 +80,10 @@
+@@ -88,6 +88,10 @@
  
  #ifdef MS_WINDOWS
  #  undef BYTE
@@ -47,7 +47,7 @@ index 352787c6495..4fd4fcb0f6e 100644
  #endif
  
  #define PUTS(fd, str) (void)_Py_write_noraise(fd, str, (int)strlen(str))
-@@ -114,6 +118,93 @@ GENERATE_DEBUG_SECTION(PyRuntime, _PyRuntimeState _PyRuntime)
+@@ -122,6 +126,93 @@ GENERATE_DEBUG_SECTION(PyRuntime, _PyRuntimeState _PyRuntime)
  = _PyRuntimeState_INIT(_PyRuntime, _Py_Debug_Cookie);
  _Py_COMP_DIAG_POP
  
@@ -141,7 +141,7 @@ index 352787c6495..4fd4fcb0f6e 100644
  
  static int runtime_initialized = 0;
  
-@@ -131,6 +222,10 @@ _PyRuntime_Initialize(void)
+@@ -139,6 +230,10 @@ _PyRuntime_Initialize(void)
      }
      runtime_initialized = 1;
  
@@ -153,5 +153,5 @@ index 352787c6495..4fd4fcb0f6e 100644
  }
  
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 
