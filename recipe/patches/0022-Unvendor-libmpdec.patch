@@ -5,13 +5,13 @@ Subject: [PATCH 21/24] Unvendor libmpdec
 
 ---
  PCbuild/_decimal.vcxproj | 51 ++++++----------------------------------
- 1 file changed, 7 insertions(+), 44 deletions(-)
+ 1 file changed, 6 insertions(+), 44 deletions(-)
 
 diff --git a/PCbuild/_decimal.vcxproj b/PCbuild/_decimal.vcxproj
 index 921d22e47b3..0f49d7923f5 100644
 --- a/PCbuild/_decimal.vcxproj
 +++ b/PCbuild/_decimal.vcxproj
-@@ -93,64 +93,27 @@
+@@ -93,60 +93,22 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -23,10 +23,6 @@ index 921d22e47b3..0f49d7923f5 100644
        <PreprocessorDefinitions Condition="'$(Platform)' == 'x64'">CONFIG_64;MASM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 -      <AdditionalIncludeDirectories>..\Modules\_decimal;..\Modules\_decimal\windows;$(mpdecimalDir)\libmpdec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 +      <AdditionalIncludeDirectories>..\Modules\_decimal;$(condaDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
-       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='PGInstrument|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
-       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='PGUpdate|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
-       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/d1trimfile:%SRC_DIR%</AdditionalOptions>
      </ClCompile>
 +    <Link>
 +      <AdditionalLibraryDirectories>$(condaDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -53,7 +49,6 @@ index 921d22e47b3..0f49d7923f5 100644
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\typearith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\umodarith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\vccompat.h" />
-+    <ClInclude Include="..\Modules\_decimal\docstrings.h" />
    </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\_decimal\_decimal.c" />
@@ -85,4 +80,3 @@ index 921d22e47b3..0f49d7923f5 100644
      <ResourceCompile Include="..\PC\python_nt.rc" />
 -- 
 2.51.0
-
