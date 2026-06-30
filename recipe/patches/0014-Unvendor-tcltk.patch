@@ -5,11 +5,11 @@ Subject: [PATCH 14/24] Unvendor tcltk
 
 ---
  PCbuild/_tkinter.vcxproj | 6 ------
- PCbuild/tcltk.props      | 8 +++-----
- 2 files changed, 3 insertions(+), 11 deletions(-)
+ PCbuild/tcltk.props      | 7 +++----
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/PCbuild/_tkinter.vcxproj b/PCbuild/_tkinter.vcxproj
-index de9358312ac..3fe2c29c823 100644
+index de93583..3fe2c29 100644
 --- a/PCbuild/_tkinter.vcxproj
 +++ b/PCbuild/_tkinter.vcxproj
 @@ -128,12 +128,6 @@
@@ -26,14 +26,13 @@ index de9358312ac..3fe2c29c823 100644
      <WriteLinesToFile File="$(OutDir)TCL_LIBRARY.env" Lines="$(tcltkdir)\lib\tcl$(TclMajorVersion).$(TclMinorVersion)" Encoding="utf-8" Overwrite="true" />
    </Target>
 diff --git a/PCbuild/tcltk.props b/PCbuild/tcltk.props
-index 28e8c0db4d1..537de0e5e38 100644
+index 28e8c0d..cf2b2dc 100644
 --- a/PCbuild/tcltk.props
 +++ b/PCbuild/tcltk.props
-@@ -12,15 +12,13 @@
-     <TkMinorVersion>$([System.Version]::Parse($(TkVersion)).Minor)</TkMinorVersion>
+@@ -13,10 +13,9 @@
      <TkPatchLevel>$([System.Version]::Parse($(TkVersion)).Build)</TkPatchLevel>
      <TkRevision>$([System.Version]::Parse($(TkVersion)).Revision)</TkRevision>
--    <!-- Back compat hack.  If you're here wondering about -core vs not, do us both a favor and just override the whole tclDir variable -->
+     <!-- Back compat hack.  If you're here wondering about -core vs not, do us both a favor and just override the whole tclDir variable -->
 -    <tclDir Condition="$(tclDir) == '' and $(TclMajorVersion) == '8'">$(ExternalsDir)tcl-core-$(TclVersion)\</tclDir>
 -    <tclDir Condition="$(tclDir) == ''">$(ExternalsDir)tcl-$(TclVersion)\</tclDir>
 -    <tkDir Condition="$(tkDir) == ''">$(ExternalsDir)tk-$(TkVersion)\</tkDir>
@@ -44,10 +43,3 @@ index 28e8c0db4d1..537de0e5e38 100644
      <tcltkSuffix Condition="'$(TclMajorVersion)' == '8'">t</tcltkSuffix>
      <tkPrefix Condition="'$(TclMajorVersion)' == '9'">tcl9</tkPrefix>
      <TclshNativeFlag Condition="$(Platform) != 'Win32'">TCLSH_NATIVE="$(tcltkDir)\..\win32\bin\tclsh$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix).exe"</TclshNativeFlag>
-     <tclExternalTommath Condition="$(TclMajorVersion) == '9'">TCL_WITH_EXTERNAL_TOMMATH;</tclExternalTommath>
- 
-     <!--<TclDebugExt Condition="'$(Configuration)' == 'Debug'">g</TclDebugExt>-->
-     <tclDLLName >tcl$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix)$(TclDebugExt).dll</tclDLLName>
--- 
-2.51.0
-
