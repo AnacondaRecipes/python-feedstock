@@ -315,6 +315,8 @@ outputs:
     script: build_static.bat  # [win]
     build:
       number: {{ build_number }}
+      force_use_keys:
+        - gil_type
       activate_in_script: true
       ignore_run_exports:
         - python_abi
