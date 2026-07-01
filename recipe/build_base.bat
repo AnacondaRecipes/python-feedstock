@@ -48,6 +48,11 @@ if "%PY_GIL_DISABLED%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
+  :: Free-threaded MSBuild output goes to PCbuild\amd64t\ (or win32t\), not amd64\.
+  :: Upstream python.props sets BuildPath=BuildPath64t when DisableGil=true; all
+  :: exes, .pyd, and .lib artifacts land there.  BUILD_PATH below is used to
+  :: stage those files into %PREFIX% — leaving it at amd64 makes xcopy *.pyd fail
+  :: with "File not found" even though the compile itself succeeded.
   if "%ARCH%"=="64" (
     set BUILD_PATH=amd64t
   ) else (
