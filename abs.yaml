@@ -5,5 +5,5 @@ build_parameters:
   - "--error-overlinking"
   - "--error-overdepending"
 
-build_env_vars:
-  ANACONDA_ROCKET_ENABLE_PY315 : yes
+upload_channels:
+  - ad-testing
