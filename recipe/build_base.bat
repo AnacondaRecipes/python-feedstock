@@ -90,6 +90,21 @@ for %%x in (python%VERNODOTS%%THREAD%%_D%.dll python3%THREAD%%_D%.dll python%EXE
   )
 )
 
+:: Free-threaded builds emit both python3t.dll (interpreter) and python3.dll (stable ABI
+:: shim for limited-API extensions).  The loop above stages python3t.dll via
+:: python3%THREAD%.dll; xxlimited*.pyd and other Py_LIMITED_API modules still import
+:: python3.dll — conda-build overlinking fails if it is not copied into %PREFIX%:
+:: ERROR (python,DLLs/xxlimited_3_13.cp315t-win_amd64.pyd): $RPATH/python3.dll not found in packages, sysroot(s) nor the missing_dso_whitelist.
+:: ERROR (python,DLLs/xxlimited.cp315t-win_amd64.pyd): $RPATH/python3.dll not found in packages, sysroot(s) nor the missing_dso_whitelist.
+:: ERROR (python,DLLs/xxlimited_35.cp315t-win_amd64.pyd): $RPATH/python3.dll not found in packages, sysroot(s) nor the missing_dso_whitelist.
+if "%PY_GIL_DISABLED%" == "yes" (
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%_D%.dll (
+    copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%_D%.dll %PREFIX%
+  ) else (
+    echo "WARNING :: %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%_D%.dll does not exist"
+  )
+)
+
 for %%x in (python%_D%.pdb python%VERNODOTS%%_D%.pdb pythonw%_D%.pdb) do (
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x (
     copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x %PREFIX%
