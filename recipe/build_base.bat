@@ -57,9 +57,11 @@ if "%PY_GIL_DISABLED%" == "yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
-:: Pin Tcl/Tk 8.6 - mirrors build_base.sh (-ltcl8.6 -ltk8.6); upstream 3.15
-:: tcltk.props defaults TclVersion to 9.0.3.0, but pkgs/main only ships tk 8.6.
-set TCLTK_MSBUILD_PROPS="/p:TclVersion=8.6.15.0" "/p:TkVersion=8.6.15.0"
+:: Pin Tcl/Tk from the `tk` variant in conda_build_config.yaml (single source of
+:: truth, shared with build_base.sh). Upstream 3.15 tcltk.props defaults
+:: TclVersion to 9.0.3.0, but pkgs/main only ships tk 8.6; MSBuild derives the
+:: lib names (tcl86t.lib/tk86t.lib) from the major.minor of these props.
+set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
 cd PCbuild
 
