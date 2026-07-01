@@ -57,11 +57,15 @@ if "%PY_GIL_DISABLED%" == "yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
+:: Pin Tcl/Tk 8.6 - mirrors build_base.sh (-ltcl8.6 -ltk8.6); upstream 3.15
+:: tcltk.props defaults TclVersion to 9.0.3.0, but pkgs/main only ships tk 8.6.
+set TCLTK_MSBUILD_PROPS="/p:TclVersion=8.6.15.0" "/p:TkVersion=8.6.15.0"
+
 cd PCbuild
 
 :: Twice because:
 :: error : importlib_zipimport.h updated. You will need to rebuild pythoncore to see the changes.
-call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM%
+call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM% %TCLTK_MSBUILD_PROPS%
 if errorlevel 1 exit 1
 cd ..
 
