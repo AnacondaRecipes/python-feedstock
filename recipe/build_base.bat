@@ -48,6 +48,11 @@ if "%PY_GIL_DISABLED%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
+  if "%ARCH%"=="64" (
+    set BUILD_PATH=amd64t
+  ) else (
+    set BUILD_PATH=win32t
+  )
 ) else (
   set "FREETHREADING=--experimental-jit-off"
   set "THREAD="
