@@ -5,8 +5,8 @@ Subject: [PATCH 14/24] Unvendor tcltk
 
 ---
  PCbuild/_tkinter.vcxproj | 6 ------
- PCbuild/tcltk.props      | 7 +++----
- 2 files changed, 3 insertions(+), 10 deletions(-)
+ PCbuild/tcltk.props      | 9 ++++-----
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
 diff --git a/PCbuild/_tkinter.vcxproj b/PCbuild/_tkinter.vcxproj
 index de93583..3fe2c29 100644
@@ -26,9 +26,18 @@ index de93583..3fe2c29 100644
      <WriteLinesToFile File="$(OutDir)TCL_LIBRARY.env" Lines="$(tcltkdir)\lib\tcl$(TclMajorVersion).$(TclMinorVersion)" Encoding="utf-8" Overwrite="true" />
    </Target>
 diff --git a/PCbuild/tcltk.props b/PCbuild/tcltk.props
-index 28e8c0d..cf2b2dc 100644
+index 28e8c0d..e8bdd80 100644
 --- a/PCbuild/tcltk.props
 +++ b/PCbuild/tcltk.props
+@@ -2,7 +2,7 @@
+ <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <Import Project="pyproject.props" Condition="$(__PyProject_Props_Imported) != 'true'" />
+   <PropertyGroup>
+-    <TclVersion Condition="$(TclVersion) == ''">9.0.3.0</TclVersion>
++    <TclVersion Condition="$(TclVersion) == ''">8.6.15.0</TclVersion>
+     <TkVersion Condition="$(TkVersion) == ''">$(TclVersion)</TkVersion>
+     <TclMajorVersion>$([System.Version]::Parse($(TclVersion)).Major)</TclMajorVersion>
+     <TclMinorVersion>$([System.Version]::Parse($(TclVersion)).Minor)</TclMinorVersion>
 @@ -13,10 +13,9 @@
      <TkPatchLevel>$([System.Version]::Parse($(TkVersion)).Build)</TkPatchLevel>
      <TkRevision>$([System.Version]::Parse($(TkVersion)).Revision)</TkRevision>
@@ -43,3 +52,6 @@ index 28e8c0d..cf2b2dc 100644
      <tcltkSuffix Condition="'$(TclMajorVersion)' == '8'">t</tcltkSuffix>
      <tkPrefix Condition="'$(TclMajorVersion)' == '9'">tcl9</tkPrefix>
      <TclshNativeFlag Condition="$(Platform) != 'Win32'">TCLSH_NATIVE="$(tcltkDir)\..\win32\bin\tclsh$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix).exe"</TclshNativeFlag>
+-- 
+2.34.1
+

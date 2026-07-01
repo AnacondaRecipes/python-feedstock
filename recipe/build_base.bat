@@ -25,15 +25,6 @@ for /F "tokens=1,2 delims=." %%i in ("%PKG_VERSION%") do (
   if NOT "%PY_VER%"=="%%i.%%j" exit 1
 )
 
-:: Pin Tcl/Tk to conda tk 8.6 (upstream 3.15 defaults to Tcl 9.0.3.0)
-for /f "usebackq delims=" %%i in (`conda list -p %PREFIX% tk --no-show-channel-urls --json ^| findstr "version"`) do set TK_VERSION_LINE=%%i
-for /f "tokens=2 delims==/ " %%i IN ('echo %TK_VERSION_LINE%') do (set TK_VERSION=%%~i)
-echo TK_VERSION detected as %TK_VERSION%.0
-set TCLTK_MSBUILD_PROPS="/p:TclVersion=%TK_VERSION%.0" "/p:TkVersion=%TK_VERSION%.0"
-
-cd PCbuild
-call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM% %TCLTK_MSBUILD_PROPS%
-
 for /f "usebackq delims=" %%i in (`conda list -p %PREFIX% sqlite --no-show-channel-urls --json ^| findstr "version"`) do set SQLITE3_VERSION_LINE=%%i
 for /f "tokens=2 delims==/ " %%i IN ('echo %SQLITE3_VERSION_LINE%') do (set SQLITE3_VERSION=%%~i)
 echo SQLITE3_VERSION detected as %SQLITE3_VERSION%
