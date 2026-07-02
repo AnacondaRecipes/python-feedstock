@@ -7,4 +7,4 @@ build_parameters:
 
 # Upload all testing artifacts on a labeled testing channel: ad-testing/label/py315
 upload_channels:
-- ad-testing/label/py314
+- ad-testing/label/py315
