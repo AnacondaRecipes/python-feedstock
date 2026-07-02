@@ -10,7 +10,7 @@
 #         are frozen at the RC boundary per PEP 790, so a SKIP after that date
 #         means we're building against a stale probe).
 #
-# Sources (see docs/tools/python-3.15-probe-audit.md for the full audit):
+# Sources:
 #   - Python 3.15 What's New: https://docs.python.org/3.15/whatsnew/3.15.html
 #   - PEP 790 (release schedule): https://peps.python.org/pep-0790/  — RC1 2026-08-04
 #   - PEP-specific references embedded in each probe below.
