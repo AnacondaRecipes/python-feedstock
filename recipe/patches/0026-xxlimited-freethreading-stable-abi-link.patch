@@ -7,9 +7,21 @@ On Windows freethreading builds, upstream ships python3t.dll only (not
 python3.dll).  Unconditional ProjectReference to python3dll.vcxproj makes
 xxlimited*.pyd import python3.dll and fail conda-build overlinking.
 
-- xxlimited: link python3tdll when DisableGil, else python3dll
+The DisableGil-conditioned ProjectReference pattern is partially derived
+from python/cpython#148912 (gh-148690, Petr Viktorin).  We arrived at the
+same linkage problem independently via conda-build overlinking on
+v3.15.0b3, but the conditional MSBuild approach matches that upstream work.
+
+Adaptations for this feedstock (v3.15.0b3, not a straight cherry-pick):
+
+- xxlimited: gate existing python3dll / python3tdll refs on DisableGil
+  (upstream 3.15.0b3 already lists both; #148912 added python3tdll)
 - xxlimited_35 / xxlimited_3_13: link pythoncore when DisableGil (no
-  Py_LIMITED_API in source), else python3dll
+  Py_LIMITED_API in freethreaded source), else python3dll — differs from
+  #148912, which linked xxlimited_35 against python3tdll
+- xxlimited_3_13: not touched in #148912; added here for the same reason
+
+Co-authored-by: Petr Viktorin <encukou@gmail.com>
 ---
  PCbuild/xxlimited.vcxproj      | 4 ++--
  PCbuild/xxlimited_35.vcxproj   | 7 ++++---
