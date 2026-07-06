@@ -7,10 +7,12 @@ numpy:
 # Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
-gil_type:
-  - normal
-  # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855
-  - disabled
+freethreading:
+  - yes
+  - no  # [not (s390x or (osx and x86_64))]
+build_type:
+  - release
+  - debug  # [not win]
 
 # TODO: Windows tail-calling interpreter: 64-bit builds with Visual Studio 2026 (MSVC 18) can now use the tail-call interpreter (reported ~15–20% speedup).
 # Official python.org Windows binaries now use it.
