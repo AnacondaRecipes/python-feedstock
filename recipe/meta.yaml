@@ -19,6 +19,13 @@
 {% set py_interp_debug = "yes" if build_type == "debug" else "no" %}
 {% set debug = "_debug" if build_type == "debug" else "" %}
 {% set py_gil_disabled = "yes" if freethreading == "yes" else "no" %}
+# Divergence from conda-forge: CF dropped the interpreter-linkage knob entirely
+# and drives freethreading via PY_FREETHREADING. Anaconda's build scripts still
+# key off PY_INTERP_LINKAGE_NATURE (build_base.sh/build_static.sh) and PY_GIL_DISABLED,
+# so we keep them. We no longer read them from os.environ (that broke the linter);
+# Anaconda only ships a statically-linkable interpreter, so these are constants:
+#   - linkage_nature: build-string suffix; empty because "static" is the only value.
+#   - linkage_nature_env: value exported as PY_INTERP_LINKAGE_NATURE for the scripts.
 {% set linkage_nature = "" %}
 {% set linkage_nature_env = 'static' %}
 {% set site_packages_path_unix = ("lib/python" + ver2 + "t/site-packages" if freethreading == "yes" else "lib/python" + ver2 + "/site-packages") %}
@@ -73,9 +80,8 @@ requirements:
 
 outputs:
   - name: python
-    script:
-      - build_base.sh   # [unix]
-      - build_base.bat  # [win]
+    script: build_base.sh   # [unix]
+    script: build_base.bat  # [win]
     build:
       number: {{ build_number }}
       activate_in_script: true
@@ -250,9 +256,8 @@ outputs:
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
 
   - name: libpython-static
-    script:
-      - build_static.sh  # [unix]
-      - build_static.bat  # [win]
+    script: build_static.sh  # [unix]
+    script: build_static.bat  # [win]
     build:
       number: {{ build_number }}
       force_use_keys:
@@ -314,9 +319,8 @@ outputs:
       - python_abi * *_{{ abi_tag }}
 
   - name: python-jit
-    script:
-      - install_jit_activation.sh   # [not win]
-      - install_jit_activation.bat  # [win]
+    script: install_jit_activation.sh   # [not win]
+    script: install_jit_activation.bat  # [win]
     build:
       skip: true  # [freethreading == "yes"]
       noarch: generic
@@ -360,5 +364,5 @@ extra:
     - scopatz
     - katietz
     - xhochy
-  only-lint:
-    - missing_home
+  skip-lints:
+    - license_file_overspecified
