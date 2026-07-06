@@ -73,8 +73,9 @@ requirements:
 
 outputs:
   - name: python
-    script: build_base.sh   # [unix]
-    script: build_base.bat  # [win]
+    script:
+      - build_base.sh   # [unix]
+      - build_base.bat  # [win]
     build:
       number: {{ build_number }}
       activate_in_script: true
@@ -249,8 +250,9 @@ outputs:
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
 
   - name: libpython-static
-    script: build_static.sh  # [unix]
-    script: build_static.bat  # [win]
+    script:
+      - build_static.sh  # [unix]
+      - build_static.bat  # [win]
     build:
       number: {{ build_number }}
       force_use_keys:
@@ -312,8 +314,9 @@ outputs:
       - python_abi * *_{{ abi_tag }}
 
   - name: python-jit
-    script: install_jit_activation.sh   # [not win]
-    script: install_jit_activation.bat  # [win]
+    script:
+      - install_jit_activation.sh   # [not win]
+      - install_jit_activation.bat  # [win]
     build:
       skip: true  # [freethreading == "yes"]
       noarch: generic
@@ -357,5 +360,5 @@ extra:
     - scopatz
     - katietz
     - xhochy
-  skip-lints:
-    - license_file_overspecified
+  only-lint:
+    - missing_home
