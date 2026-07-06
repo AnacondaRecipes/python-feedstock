@@ -5,7 +5,7 @@ cd ${SRC_DIR}
 
 _buildd_static=build-static
 _buildd_shared=build-shared
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   DBG=d
 else
   DBG=
@@ -16,7 +16,7 @@ else
   THREAD=
 fi
 VER=${PKG_VERSION%.*}
-VERABI=${VER}${DBG}${THREAD}
+VERABI=${VER}${THREAD}${DBG}
 
 case "$target_platform" in
   linux-64)

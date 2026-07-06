@@ -22,6 +22,8 @@ print('sys.platform:', sys.platform)
 print('tuple.__itemsize__:', tuple.__itemsize__)
 if sys.platform == 'win32':
     assert 'MSC v.19' in sys.version
+if hasattr(sys, "abiflags"):
+    print('sys.abiflags', sys.abiflags)
 print('sys.maxunicode:', sys.maxunicode)
 print('platform.architecture:', platform.architecture())
 print('platform.python_version:', platform.python_version())
@@ -72,11 +74,17 @@ import test
 import test.support
 import unicodedata
 import zlib
+import compression.zstd
 from os import urandom
 import os
 
 t = 100 * b'Foo '
 assert lzma.decompress(lzma.compress(t)) == t
+
+if os.getenv('PY_INTERP_DEBUG') == 'yes':
+    if sys.platform != 'win32':
+        assert 'd' in sys.abiflags
+    assert 'gettotalrefcount' in dir(sys)
 
 if sys.platform != 'win32':
     if not (ppc64le or armv7l):

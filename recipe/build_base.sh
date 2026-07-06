@@ -58,7 +58,7 @@ if [[ ${target_platform} == linux-ppc64le ]]; then
 fi
 
 declare -a _dbg_opts
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   # This Python will not be usable with non-debug Python modules.
   _dbg_opts+=(--with-pydebug)
   DBG=d
@@ -260,7 +260,7 @@ _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -l
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
