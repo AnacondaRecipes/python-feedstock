@@ -363,5 +363,5 @@ extra:
     - scopatz
     - katietz
     - xhochy
-  skip-lints:
-    - license_file_overspecified
+  only-lint:
+    - missing_home
