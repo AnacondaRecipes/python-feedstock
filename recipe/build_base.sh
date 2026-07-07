@@ -370,7 +370,7 @@ fi
 # build a static library with PIC objects and without LTO/PGO
 make -j${CPU_COUNT} -C ${_buildd_shared} \
         EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-        LIBRARY=libpython${VERABI}-pic.a libpython${VERABI}-pic.a
+        LIBRARY=libpython${STDLIB_VER}-pic.a libpython${STDLIB_VER}-pic.a
 
 make -C ${_buildd_static} install
 
