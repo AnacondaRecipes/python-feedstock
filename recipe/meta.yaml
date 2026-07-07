@@ -313,6 +313,8 @@ outputs:
     build:
       number: {{ build_number }}
       activate_in_script: true
+      track_features:     # [gil_type == "disabled"]
+        - free-threading  # [gil_type == "disabled"]
       ignore_run_exports:
         - python_abi
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
