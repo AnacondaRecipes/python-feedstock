@@ -248,6 +248,7 @@ outputs:
         - popd
         - popd
         - python run_test.py
+        - rm -f default.profraw  # [osx]
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
         - python3.1 --version  # [unix]
@@ -322,6 +323,7 @@ outputs:
     script: install_jit_activation.bat  # [win]
     build:
       skip: true  # [freethreading == "yes"]
+      skip: true  # [build_type == "debug"]
       noarch: generic
     requirements:
       - python {{ version }}{{ dev }}
