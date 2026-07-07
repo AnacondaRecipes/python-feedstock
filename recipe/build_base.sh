@@ -539,14 +539,6 @@ fi
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
 rm ${PREFIX}/lib/libpython${VERABI}.a
 
-if [[ ${PY_INTERP_DEBUG} == yes ]]; then
-  # Legacy FindPythonInterp/Libs and other tools expect unprefixed ABI paths.
-  rm -f ${PREFIX}/bin/python${VER}
-  ln -sf ${PREFIX}/bin/python${VERABI} ${PREFIX}/bin/python${VER}
-  ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT} ${PREFIX}/lib/libpython${STDLIB_VER}${SHLIB_EXT}
-  ln -sf ${PREFIX}/include/python${VERABI} ${PREFIX}/include/python${STDLIB_VER}
-fi
-
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi

@@ -242,9 +242,9 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        # FindPythonLibs does not know freethreading ABI; skip like conda-forge main.
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [unix and freethreading == "no"]
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [win and freethreading == "no"]
+        # Legacy FindPythonLibs lacks freethreading and pydebug ABI; skip those variants.
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [unix and freethreading == "no" and build_type == "release"]
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [win and freethreading == "no" and build_type == "release"]
         - popd
         - popd
         - python run_test.py
