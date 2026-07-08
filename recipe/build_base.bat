@@ -1,6 +1,9 @@
 setlocal EnableDelayedExpansion
 echo on
 
+:: Avoids fetching nuget.exe from the internet.
+set PYTHON=%CONDA_PYTHON_EXE%
+
 :: Compile python, extensions and external libraries
 if "%ARCH%"=="arm64" (
    set PLATFORM=ARM64
