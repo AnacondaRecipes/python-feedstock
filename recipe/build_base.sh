@@ -416,6 +416,7 @@ if [[ -f ${PREFIX}/bin/python${VER}m ]]; then
 fi
 ln -s ${PREFIX}/bin/python${VER} ${PREFIX}/bin/python
 ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
+# TODO: It's still relevant for python 3.10. Consider removing this once we drop 3.10.
 # Workaround for https://github.com/conda/conda/issues/10969 -
 # specifically for conda<=4.10
 # https://github.com/conda/conda/issues/11423#issuecomment-1104253815
@@ -480,7 +481,7 @@ pushd "${PREFIX}"/lib/python${VERABI}
   # Remove osx sysroot as it depends on the build machine
   sed -i.bak "s@-isysroot @@g" sysconfigfile
   # make sure $CONDA_BUILD_SYSROOT is not empty ...
-  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then 
+  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then
     sed -i.bak "s@$CONDA_BUILD_SYSROOT @@g" sysconfigfile
   fi
   # Remove unfilled config option
