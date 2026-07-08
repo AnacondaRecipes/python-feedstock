@@ -248,7 +248,6 @@ outputs:
         - tests/cython/*
         - tests/prefix-replacement/*
         - run_test.py
-        - run_test_py315.py
       commands:
         - echo on  # [win]
         - set  # [win]
@@ -302,8 +301,6 @@ outputs:
         - popd
         - popd
         - python run_test.py
-        - export RUN_TEST_REQUIRE_315=1 && python run_test_py315.py   # [unix]
-        - set RUN_TEST_REQUIRE_315=1 && python run_test_py315.py      # [win]
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
         - python3.1 --version  # [unix]

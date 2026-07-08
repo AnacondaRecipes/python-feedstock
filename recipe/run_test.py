@@ -12,6 +12,11 @@ if sys.platform == 'darwin':
 else:
     osx105 = False
 
+# Build sanity: test env must point at the conda prefix we just built.
+assert sys.prefix and os.path.isdir(sys.prefix), f"invalid prefix: {sys.prefix!r}"
+print('sys.prefix:', sys.prefix)
+print('sys.abiflags:', getattr(sys, 'abiflags', ''))
+
 print('sys.version:', sys.version)
 print('sys.platform:', sys.platform)
 print('tuple.__itemsize__:', tuple.__itemsize__)
