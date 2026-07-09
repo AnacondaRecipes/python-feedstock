@@ -17,9 +17,7 @@ else
 fi
 VER=${PKG_VERSION%.*}
 VERABI=${VER}${THREAD}${DBG}
-# Stdlib layout from `make install` uses VER+THREAD only; DBG affects lib names
-# (libpython3.15d.a) and config-3.15d-* dirs, not the python3.15(d) directory.
-STDLIB_VER=${VER}${THREAD}
+VERABI_NO_DBG=${VER}${THREAD}
 
 case "$target_platform" in
   linux-64)
@@ -38,12 +36,12 @@ esac
 
 cp -pf ${_buildd_static}/libpython${VERABI}.a ${PREFIX}/lib/libpython${VERABI}.a
 if [[ ${HOST} =~ .*linux.* ]]; then
-  pushd ${PREFIX}/lib/python${STDLIB_VER}/config-${VERABI}-${OLD_HOST}
+  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-${OLD_HOST}
 elif [[ ${HOST} =~ .*darwin.* ]]; then
-  pushd ${PREFIX}/lib/python${STDLIB_VER}/config-${VERABI}-darwin
+  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-darwin
 fi
 ln -s ../../libpython${VERABI}.a libpython${VERABI}.a
 popd
 # If the LTO info in the normal lib is problematic (using different compilers for example
 # we also provide a 'nolto' version).
-cp -pf ${_buildd_shared}/libpython${STDLIB_VER}-pic.a ${PREFIX}/lib/libpython${STDLIB_VER}.nolto.a
+cp -pf ${_buildd_shared}/libpython${VERABI_NO_DBG}-pic.a ${PREFIX}/lib/libpython${VERABI_NO_DBG}.nolto.a
