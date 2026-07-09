@@ -60,6 +60,7 @@ source:
       - patches/0024-Unvendor-zlib-ng.patch
       - patches/0025-Unvendor-zstd.patch
       - patches/0026-xxlimited-freethreading-stable-abi-link.patch  # [win and freethreading == "yes"]
+      - patches/0027-Win32-fix-broken-nuget-download-URL.patch      # [win]
 
 build:
   number: {{ build_number }}
@@ -101,7 +102,7 @@ outputs:
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}
       track_features:     # [freethreading == "yes"]
-        - free-threading  # [freethreading == "yes"]
+        - py_freethreading  # [freethreading == "yes"]
       run_exports:
         noarch:
           - python
@@ -177,7 +178,7 @@ outputs:
         - ripgrep
         - cmake
         - make  # [unix]
-        - ninja-base
+        - ninja
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         # Tried to use enable_language(C) to avoid needing this. It does not work.
@@ -313,6 +314,8 @@ outputs:
     build:
       skip: true  # [freethreading == "yes"]
       skip: true  # [build_type == "debug"]
+      # Mirror build_base.sh JIT gate: yes-off only when not debug, not freethreading, and target_platform matches *-64
+      skip: true  # [not linux64 and not win64 and not (osx and x86_64)]
       noarch: generic
     requirements:
       - python {{ version }}{{ dev }}

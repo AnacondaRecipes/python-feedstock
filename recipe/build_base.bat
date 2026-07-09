@@ -80,6 +80,9 @@ set PGO=
 :: with TclMajorVersion=9 sets tkPrefix=tcl9 → tcl90.lib / tcl9tk90.lib (no threaded t).
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
+:: PCbuild code-gen needs a host Python; prefer the conda build env over nuget.
+if not defined PYTHON_FOR_BUILD set PYTHON_FOR_BUILD=%BUILD_PREFIX%\python.exe
+
 cd PCbuild
 
 :: Twice because:
