@@ -18,16 +18,6 @@
 {% set build_number = build_number + (0 if freethreading == "yes" else 100) %}
 {% set py_interp_debug = "yes" if build_type == "debug" else "no" %}
 {% set debug = "_debug" if build_type == "debug" else "" %}
-{% set py_gil_disabled = "yes" if freethreading == "yes" else "no" %}
-# Divergence from conda-forge: CF dropped the interpreter-linkage knob entirely
-# and drives freethreading via PY_FREETHREADING. Anaconda's build scripts still
-# key off PY_INTERP_LINKAGE_NATURE (build_base.sh/build_static.sh) and PY_GIL_DISABLED,
-# so we keep them. We no longer read them from os.environ (that broke the linter);
-# Anaconda only ships a statically-linkable interpreter, so these are constants:
-#   - linkage_nature: build-string suffix; empty because "static" is the only value.
-#   - linkage_nature_env: value exported as PY_INTERP_LINKAGE_NATURE for the scripts.
-{% set linkage_nature = "" %}
-{% set linkage_nature_env = 'static' %}
 {% set site_packages_path_unix = ("lib/python" + ver2 + "t/site-packages" if freethreading == "yes" else "lib/python" + ver2 + "/site-packages") %}
 {% set site_packages_path = "Lib/site-packages" if win else site_packages_path_unix %}
 
@@ -108,7 +98,7 @@ outputs:
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard (vc14+ only for 3.15)
       skip: true  # [win and vc < 14]
-      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}
       track_features:     # [freethreading == "yes"]
         - free-threading  # [freethreading == "yes"]
@@ -119,10 +109,8 @@ outputs:
           - python_abi {{ ver2 }}.* *_{{ abi_tag }}
           - python {{ ver2 }}.* *_debug_{{ abi_tag }}  # [build_type == "debug"]
       script_env:
-        - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
-        - PY_GIL_DISABLED={{ py_gil_disabled }}
-        - CONDA_FORGE=no
+        - PY_FREETHREADING={{ freethreading }}
       missing_dso_whitelist:   # [win or linux]
         - '**/MSVCR71.dll'  # [win]
         - '**/MSVCR80.dll'  # [win]
@@ -187,7 +175,7 @@ outputs:
     test:
       requires:
         - ripgrep
-        - cmake-no-system
+        - cmake
         - make  # [unix]
         - ninja-base
         - {{ stdlib('c') }}
@@ -242,9 +230,10 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        # Legacy FindPythonLibs lacks freethreading and pydebug ABI; skip those variants.
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [unix and freethreading == "no" and build_type == "release"]
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [win and freethreading == "no" and build_type == "release"]
+{% if freethreading == "no" %}
+        # TODO: use the new FindPython3 which supports freethreading
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
+{% endif %}
         - popd
         - popd
         - python run_test.py
@@ -266,10 +255,10 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
-        - PY_GIL_DISABLED={{ py_gil_disabled }}
+        - PY_FREETHREADING={{ freethreading }}
     requirements:
       build:
         - {{ stdlib('c') }}

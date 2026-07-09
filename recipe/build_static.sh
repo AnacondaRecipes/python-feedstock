@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ex
 
-cd ${SRC_DIR}
-
 _buildd_static=build-static
 _buildd_shared=build-shared
 if [[ ${PY_INTERP_DEBUG} == yes ]]; then
@@ -10,33 +8,21 @@ if [[ ${PY_INTERP_DEBUG} == yes ]]; then
 else
   DBG=
 fi
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
+  # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
   THREAD=
 fi
+
 VER=${PKG_VERSION%.*}
+ABIFLAGS=${DBG}${THREAD}
 VERABI=${VER}${THREAD}${DBG}
 VERABI_NO_DBG=${VER}${THREAD}
 
-case "$target_platform" in
-  linux-64)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda_cos6//g')
-    OLD_HOST=$(echo ${OLD_HOST} | sed -e 's/-conda_cos7//g')
-    OLD_HOST=$(echo ${OLD_HOST} | sed -e 's/-conda//g')
-    ;;
-  linux-*)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda_cos7//g')
-    OLD_HOST=$(echo ${OLD_HOST} | sed -e 's/-conda//g')
-    ;;
-  *)
-    OLD_HOST=$HOST
-    ;;
-esac
-
 cp -pf ${_buildd_static}/libpython${VERABI}.a ${PREFIX}/lib/libpython${VERABI}.a
 if [[ ${HOST} =~ .*linux.* ]]; then
-  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-${OLD_HOST}
+  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-${HOST/-conda/}
 elif [[ ${HOST} =~ .*darwin.* ]]; then
   pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-darwin
 fi

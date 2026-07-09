@@ -35,26 +35,12 @@ _buildd_shared=build-shared
 _ENABLE_SHARED=--enable-shared
 # We *still* build a shared lib here for non-static embedded use cases
 _DISABLE_SHARED=--disable-shared
-# Hack to allow easily comparing static vs shared interpreter performance
-# .. hack because we just build it shared in both the build-static and
-# build-shared directories.
-# Yes this hack is a bit confusing, sorry about that.
-if [[ ${PY_INTERP_LINKAGE_NATURE} == shared ]]; then
-  _DISABLE_SHARED=--enable-shared
-  _ENABLE_SHARED=--enable-shared
-fi
 
 # For debugging builds, set this to no to disable profile-guided optimization
-if [[ ${DEBUG_C} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   _OPTIMIZED=no
 else
   _OPTIMIZED=yes
-fi
-
-if [[ ${target_platform} == linux-ppc64le ]]; then
-  _OPTIMIZED=no
-  # ppc64le cdt need to be rebuilt with files in powerpc64le-conda-linux-gnu instead of powerpc64le-conda_cos7-linux-gnu. In the mean time:
-  cp --force --archive --update --link $BUILD_PREFIX/powerpc64le-conda_cos7-linux-gnu/. $BUILD_PREFIX/powerpc64le-conda-linux-gnu
 fi
 
 declare -a _dbg_opts
@@ -66,14 +52,14 @@ else
   DBG=
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
   # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
   THREAD=
 fi
 
-ABIFLAGS=${DBG}
+ABIFLAGS=${DBG}${THREAD}
 VERABI=${VER}${THREAD}${DBG}
 VERABI_NO_DBG=${VER}${THREAD}
 
@@ -112,6 +98,12 @@ if [[ ${_OPTIMIZED} = yes ]]; then
   CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O3/g")
   CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O3/g")
   CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O3/g")
+fi
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O0/g")
+  CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O0/g")
+  CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O0/g")
 fi
 
 if [[ "$target_platform" == linux-* ]]; then
@@ -261,7 +253,7 @@ _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -l
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"-64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -272,7 +264,7 @@ if [[ "${target_platform}" == osx-* ]]; then
     _common_configure_args+=(--with-tail-call-interp)
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     _common_configure_args+=(--disable-gil)
 fi
 
@@ -401,6 +393,8 @@ SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${PREFIX}/lib/python${VERABI_NO_DBG}/$(basename ${SYSCONFIG})
+BUILD_DETAILS=${_buildd_shared}/$(cat ${_buildd_shared}/pybuilddir.txt)/build-details.json
+cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI_NO_DBG}/
 MAKEFILE=$(find ${PREFIX}/lib/python${VERABI_NO_DBG}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
@@ -448,22 +442,6 @@ pushd ${PREFIX}
   fi
 popd
 
-# OLD_HOST is with CentOS version in them. When building this recipe
-# with the compilers from conda-forge OLD_HOST != HOST, but when building
-# with the compilers from defaults OLD_HOST == HOST. Both cases are handled in the
-# code below
-case "$target_platform" in
-  linux-64)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos6-/g')
-    ;;
-  linux-*)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos7-/g')
-    ;;
-  *)
-    OLD_HOST=$HOST
-    ;;
-esac
-
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
@@ -482,9 +460,9 @@ pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   # Append the conda-forge zoneinfo to the end
   sed -i.bak "s@zoneinfo'@zoneinfo:$PREFIX/share/tzinfo'@g" sysconfigfile
   # Remove osx sysroot as it depends on the build machine
-  sed -i.bak "s@-isysroot @@g" sysconfigfile
-  # make sure $CONDA_BUILD_SYSROOT is not empty ...
-  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then
+  # be sure CONDA_BUILD_SYSROOT has value, as other we will remove here instead spaces
+  if [[ "${target_platform}" == osx-* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then
+    sed -i.bak "s@-isysroot @@g" sysconfigfile
     sed -i.bak "s@$CONDA_BUILD_SYSROOT @@g" sysconfigfile
   fi
   # Remove unfilled config option
@@ -494,16 +472,12 @@ pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   sed -i.bak "s/'GNULD': 'yes'/'GNULD': 'no'/g" sysconfigfile
   cp sysconfigfile ${our_compilers_name}
 
-  sed -i.bak "s@${HOST}@${OLD_HOST}@g" sysconfigfile
-  old_compiler_name=_sysconfigdata_$(echo ${OLD_HOST} | sed -e 's/[.-]/_/g').py
-  cp sysconfigfile ${old_compiler_name}
-
   # For system gcc remove the triple
-  sed -i.bak "s@$OLD_HOST-c++@g++@g" sysconfigfile
-  sed -i.bak "s@$OLD_HOST-@@g" sysconfigfile
+  sed -i.bak "s@$HOST-c++@g++@g" sysconfigfile
+  sed -i.bak "s@$HOST-@@g" sysconfigfile
   if [[ "$target_platform" == linux* ]]; then
     # For linux, make sure the system gcc uses our linker
-    sed -i.bak "s@-pthread@-pthread -B $PREFIX/compiler_compat@g" sysconfigfile
+    sed -i.bak "s@-pthread@-pthread -B $PREFIX/share/python_compiler_compat@g" sysconfigfile
   fi
   # Don't set -march and -mtune for system gcc
   sed -i.bak "s@-march=[^( |\\\"|\\\')]*@@g" sysconfigfile
@@ -528,14 +502,21 @@ pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
 popd
 
 if [[ ${HOST} =~ .*linux.* ]]; then
-  mkdir -p ${PREFIX}/compiler_compat
-  ln -s ${PREFIX}/bin/${HOST}-ld ${PREFIX}/compiler_compat/ld
-  echo "Files in this folder are to enhance backwards compatibility of anaconda software with older compilers."   > ${PREFIX}/compiler_compat/README
-  echo "See: https://github.com/conda/conda/issues/6030 for more information."                                   >> ${PREFIX}/compiler_compat/README
+  mkdir -p ${PREFIX}/share/python_compiler_compat
+  ln -s ${PREFIX}/bin/${HOST}-ld ${PREFIX}/share/python_compiler_compat/ld
+  echo "Files in this folder are to enhance backwards compatibility of anaconda software with older compilers."   > ${PREFIX}/share/python_compiler_compat/README
+  echo "See: https://github.com/conda/conda/issues/6030 for more information."                                   >> ${PREFIX}/share/python_compiler_compat/README
 fi
 
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
 rm ${PREFIX}/lib/libpython${VERABI}.a
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  rm ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/bin/python${VERABI} ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT} ${PREFIX}/lib/libpython${VERABI_NO_DBG}${SHLIB_EXT}
+  ln -s ${PREFIX}/include/python${VERABI} ${PREFIX}/include/python${VER}
+fi
 
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
@@ -554,7 +535,7 @@ fi
 # <prefix>/lib/python3.13t/site-packages.
 # Note that these directories are not added to sys.path if they do not exist.
 SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
 # Workaround for https://github.com/conda/conda/issues/10969
