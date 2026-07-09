@@ -94,7 +94,6 @@ source:
       - patches/0024-Unvendor-zlib-ng.patch
       - patches/0025-Unvendor-zstd.patch
       - patches/0026-xxlimited-freethreading-stable-abi-link.patch  # [win]
-      - patches/0027-Win32-fix-broken-nuget-download-URL.patch      # [win]
 
 build:
   number: {{ build_number }}

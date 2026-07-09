@@ -1,6 +1,9 @@
 setlocal EnableDelayedExpansion
 echo on
 
+:: Avoids fetching nuget.exe from the internet.
+set PYTHON=%CONDA_PYTHON_EXE%
+
 :: Compile python, extensions and external libraries
 if "%ARCH%"=="64" (
    set PLATFORM=x64
@@ -73,9 +76,6 @@ set PGO=
 :: TclVersion to 9.0.3.0, but pkgs/main only ships tk 8.6; MSBuild derives the
 :: lib names (tcl86t.lib/tk86t.lib) from the major.minor of these props.
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
-
-:: PCbuild code-gen needs a host Python; prefer the conda build env over nuget.
-if not defined PYTHON_FOR_BUILD set PYTHON_FOR_BUILD=%BUILD_PREFIX%\python.exe
 
 cd PCbuild
 
