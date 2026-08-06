@@ -1,7 +1,7 @@
-From 0c88a8e5d9673742d74fb5b4be8ad45c33f1f43f Mon Sep 17 00:00:00 2001
+From 97a631d412cac9ee29c3aa91ceef4dd540c1a852 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 20 Aug 2021 10:23:51 -0700
-Subject: [PATCH 14/24] Unvendor tcltk
+Subject: [PATCH 14/25] Unvendor tcltk
 
 ---
  PCbuild/_tkinter.vcxproj | 6 ------
@@ -9,7 +9,7 @@ Subject: [PATCH 14/24] Unvendor tcltk
  2 files changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/PCbuild/_tkinter.vcxproj b/PCbuild/_tkinter.vcxproj
-index de93583..3fe2c29 100644
+index de9358312a..3fe2c29c82 100644
 --- a/PCbuild/_tkinter.vcxproj
 +++ b/PCbuild/_tkinter.vcxproj
 @@ -128,12 +128,6 @@
@@ -26,7 +26,7 @@ index de93583..3fe2c29 100644
      <WriteLinesToFile File="$(OutDir)TCL_LIBRARY.env" Lines="$(tcltkdir)\lib\tcl$(TclMajorVersion).$(TclMinorVersion)" Encoding="utf-8" Overwrite="true" />
    </Target>
 diff --git a/PCbuild/tcltk.props b/PCbuild/tcltk.props
-index 28e8c0d..cf2b2dc 100644
+index 28e8c0db4d..cf2b2dc14e 100644
 --- a/PCbuild/tcltk.props
 +++ b/PCbuild/tcltk.props
 @@ -13,10 +13,9 @@
@@ -43,3 +43,6 @@ index 28e8c0d..cf2b2dc 100644
      <tcltkSuffix Condition="'$(TclMajorVersion)' == '8'">t</tcltkSuffix>
      <tkPrefix Condition="'$(TclMajorVersion)' == '9'">tcl9</tkPrefix>
      <TclshNativeFlag Condition="$(Platform) != 'Win32'">TCLSH_NATIVE="$(tcltkDir)\..\win32\bin\tclsh$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix).exe"</TclshNativeFlag>
+-- 
+2.51.0
+

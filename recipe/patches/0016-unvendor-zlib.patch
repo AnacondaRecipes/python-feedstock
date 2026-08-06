@@ -1,7 +1,7 @@
-From bf303d3b27688d62fe6a55fe7e32ee6c54b8d670 Mon Sep 17 00:00:00 2001
+From aa5d252b4b3a1c87c491efddb23e190c21d630a2 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
-Subject: [PATCH 16/24] unvendor zlib
+Subject: [PATCH 16/25] unvendor zlib
 
 ---
  PCbuild/pythoncore.vcxproj         |  8 ++--
@@ -9,7 +9,7 @@ Subject: [PATCH 16/24] unvendor zlib
  2 files changed, 4 insertions(+), 70 deletions(-)
 
 diff --git a/PCbuild/pythoncore.vcxproj b/PCbuild/pythoncore.vcxproj
-index b455b3089ca..00e29eae266 100644
+index b455b3089c..00e29eae26 100644
 --- a/PCbuild/pythoncore.vcxproj
 +++ b/PCbuild/pythoncore.vcxproj
 @@ -82,7 +82,7 @@
@@ -30,8 +30,7 @@ index b455b3089ca..00e29eae266 100644
        <AdditionalIncludeDirectories Condition="'$(UseJIT)' == 'true'">$(GeneratedJitStencilsDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
        <PreprocessorDefinitions>_USRDLL;Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_ENABLE_SHARED;MS_DLL_ID="$(SysWinVer)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(IncludeExternals)">_Py_HAVE_ZLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-@@ -112,9 +112,9 @@
-       <PreprocessorDefinitions Condition="'$(DisableRemoteDebug)' != 'true'">Py_REMOTE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+@@ -113,8 +113,8 @@
        <PreprocessorDefinitions Condition="'$(StackRefDebug)' == 'true'">Py_STACKREF_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
      </ClCompile>
      <Link>
@@ -43,7 +42,7 @@ index b455b3089ca..00e29eae266 100644
        <AdditionalDependencies Condition="'$(UseJIT)' == 'true' and $(Platform) == 'Win32'">$(GeneratedJitStencilsDir)jit_shim-i686-pc-windows-msvc.o;%(AdditionalDependencies)</AdditionalDependencies>
        <AdditionalDependencies Condition="'$(UseJIT)' == 'true' and $(Platform) == 'x64'">$(GeneratedJitStencilsDir)jit_shim-x86_64-pc-windows-msvc.o;%(AdditionalDependencies)</AdditionalDependencies>
 diff --git a/PCbuild/pythoncore.vcxproj.filters b/PCbuild/pythoncore.vcxproj.filters
-index 649ee1859ff..6fb1a6b5d0f 100644
+index 649ee1859f..6fb1a6b5d0 100644
 --- a/PCbuild/pythoncore.vcxproj.filters
 +++ b/PCbuild/pythoncore.vcxproj.filters
 @@ -939,39 +939,6 @@

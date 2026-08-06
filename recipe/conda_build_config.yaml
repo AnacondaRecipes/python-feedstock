@@ -4,6 +4,9 @@ python_impl:
   - cpython
 numpy:
   - 2.5
+# Override aggregate global tk 8.6 — build/test against tk 9 (staging via abs.yaml)
+tk:
+  - '9.0'
 gil_type:
   - normal
   # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855

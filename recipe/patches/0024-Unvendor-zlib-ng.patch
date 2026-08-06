@@ -1,7 +1,7 @@
-From bd0276b98bafd18a8e6b29ef336136ea8691178d Mon Sep 17 00:00:00 2001
+From 10a41672dbad7f03816c37832d3e92709f9649e0 Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
-Subject: [PATCH 23/24] Unvendor zlib-ng
+Subject: [PATCH 23/25] Unvendor zlib-ng
 
 ---
  PCbuild/pcbuild.proj            |   2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 23/24] Unvendor zlib-ng
  3 files changed, 2 insertions(+), 352 deletions(-)
 
 diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
-index 9d077bbd3f0..bed07aefa7f 100644
+index 9d077bbd3f..bed07aefa7 100644
 --- a/PCbuild/pcbuild.proj
 +++ b/PCbuild/pcbuild.proj
 @@ -48,7 +48,7 @@
@@ -23,7 +23,7 @@ index 9d077bbd3f0..bed07aefa7f 100644
      <!--
      Parallel build is explicitly disabled for this project because it
 diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
-index ffe8e70f2db..e3c9b16f6ef 100644
+index ffe8e70f2d..e3c9b16f6e 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
 @@ -73,9 +73,6 @@
@@ -181,7 +181,7 @@ index ffe8e70f2db..e3c9b16f6ef 100644
 -          DependsOnTargets="_EnsureZlibH;_EnsureZlibNgH" />
  </Project>
 diff --git a/PCbuild/zlib-ng.vcxproj.filters b/PCbuild/zlib-ng.vcxproj.filters
-index addbd45f880..0280369b001 100644
+index addbd45f88..0280369b00 100644
 --- a/PCbuild/zlib-ng.vcxproj.filters
 +++ b/PCbuild/zlib-ng.vcxproj.filters
 @@ -1,242 +1,14 @@
