@@ -5,6 +5,7 @@
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
 {% set build_number = 1 %}
+{% set llvm_version_win = 20 %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
 {% set bootstrap = "false" %}
@@ -152,6 +153,7 @@ outputs:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_GIL_DISABLED={{ py_gil_disabled }}
+        - LLVM_VERSION={{ llvm_version_win }}  # [win]
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -196,8 +198,8 @@ outputs:
         # "LLVM version 21 is the officially supported version"
         - clang-19         # [not win]
         - llvm-tools-19    # [not win]
-        - clang 20.*       # [win]
-        - llvm-tools 20.*  # [win]
+        - clang {{ llvm_version_win }}.*       # [win]
+        - llvm-tools {{ llvm_version_win }}.*  # [win]
       host:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
