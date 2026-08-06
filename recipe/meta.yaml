@@ -1,4 +1,4 @@
-{% set version = "3.14.2" %}
+{% set version = "3.14.6" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: ce543ab854bc256b61b71e9b27f831ffd1bfd60a479d639f8be7f9757cf573e9
+    sha256: 143b1dddefaec3bd2e21e3b839b34a2b7fb9842272883c576420d605e9f30c63
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -119,7 +119,7 @@ outputs:
         - DLLs/_ctypes.pyd       # [win]
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
-        - {{ compiler('cxx') }}  # [unix]        
+        - {{ compiler('cxx') }}  # [unix]
         # These two are just to get the headers needed for tk.h, but is unused
         - xorg-libx11            # [linux]
         - xorg-xorgproto         # [linux]
@@ -314,6 +314,8 @@ outputs:
     build:
       number: {{ build_number }}
       activate_in_script: true
+      track_features:     # [gil_type == "disabled"]
+        - free-threading  # [gil_type == "disabled"]
       ignore_run_exports:
         - python_abi
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}

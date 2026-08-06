@@ -17,7 +17,7 @@ index 11c2bd350a8..4471986b104 100644
      <KillPython>true</KillPython>
      <RequireProfileData>true</RequireProfileData>
 -    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(zlibNgDir)\zlib-ng.h.in')">true</IncludeExternals>
-+    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(condaDir)\include\zlib.h)">true</IncludeExternals>
++    <IncludeExternals Condition="$(IncludeExternals) == '' and Exists('$(condaDir)\include\zlib.h')">true</IncludeExternals>
      <IncludeExternals Condition="$(IncludeExternals) == ''">false</IncludeExternals>
    </PropertyGroup>
    <ImportGroup Label="PropertySheets">
