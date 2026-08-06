@@ -8,22 +8,12 @@ def _entrypoint_launcher_exe():
     """Match conda_build.windows.fix_staged_scripts: cli-{host_arch}.exe.
 
     ARCH is set by conda-build from target platform (e.g. arm64 for win-arm64).
-    Fall back to recipe-dir cli-{arch}.exe if not yet shipped in conda-build.
     """
     arch = os.environ.get("ARCH", "64")
     if arch not in ("32", "64", "arm64"):
         arch = "64"
-    name = "cli-%s.exe" % arch
     base_env = dirname(dirname(os.environ["CONDA_EXE"]))
-    cb_pkg = join(base_env, "lib", "site-packages", "conda_build", name)
-    if isfile(cb_pkg):
-        return cb_pkg
-    recipe_dir = os.environ.get("RECIPE_DIR")
-    if recipe_dir:
-        vendored = join(recipe_dir, name)
-        if isfile(vendored):
-            return vendored
-    return cb_pkg
+    return join(base_env, "lib", "site-packages", "conda_build", "cli-%s.exe" % arch)
 
 
 # Taken and adapted from conda_build/windows.py
@@ -55,8 +45,7 @@ def fix_staged_scripts(scripts_dir):
             if not isfile(exe):
                 raise FileNotFoundError(
                     "Missing Windows script launcher %s. Install a conda-build "
-                    "that ships this file for the target ARCH, or place it under "
-                    "RECIPE_DIR."
+                    "that ships this file for the target ARCH."
                     % (exe,)
                 )
             shutil.copyfile(exe, join(scripts_dir, fn + '.exe'))
