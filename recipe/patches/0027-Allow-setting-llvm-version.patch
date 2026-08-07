@@ -1,0 +1,25 @@
+From 502259299cf46dd611708bec81c6c161e726b523 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <Eric.Lundby@gmail.com>
+Date: Fri, 7 Aug 2026 05:23:30 +0000
+Subject: [PATCH] Allow setting llvm version
+
+---
+ Tools/jit/_llvm.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Tools/jit/_llvm.py b/Tools/jit/_llvm.py
+index 96cf5fc..5870013 100644
+--- a/Tools/jit/_llvm.py
++++ b/Tools/jit/_llvm.py
+@@ -10,7 +10,7 @@ import typing
+ 
+ import _targets
+ 
+-_LLVM_VERSION = "21"
++_LLVM_VERSION = os.environ.get("LLVM_VERSION", "21")
+ _EXTERNALS_LLVM_TAG = "llvm-21.1.4.0"
+ 
+ _P = typing.ParamSpec("_P")
+-- 
+2.43.0
+
