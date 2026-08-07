@@ -5,7 +5,6 @@
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
 {% set build_number = 0 %}
-{% set llvm_version_win = 21 %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
 {% set bootstrap = "false" %}
@@ -95,9 +94,6 @@ source:
       - patches/0024-Unvendor-zlib-ng.patch
       - patches/0025-Unvendor-zstd.patch
       - patches/0026-xxlimited-freethreading-stable-abi-link.patch  # [win]
-      # win-arm64 / JIT: allow overriding Tools/jit/_llvm.py version via LLVM_VERSION
-      # (ported from AnacondaRecipes/python-feedstock#240; regenerated for 3.15.0b4 string "21")
-      - patches/0027-Allow-setting-llvm-version.patch
 
 build:
   number: {{ build_number }}
@@ -156,7 +152,6 @@ outputs:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_GIL_DISABLED={{ py_gil_disabled }}
-        - LLVM_VERSION={{ llvm_version_win }}  # [win]
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -201,8 +196,8 @@ outputs:
         # "LLVM version 21 is the officially supported version"
         - clang-21         # [not win]
         - llvm-tools-21    # [not win]
-        - clang {{ llvm_version_win }}.*       # [win]
-        - llvm-tools {{ llvm_version_win }}.*  # [win]
+        - clang 21.*       # [win]
+        - llvm-tools 21.*  # [win]
       host:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
