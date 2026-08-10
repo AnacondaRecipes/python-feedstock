@@ -1,7 +1,7 @@
-From 6250a23c4f7ca2373a6f3208deaaf1cc26f12eb5 Mon Sep 17 00:00:00 2001
+From abc68c8f944bc9d6800889e42f4dd23c940953c4 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 31 Dec 2019 21:47:47 +0100
-Subject: [PATCH 08/24] Doing d1trimfile
+Subject: [PATCH 08/25] Doing d1trimfile
 
 ---
  PCbuild/_asyncio.vcxproj            | 20 ++++++++++++++++++++
@@ -155,7 +155,7 @@ index ee7421484b5..e9d60b4db1a 100644
    </ItemDefinitionGroup>
    <ItemGroup>
 diff --git a/PCbuild/_elementtree.vcxproj b/PCbuild/_elementtree.vcxproj
-index 3eb9c89bcb6..920656f2ee2 100644
+index 46e34a5ea82..fb1589557da 100644
 --- a/PCbuild/_elementtree.vcxproj
 +++ b/PCbuild/_elementtree.vcxproj
 @@ -94,7 +94,11 @@
@@ -394,7 +394,7 @@ index 4e721e8ce09..048adde0951 100644
      <ClCompile Include="..\Modules\_testbuffer.c" />
    </ItemGroup>
 diff --git a/PCbuild/_testcapi.vcxproj b/PCbuild/_testcapi.vcxproj
-index a68f15d25aa..5c42f15c312 100644
+index 51c4bcc6b47..ccc81a417fa 100644
 --- a/PCbuild/_testcapi.vcxproj
 +++ b/PCbuild/_testcapi.vcxproj
 @@ -92,6 +92,26 @@
@@ -563,7 +563,7 @@ index 97938692328..64b1d443cfa 100644
    </ItemDefinitionGroup>
    <ItemGroup>
 diff --git a/PCbuild/pyexpat.vcxproj b/PCbuild/pyexpat.vcxproj
-index dc9161a8b29..3bcef600a3e 100644
+index 8499402f0a9..833ab5e9f7e 100644
 --- a/PCbuild/pyexpat.vcxproj
 +++ b/PCbuild/pyexpat.vcxproj
 @@ -92,6 +92,10 @@
@@ -862,5 +862,5 @@ index 3f4d4463f24..2572449ba0c 100644
        <AdditionalDependencies>wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
      </Link>
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

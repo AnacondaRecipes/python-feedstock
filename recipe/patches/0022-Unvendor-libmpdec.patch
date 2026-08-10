@@ -1,7 +1,7 @@
-From daee1afe1630439904567d756fc6afb4de8ea4c4 Mon Sep 17 00:00:00 2001
+From 2b71744d2b484f2ad25e631714688eb027ac3ca2 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 16 Aug 2024 21:34:43 -0500
-Subject: [PATCH 21/24] Unvendor libmpdec
+Subject: [PATCH 21/25] Unvendor libmpdec
 
 ---
  PCbuild/_decimal.vcxproj | 50 +++++-----------------------------------
@@ -84,5 +84,5 @@ index e9d60b4db1a..0f49d7923f5 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

@@ -1,7 +1,7 @@
-From 9a026370bd659c0214389f45b41d6eeffd4c368e Mon Sep 17 00:00:00 2001
+From b7562937309ef24a587dda3e92d74e0c24cfbe79 Mon Sep 17 00:00:00 2001
 From: Eric Lundby <Eric.Lundby@gmail.com>
 Date: Mon, 9 Mar 2026 15:28:24 -0600
-Subject: [PATCH] Allow setting llvm version
+Subject: [PATCH 25/25] Allow setting llvm version
 
 ---
  Tools/jit/_llvm.py | 2 +-
@@ -11,7 +11,7 @@ diff --git a/Tools/jit/_llvm.py b/Tools/jit/_llvm.py
 index 79b6b7ec530..b73d0b10aae 100644
 --- a/Tools/jit/_llvm.py
 +++ b/Tools/jit/_llvm.py
-@@ -10,7 +10,7 @@ import typing
+@@ -10,7 +10,7 @@
  
  import _targets
  
@@ -20,4 +20,6 @@ index 79b6b7ec530..b73d0b10aae 100644
  _LLVM_VERSION_PATTERN = re.compile(
      rf"(?<!Apple )(LLVM|clang) version\s+{_LLVM_VERSION}\.\d+\.\d+\S*\s+"
  )
- _EXTERNALS_LLVM_TAG = "llvm-19.1.7.0"
+-- 
+2.51.0
+
