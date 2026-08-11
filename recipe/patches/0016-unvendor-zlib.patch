@@ -1,7 +1,7 @@
-From 44c02cd037fbad6611aeeff9dc423469f779ea45 Mon Sep 17 00:00:00 2001
+From f4a1fddfbcdd4684cae1c2ad134b77d7aebbd8a8 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Sep 2021 15:21:55 -0700
-Subject: [PATCH 17/22] unvendor zlib
+Subject: [PATCH 16/22] unvendor zlib
 
 ---
  PCbuild/pythoncore.vcxproj         | 33 ++-------------
@@ -163,3 +163,6 @@ index 3eed5a9465b..0892b669d6b 100644
      <ClCompile Include="..\Python\hamt.c">
        <Filter>Python</Filter>
      </ClCompile>
+-- 
+2.51.0
+

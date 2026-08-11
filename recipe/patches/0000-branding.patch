@@ -1,7 +1,7 @@
-From 3be7cda6e0b58051fcf761a694fd6065dc9d84a1 Mon Sep 17 00:00:00 2001
+From 7e2bf4f82f0b1301259acb23a9f467d42aab63de Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
-Subject: [PATCH 01/22] branding
+Subject: [PATCH 00/22] branding
 
 ---
  Lib/platform.py     | 2 +-
@@ -46,3 +46,6 @@ index 226b2f999a6..0c7ff163257 100644
  #endif
      PyOS_snprintf(version, sizeof(version), buildinfo_format,
                    PY_VERSION, Py_GetBuildInfo(), Py_GetCompiler());
+-- 
+2.51.0
+
