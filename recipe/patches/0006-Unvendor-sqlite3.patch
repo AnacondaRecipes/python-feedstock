@@ -27,7 +27,7 @@ index 9ae0a0fc3a0..f482734ba1d 100644
    </ItemDefinitionGroup>
    <ItemGroup>
      <ClInclude Include="..\Modules\_sqlite\connection.h" />
-@@ -127,12 +130,7 @@
+@@ -127,12 +130,8 @@
        <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
      </ProjectReference>
@@ -41,6 +41,7 @@ index 9ae0a0fc3a0..f482734ba1d 100644
    </ImportGroup>
 -</Project>
 \ No newline at end of file
++</Project>
 diff --git a/PCbuild/pcbuild.sln b/PCbuild/pcbuild.sln
 index d10e1c46a91..22042bacd9f 100644
 --- a/PCbuild/pcbuild.sln
