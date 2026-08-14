@@ -1,16 +1,16 @@
-From 04cfcc1728485e2fbdd04f1c34425e8377b72c61 Mon Sep 17 00:00:00 2001
+From 11f9c0e576bbd13b5fdfab12c2b340114db44f9d Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
-Subject: [PATCH 05/24] Unvendor openssl
+Subject: [PATCH 05/25] Unvendor openssl
 
 Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
  PCbuild/openssl.props   | 14 ++------------
  PCbuild/openssl.vcxproj | 32 --------------------------------
- PCbuild/python.props    | 27 ++++++++++++++-------------
+ PCbuild/python.props    | 13 +------------
  PCbuild/python.vcxproj  |  3 +++
  PCbuild/pythonw.vcxproj |  3 +++
- 5 files changed, 22 insertions(+), 57 deletions(-)
+ 5 files changed, 9 insertions(+), 56 deletions(-)
 
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
 index 5fd708b211e..044cefd95ea 100644
@@ -151,5 +151,5 @@ index c6a5b8ce90a..8645a7bf438 100644
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 
