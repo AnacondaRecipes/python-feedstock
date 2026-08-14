@@ -4,7 +4,7 @@ python_impl:
   - cpython
 numpy:
   - 2.5
-# Override aggregate global tk 8.6 — build/test against tk 9 (staging via abs.yaml)
+# Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
 gil_type:

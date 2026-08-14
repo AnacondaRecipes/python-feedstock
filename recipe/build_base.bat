@@ -76,7 +76,7 @@ if "%PY_GIL_DISABLED%" == "yes" (
 set PGO=
 
 :: Pin Tcl/Tk from the `tk` CBC variant (feedstock overrides aggregate 8.6 → 9.0;
-:: host tk 9.0.4 comes from abs.yaml staging until defaults). Upstream tcltk.props
+:: host tk 9.0.4 from pkgs/main). Upstream tcltk.props
 :: with TclMajorVersion=9 sets tkPrefix=tcl9 → tcl90.lib / tcl9tk90.lib (no threaded t).
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 

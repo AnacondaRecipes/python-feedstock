@@ -8,7 +8,3 @@ build_parameters:
 # Upload all testing artifacts on a labeled testing channel: ad-testing/label/py315
 upload_channels:
 - ad-testing/label/py315
-
-# Host tk 9.0.4 from tk-feedstock PR #16 (PKG-16099) until it lands on defaults
-channels:
-- https://staging.continuum.io/pbp/fs/tk-feedstock/pr16/156fa80
