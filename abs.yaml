@@ -8,7 +8,3 @@ build_parameters:
 # Upload all testing artifacts on a labeled testing channel: ad-testing/label/py315
 upload_channels:
 - ad-testing/label/py315
-
-# After promote: testing channel (not PBP staging) for pre-release stack
-channels:
-  - ad-testing/labels/py315
