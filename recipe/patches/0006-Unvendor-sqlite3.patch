@@ -1,7 +1,7 @@
-From d11ed988e3607d8ed0fe6579cb74a3801b426582 Mon Sep 17 00:00:00 2001
+From a26f438ac80a24cecd65099fa2e55cdeb76cabd4 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Tue, 5 Oct 2021 12:42:06 -0700
-Subject: [PATCH 07/22] Unvendor sqlite3
+Subject: [PATCH 06/22] Unvendor sqlite3
 
 ---
  PCbuild/_sqlite3.vcxproj | 11 +++++------
@@ -78,3 +78,6 @@ index 6bcc4e913c8..9fe4bb740ab 100644
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
+-- 
+2.51.0
+
