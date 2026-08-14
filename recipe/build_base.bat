@@ -5,7 +5,12 @@ echo on
 set PYTHON=%CONDA_PYTHON_EXE%
 
 :: Compile python, extensions and external libraries
-if "%ARCH%"=="64" (
+:: win-arm64: ARCH=arm64 from conda-build (see PR #240 / main-3.14).
+if "%ARCH%"=="arm64" (
+   set PLATFORM=ARM64
+   set VC_PATH=arm64
+   set BUILD_PATH=arm64
+) else if "%ARCH%"=="64" (
    set PLATFORM=x64
    set VC_PATH=x64
    set BUILD_PATH=amd64
@@ -51,13 +56,13 @@ if "%PY_GIL_DISABLED%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
-  :: Free-threaded MSBuild output goes to PCbuild\amd64t\ (or win32t\), not amd64\.
-  :: Upstream python.props sets BuildPath=BuildPath64t when DisableGil=true; all
-  :: exes, .pyd, and .lib artifacts land there.  BUILD_PATH below is used to
-  :: stage those files into %PREFIX% — leaving it at amd64 makes xcopy *.pyd fail
-  :: with "File not found" even though the compile itself succeeded.
+  :: Free-threaded MSBuild output goes to PCbuild\amd64t\ / arm64t\ / win32t\,
+  :: not the non-t dirs. Upstream python.props sets BuildPath*t when DisableGil=true;
+  :: BUILD_PATH below stages those files into %PREFIX% — wrong path → xcopy miss.
   if "%ARCH%"=="64" (
     set BUILD_PATH=amd64t
+  ) else if "%ARCH%"=="arm64" (
+    set BUILD_PATH=arm64t
   ) else (
     set BUILD_PATH=win32t
   )
@@ -70,11 +75,9 @@ if "%PY_GIL_DISABLED%" == "yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
-:: TODO: remove once tk 9 is available on main
-:: Pin Tcl/Tk from the `tk` variant in conda_build_config.yaml (single source of
-:: truth, shared with build_base.sh). Upstream 3.15 tcltk.props defaults
-:: TclVersion to 9.0.3.0, but pkgs/main only ships tk 8.6; MSBuild derives the
-:: lib names (tcl86t.lib/tk86t.lib) from the major.minor of these props.
+:: Pin Tcl/Tk from the `tk` CBC variant (feedstock overrides aggregate 8.6 → 9.0;
+:: host tk 9.0.4 from pkgs/main). Upstream tcltk.props
+:: with TclMajorVersion=9 sets tkPrefix=tcl9 → tcl90.lib / tcl9tk90.lib (no threaded t).
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
 cd PCbuild

@@ -24,6 +24,8 @@ fi
 VERFULL=${PKG_VERSION}
 VER=${PKG_VERSION%.*}
 VERNODOTS=${VER//./}
+# Tcl/Tk major.minor from CBC `tk` (override aggregate 8.6 → 9.0 for this feedstock).
+# tk 9 ships libtcl9.0.so + libtcl9tk9.0.so (not libtk9.0.so).
 TCLTK_VER=${tk}
 # Disables some PGO/LTO
 QUICK_BUILD=no
@@ -254,7 +256,7 @@ _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
-_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltk${TCLTK_VER}")
+_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl9tk${TCLTK_VER}")
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 

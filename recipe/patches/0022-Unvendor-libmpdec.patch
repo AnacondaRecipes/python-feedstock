@@ -1,14 +1,14 @@
-From a93336b239983227c6549ec1ede266b769f8a999 Mon Sep 17 00:00:00 2001
+From 89e04f3a9e693c7d0a819ce74b9bb11316813a95 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 16 Aug 2024 21:34:43 -0500
-Subject: [PATCH 21/24] Unvendor libmpdec
+Subject: [PATCH 21/25] Unvendor libmpdec
 
 ---
- PCbuild/_decimal.vcxproj | 51 ++++++----------------------------------
+ PCbuild/_decimal.vcxproj | 52 +++++-----------------------------------
  1 file changed, 6 insertions(+), 46 deletions(-)
 
 diff --git a/PCbuild/_decimal.vcxproj b/PCbuild/_decimal.vcxproj
-index 921d22e47b3..0f49d7923f5 100644
+index 921d22e47b..c1eb96fae1 100644
 --- a/PCbuild/_decimal.vcxproj
 +++ b/PCbuild/_decimal.vcxproj
 @@ -93,64 +93,24 @@
@@ -33,7 +33,7 @@ index 921d22e47b3..0f49d7923f5 100644
 +      <AdditionalDependencies>mpdec.lib;%(AdditionalDependencies)</AdditionalDependencies>
 +    </Link>
    </ItemDefinitionGroup>
-   <ItemGroup>
+-  <ItemGroup>
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\basearith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\bits.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\constants.h" />
@@ -54,7 +54,7 @@ index 921d22e47b3..0f49d7923f5 100644
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\umodarith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\vccompat.h" />
 -  </ItemGroup>
--  <ItemGroup>
+   <ItemGroup>
      <ClCompile Include="..\Modules\_decimal\_decimal.c" />
 -    <ClCompile Include="$(mpdecimalDir)\libmpdec\basearith.c" />
 -    <ClCompile Include="$(mpdecimalDir)\libmpdec\constants.c" />
@@ -84,3 +84,4 @@ index 921d22e47b3..0f49d7923f5 100644
      <ResourceCompile Include="..\PC\python_nt.rc" />
 -- 
 2.51.0
+
