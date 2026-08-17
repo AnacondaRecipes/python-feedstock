@@ -184,8 +184,9 @@ outputs:
         - make                          # [not win]
         - libtool                       # [unix]
         - pkg-config                    # [not win]
-        # configure script looks for llvm-ar for lto
-        - llvm-tools                    # [osx]
+        # configure script looks for llvm-ar for lto (keep single LLVM major;
+        # unversioned llvm-tools can pull llvm-tools-20 beside llvm-tools-21 and
+        # break osx llvm-ar via missing @rpath/libLLVM.*.dylib).
         - ld_impl_{{ target_platform }} # [linux]
         # called in build_base.sh
         - ripgrep                       # [not win]
@@ -196,6 +197,7 @@ outputs:
         # "LLVM version 21 is the officially supported version"
         - clang-21         # [not win]
         - llvm-tools-21    # [not win]
+        - libllvm21        # [not win]
         - clang 21.*       # [win]
         - llvm-tools 21.*  # [win]
       host:
