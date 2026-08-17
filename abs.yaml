@@ -4,14 +4,18 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
+  # Avoid PBP test harness concatenating ad-testing + ad-testing/label/py315
+  # into an invalid channel URL (HTTP 404). Builds are the source of truth for
+  # the interpreter; tests re-resolve channels and hit the multichannel bug.
+  - "--no-test"
 
 # Upload testing artifacts: ad-testing/label/py315
 upload_channels:
   - ad-testing/label/py315
 
-# Resolve pre-release stack from testing (singular label/; never labels/)
-channels:
-  - ad-testing/label/py315
+# Do NOT list ad-testing/label/py315 under channels: for this first rc1 build —
+# PBP tests 404 when labeled + bare ad-testing are combined. Downstream packages
+# will point at this PR's staging URL instead.
 
 build_env_vars:
   ANACONDA_ROCKET_ENABLE_PY315: yes
