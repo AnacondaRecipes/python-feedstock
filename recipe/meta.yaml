@@ -184,9 +184,6 @@ outputs:
         - make                          # [not win]
         - libtool                       # [unix]
         - pkg-config                    # [not win]
-        # configure script looks for llvm-ar for lto (keep single LLVM major;
-        # unversioned llvm-tools can pull llvm-tools-20 beside llvm-tools-21 and
-        # break osx llvm-ar via missing @rpath/libLLVM.*.dylib).
         - ld_impl_{{ target_platform }} # [linux]
         # called in build_base.sh
         - ripgrep                       # [not win]
@@ -195,9 +192,10 @@ outputs:
 {% endif %}
         # https://github.com/python/cpython/blob/main/Tools/jit/README.md#installing-llvm:
         # "LLVM version 21 is the officially supported version"
+        # Also supplies llvm-ar-21, which build_base.sh wraps as the lto archiver
+        # that configure picks up via $HOST-llvm-ar.
         - clang-21         # [not win]
         - llvm-tools-21    # [not win]
-        - libllvm21        # [not win]
         - clang 21.*       # [win]
         - llvm-tools 21.*  # [win]
       host:
