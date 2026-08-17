@@ -5,6 +5,13 @@ build_parameters:
   - "--error-overlinking"
   - "--error-overdepending"
 
-# Upload all testing artifacts on a labeled testing channel: ad-testing/label/py315
+# Upload testing artifacts: ad-testing/label/py315
 upload_channels:
-- ad-testing/label/py315
+  - ad-testing/label/py315
+
+# Resolve pre-release stack from testing (singular label/; never labels/)
+channels:
+  - ad-testing/label/py315
+
+build_env_vars:
+  ANACONDA_ROCKET_ENABLE_PY315: yes
