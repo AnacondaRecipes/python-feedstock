@@ -5,6 +5,10 @@ build_parameters:
   - "--error-overlinking"
   - "--error-overdepending"
 
+# After promote: consume from testing (do not merge this PR — Ian upload_channels gate)
+channels:
+  - ad-testing/label/py315
+
 # Upload testing artifacts: ad-testing/label/py315
 upload_channels:
   - ad-testing/label/py315
