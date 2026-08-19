@@ -101,6 +101,8 @@ outputs:
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard (vc14+ only for 3.15)
       skip: true  # [win and vc < 14]
+      skip_compile_pyc:
+        - '*.py'  # [build_platform != target_platform]
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}
       track_features:     # [freethreading == "yes"]
@@ -233,15 +235,12 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-{% if freethreading == "no" and build_type != "debug" %}
         # FindPythonLibs does not know freethreading/debug ABIs; skip those variants.
         # TODO: use FindPython3 once it supports freethreading (cmake#26016).
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
-{% endif %}
+        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [freethreading == "no" and build_type != "debug"]
         - popd
         - popd
         - python run_test.py
-        - rm -f default.profraw  # [osx]
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
         - python3.1 --version  # [unix]
@@ -360,5 +359,3 @@ extra:
     - scopatz
     - katietz
     - xhochy
-  skip-lints:
-    - license_file_overspecified
