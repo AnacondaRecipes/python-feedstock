@@ -202,7 +202,7 @@ if [[ ${target_platform} == osx-64 ]]; then
   # TODO: check with LLVM 12 if the following hack is needed.
   # https://reviews.llvm.org/D76461 may have fixed the need for the following hack.
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
-  echo "$BUILD_PREFIX/bin/llvm-ar --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
+  echo "$BUILD_PREFIX/bin/llvm-ar-21 --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch x86_64"
 elif [[ ${target_platform} == osx-arm64 ]]; then
@@ -211,7 +211,7 @@ elif [[ ${target_platform} == osx-arm64 ]]; then
   export ac_sys_release=20.0.0
   export MACOSX_DEFAULT_ARCH=arm64
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
-  echo "$BUILD_PREFIX/bin/llvm-ar --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
+  echo "$BUILD_PREFIX/bin/llvm-ar-21 --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch arm64"
   export CFLAGS="$CFLAGS $ARCHFLAGS"

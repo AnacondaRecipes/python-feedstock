@@ -7,6 +7,14 @@ numpy:
 # Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
+# Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
+# (Tools/jit/_llvm.py); mixing compiler('c')=20 with clang-21/llvm-tools-21
+# breaks osx-arm64 LTO+PGO (___llvm_profile_runtime) and JIT tool discovery.
+# Matches conda-forge python-feedstock osx c_compiler_version: 21.
+c_compiler_version:            # [osx]
+  - 21                         # [osx]
+cxx_compiler_version:          # [osx]
+  - 21                         # [osx]
 freethreading:
   - yes
   - no  # [not (s390x or (osx and x86_64))]
