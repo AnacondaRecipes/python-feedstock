@@ -24,7 +24,14 @@ fi
 VERFULL=${PKG_VERSION}
 VER=${PKG_VERSION%.*}
 VERNODOTS=${VER//./}
+# tk 9 ships libtcl9.0.so + libtcl9tk9.0.so (not libtk9.0.so).
 TCLTK_VER=${tk}
+TK_MAJOR_VER=${tk%.*}
+# LLVM version to use for LTO/PGO. Align it with c_compiler_version on osx-arm64.
+LLVM_VER=${c_compiler_version%.*}
+if [[ ${target_platform} == osx-arm64 ]]; then
+  LLVM_VER=21
+fi
 # Disables some PGO/LTO
 QUICK_BUILD=no
 
@@ -207,7 +214,7 @@ if [[ ${target_platform} == osx-64 ]]; then
   # TODO: check with LLVM 12 if the following hack is needed.
   # https://reviews.llvm.org/D76461 may have fixed the need for the following hack.
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
-  echo "$BUILD_PREFIX/bin/llvm-ar --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
+  echo "$BUILD_PREFIX/bin/llvm-ar-$LLVM_VER --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch x86_64"
 elif [[ ${target_platform} == osx-arm64 ]]; then
@@ -216,7 +223,7 @@ elif [[ ${target_platform} == osx-arm64 ]]; then
   export ac_sys_release=20.0.0
   export MACOSX_DEFAULT_ARCH=arm64
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
-  echo "$BUILD_PREFIX/bin/llvm-ar --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
+  echo "$BUILD_PREFIX/bin/llvm-ar-$LLVM_VER --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch arm64"
   export CFLAGS="$CFLAGS $ARCHFLAGS"
@@ -254,7 +261,7 @@ _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
-_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl8.6 -ltk8.6")
+_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
@@ -416,10 +423,6 @@ if [[ -f ${PREFIX}/bin/python${VER}m ]]; then
 fi
 ln -s ${PREFIX}/bin/python${VER} ${PREFIX}/bin/python
 ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
-# Workaround for https://github.com/conda/conda/issues/10969 -
-# specifically for conda<=4.10
-# https://github.com/conda/conda/issues/11423#issuecomment-1104253815
-ln -s ${PREFIX}/bin/python3.14 ${PREFIX}/bin/python3.1
 
 # Remove test data to save space
 # Though keep `support` as some things use that.
@@ -480,7 +483,7 @@ pushd "${PREFIX}"/lib/python${VERABI}
   # Remove osx sysroot as it depends on the build machine
   sed -i.bak "s@-isysroot @@g" sysconfigfile
   # make sure $CONDA_BUILD_SYSROOT is not empty ...
-  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then 
+  if [[ ${HOST} =~ .*darwin.* ]] && [[ -n ${CONDA_BUILD_SYSROOT} ]]; then
     sed -i.bak "s@$CONDA_BUILD_SYSROOT @@g" sysconfigfile
   fi
   # Remove unfilled config option
@@ -552,8 +555,7 @@ SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
 if [[ ${PY_GIL_DISABLED} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
-# Workaround for https://github.com/conda/conda/issues/10969
-echo "${PREFIX}/lib/python3.1/site-packages" >> $SP_DIR/conda-site.pth
+
 # A python version independent directory that ABI3 and noarch packages can use.
 # This is unused at the moment, but keeping it here for experimentation.
 echo "${PREFIX}/lib/python/site-packages" >> $SP_DIR/conda-site.pth
