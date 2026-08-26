@@ -1,17 +1,17 @@
-From daee1afe1630439904567d756fc6afb4de8ea4c4 Mon Sep 17 00:00:00 2001
+From 89e04f3a9e693c7d0a819ce74b9bb11316813a95 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 16 Aug 2024 21:34:43 -0500
-Subject: [PATCH 21/24] Unvendor libmpdec
+Subject: [PATCH 21/25] Unvendor libmpdec
 
 ---
- PCbuild/_decimal.vcxproj | 50 +++++-----------------------------------
- 1 file changed, 6 insertions(+), 44 deletions(-)
+ PCbuild/_decimal.vcxproj | 52 +++++-----------------------------------
+ 1 file changed, 6 insertions(+), 46 deletions(-)
 
 diff --git a/PCbuild/_decimal.vcxproj b/PCbuild/_decimal.vcxproj
-index e9d60b4db1a..0f49d7923f5 100644
+index 921d22e47b..c1eb96fae1 100644
 --- a/PCbuild/_decimal.vcxproj
 +++ b/PCbuild/_decimal.vcxproj
-@@ -93,65 +93,27 @@
+@@ -93,64 +93,24 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -33,14 +33,13 @@ index e9d60b4db1a..0f49d7923f5 100644
 +      <AdditionalDependencies>mpdec.lib;%(AdditionalDependencies)</AdditionalDependencies>
 +    </Link>
    </ItemDefinitionGroup>
-   <ItemGroup>
+-  <ItemGroup>
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\basearith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\bits.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\constants.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\convolute.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\crt.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\difradix2.h" />
-     <ClInclude Include="..\Modules\_decimal\docstrings.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\fnt.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\fourstep.h" />
 -    <ClInclude Include="..\Modules\_decimal\windows\mpdecimal.h" />
@@ -54,7 +53,7 @@ index e9d60b4db1a..0f49d7923f5 100644
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\typearith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\umodarith.h" />
 -    <ClInclude Include="$(mpdecimalDir)\libmpdec\vccompat.h" />
-   </ItemGroup>
+-  </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\_decimal\_decimal.c" />
 -    <ClCompile Include="$(mpdecimalDir)\libmpdec\basearith.c" />
@@ -84,5 +83,5 @@ index e9d60b4db1a..0f49d7923f5 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

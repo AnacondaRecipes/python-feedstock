@@ -1,7 +1,7 @@
-From 8e33d5a82f85137935f6004c2c7be262c1c12c9b Mon Sep 17 00:00:00 2001
+From b81adf9cc72e86156e23ab6d30f1b95fb5849ba7 Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:42:39 +0100
-Subject: [PATCH 24/24] Unvendor zstd
+Subject: [PATCH 24/25] Unvendor zstd
 
 ---
  PCbuild/_zstd.vcxproj         |  59 ++-----------
@@ -9,7 +9,7 @@ Subject: [PATCH 24/24] Unvendor zstd
  2 files changed, 5 insertions(+), 213 deletions(-)
 
 diff --git a/PCbuild/_zstd.vcxproj b/PCbuild/_zstd.vcxproj
-index 6f91b8d05cc..57e35741a41 100644
+index 6f91b8d05c..57e35741a4 100644
 --- a/PCbuild/_zstd.vcxproj
 +++ b/PCbuild/_zstd.vcxproj
 @@ -95,72 +95,23 @@
@@ -91,7 +91,7 @@ index 6f91b8d05cc..57e35741a41 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/_zstd.vcxproj.filters b/PCbuild/_zstd.vcxproj.filters
-index eec666e5eaf..a2aa391f393 100644
+index eec666e5ea..a2aa391f39 100644
 --- a/PCbuild/_zstd.vcxproj.filters
 +++ b/PCbuild/_zstd.vcxproj.filters
 @@ -30,96 +30,6 @@
@@ -268,5 +268,5 @@ index eec666e5eaf..a2aa391f393 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 
