@@ -1,5 +1,5 @@
-{% set version = "3.14.6" %}
-{% set dev = "" %}
+{% set version = "3.15.0" %}
+{% set dev = "rc1" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 143b1dddefaec3bd2e21e3b839b34a2b7fb9842272883c576420d605e9f30c63
+    sha256: f84dad680ab2147417d2739355c2678f0f9acffe4ae8ef77895de1454b384b07
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -93,6 +93,7 @@ source:
       - patches/0023-branding.patch
       - patches/0024-Unvendor-zlib-ng.patch
       - patches/0025-Unvendor-zstd.patch
+      - patches/0026-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
 
 build:
   number: {{ build_number }}
@@ -183,8 +184,6 @@ outputs:
         - make                          # [not win]
         - libtool                       # [unix]
         - pkg-config                    # [not win]
-        # configure script looks for llvm-ar for lto
-        - llvm-tools                    # [osx]
         - ld_impl_{{ target_platform }} # [linux]
         # called in build_base.sh
         - ripgrep                       # [not win]
@@ -193,10 +192,13 @@ outputs:
 {% endif %}
         # https://github.com/python/cpython/blob/main/Tools/jit/README.md#installing-llvm:
         # "LLVM version 21 is the officially supported version"
-        - clang-19         # [not win]
-        - llvm-tools-19    # [not win]
-        - clang 19.*       # [win]
-        - llvm-tools 19.*  # [win]
+        - clang-21         # [not win]
+        # configure script looks for llvm-ar for lto.
+        # llvm-tools-21 also supplies llvm-ar-21, which build_base.sh wraps as the lto archiver
+        # that configure picks up via $HOST-llvm-ar.
+        - llvm-tools-21    # [not win]
+        - clang 21.*       # [win]
+        - llvm-tools 21.*  # [win]
       host:
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
@@ -287,22 +289,11 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-{% if gil_type is defined and gil_type == "disabled" %}
-       # TODO: cmake does not know about the free-threading ABI and fails to
-       # identify libpython3.13t.dylib as a valid PythonLibs target.
-       # Skip this test for the time being.
-       # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || true           # [unix]
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || type nul>nul   # [win]
-{% else %}
         - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
-{% endif %}
         - popd
         - popd
         - python run_test.py
         - test ! -f default.profraw   # [osx]
-        # Test workaround for https://github.com/conda/conda/issues/10969
-        - python3.1 --version  # [unix]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
 
@@ -312,6 +303,8 @@ outputs:
     script: build_static.bat  # [win]
     build:
       number: {{ build_number }}
+      force_use_keys:
+        - gil_type
       activate_in_script: true
       ignore_run_exports:
         - python_abi
