@@ -4,3 +4,10 @@ build_parameters:
   #- "--skip-existing"
   - "--error-overlinking"
   - "--error-overdepending"
+
+# Upload testing artifacts: ad-testing/label/py315
+upload_channels:
+  - ad-testing/label/py315
+
+build_env_vars:
+  ANACONDA_ROCKET_ENABLE_PY315: yes
