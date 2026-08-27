@@ -2,6 +2,7 @@ import os
 import platform
 import sys
 import subprocess
+import site
 
 armv6l = bool(platform.machine() == 'armv6l')
 armv7l = bool(platform.machine() == 'armv7l')
@@ -15,18 +16,19 @@ else:
 # Build sanity: test env must point at the conda prefix we just built.
 assert sys.prefix and os.path.isdir(sys.prefix), f"invalid prefix: {sys.prefix!r}"
 print('sys.prefix:', sys.prefix)
-print('sys.abiflags:', getattr(sys, 'abiflags', ''))
 
-print('sys.version:', sys.version)
-print('sys.platform:', sys.platform)
-print('tuple.__itemsize__:', tuple.__itemsize__)
+print(f"{sys.version=}")
+print(f"{sys.platform=}")
+print(f"{tuple.__itemsize__=}")
 if sys.platform == 'win32':
     assert 'MSC v.19' in sys.version
 if hasattr(sys, "abiflags"):
-    print('sys.abiflags', sys.abiflags)
-print('sys.maxunicode:', sys.maxunicode)
-print('platform.architecture:', platform.architecture())
-print('platform.python_version:', platform.python_version())
+    print(f"{sys.abiflags=}")
+print(f"{sys.maxunicode=}")
+print(f"{platform.architecture=}")
+print(f"{platform.python_version=}")
+print(f"{site.getsitepackages()=}")
+print(f"{site.getusersitepackages()=}")
 
 import _bisect
 import _codecs_cn
@@ -61,6 +63,7 @@ import array
 import binascii
 import bz2
 import cmath
+import compression.zstd
 import datetime
 import itertools
 import lzma
@@ -74,17 +77,11 @@ import test
 import test.support
 import unicodedata
 import zlib
-import compression.zstd
 from os import urandom
 import os
 
 t = 100 * b'Foo '
 assert lzma.decompress(lzma.compress(t)) == t
-
-if os.getenv('PY_INTERP_DEBUG') == 'yes':
-    if sys.platform != 'win32':
-        assert 'd' in sys.abiflags
-    assert 'gettotalrefcount' in dir(sys)
 
 if sys.platform != 'win32':
     if not (ppc64le or armv7l):
@@ -97,6 +94,10 @@ if sys.platform != 'win32':
     import syslog
     import termios
 
+if os.getenv('PY_INTERP_DEBUG') == 'yes':
+    if sys.platform != 'win32':
+        assert 'd' in sys.abiflags
+    assert 'gettotalrefcount' in dir(sys)
 
 if not (armv6l or armv7l or ppc64le or osx105 or arm64):
     import tkinter
@@ -104,10 +105,21 @@ if not (armv6l or armv7l or ppc64le or osx105 or arm64):
     import _tkinter
     print('TK_VERSION: %s' % _tkinter.TK_VERSION)
     print('TCL_VERSION: %s' % _tkinter.TCL_VERSION)
-    TCLTK_VER = os.getenv("tk")
+    TCLTK_VER = os.getenv('tk')
     assert _tkinter.TK_VERSION == _tkinter.TCL_VERSION == TCLTK_VER
 
 import ssl
 print('OPENSSL_VERSION:', ssl.OPENSSL_VERSION)
-CONDA_OPENSSL_VERSION = os.getenv("openssl")
-assert CONDA_OPENSSL_VERSION in ssl.OPENSSL_VERSION
+CONDA_OPENSSL_VERSION = os.getenv('openssl')
+assert CONDA_OPENSSL_VERSION in ssl.OPENSSL_VERSION, f"{CONDA_OPENSSL_VERSION} not found in {ssl.OPENSSL_VERSION}"
+
+# See https://github.com/conda-forge/python-feedstock/issues/718 for context:
+assert sys.hash_info.algorithm.startswith("siphash")
+
+# xref https://github.com/conda-forge/openssl-feedstock/issues/237
+import ssl
+print("openssl:", ssl.OPENSSL_VERSION)
+pem = ssl.get_server_certificate(("pypi.org", 443))
+der = ssl.PEM_cert_to_DER_cert(pem)
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ctx.load_verify_locations(cadata=der)

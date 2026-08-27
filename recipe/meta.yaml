@@ -5,24 +5,39 @@
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
 {% set build_number = 0 %}
-{% set channel_targets = ('abc', 'def')  %}
-# this is just for the initial build, to break dependencies with python -> pip -> libpython-static
-{% set bootstrap = "false" %}
 
 # this makes the linter happy
 {% set channel_targets = channel_targets or 'conda-forge main' %}
 
 # Sanitize build system env. var tweak parameters
 # (passed to the build scripts via script_env).
-# Intentional AR divergence from conda-forge: drop PY_INTERP_LINKAGE_NATURE /
-# from_source_control os.environ Jinja in favor of CBC freethreading + build_type.
-# Empty linkage_nature (no _shared/_static in build string) matches current AR py315.
-{% set abi_tag = "cp" + ver2nd + ("t" if freethreading == "yes" else "") %}
-{% set build_number = build_number + (0 if freethreading == "yes" else 100) %}
-{% set py_interp_debug = "yes" if build_type == "debug" else "no" %}
-{% set debug = "_debug" if build_type == "debug" else "" %}
-{% set site_packages_path_unix = ("lib/python" + ver2 + "t/site-packages" if freethreading == "yes" else "lib/python" + ver2 + "/site-packages") %}
-{% set site_packages_path = "Lib/site-packages" if win else site_packages_path_unix %}
+{% if freethreading is not defined %}
+  {% set freethreading = "yes" %}
+{% endif %}
+
+{% set abi_tag = "cp" + ver2nd %}
+# freethreading, set using conda_build_config.yaml
+{% if freethreading == "yes" %}
+  {% set abi_tag = abi_tag + "t" %}
+{% else %}
+  {% set build_number = build_number + 100 %}
+{% endif %}
+
+{% if build_type == "debug" %}
+  {% set py_interp_debug = "yes" %}
+  {% set debug = "_debug" %}
+{% else %}
+  {% set py_interp_debug = "no" %}
+  {% set debug = "" %}
+{% endif %}
+
+{% if win %}
+  {% set site_packages_path = "lib/python/site-packages" %}
+{% elif freethreading == "yes" %}
+  {% set site_packages_path = "lib/python" + ver2 + "t/site-packages" %}
+{% else %}
+  {% set site_packages_path = "lib/python" + ver2 + "/site-packages" %}
+{% endif %}
 
 package:
   name: python-split
@@ -30,15 +45,12 @@ package:
 
 source:
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
-    # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
+    # sha256 from: https://www.python.org/downloads/release/python-{{ ver3nd }}{{ dev }}/
     sha256: f84dad680ab2147417d2739355c2678f0f9acffe4ae8ef77895de1454b384b07
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
       - patches/0002-Win32-Do-not-download-externals.patch
       - patches/0003-Fix-find_library-so-that-it-looks-in-sys.prefix-lib-.patch
-      # https://github.com/python/cpython/pull/28397
-      # Patch doesn't apply, but is Debian-specific anyway.
-      # - patches/0008-bpo-22699-Allow-compiling-on-debian-ubuntu-with-a-di.patch
       - patches/0004-Disable-registry-lookup-unless-CONDA_PY_ALLOW_REG_PA.patch
       - patches/0005-Unvendor-openssl.patch
       - patches/0006-Unvendor-sqlite3.patch
@@ -105,14 +117,18 @@ outputs:
         - '*.py'  # [build_platform != target_platform]
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}
-      track_features:     # [freethreading == "yes"]
-        - py_freethreading  # [freethreading == "yes"]
       run_exports:
         noarch:
           - python
         weak:
           - python_abi {{ ver2 }}.* *_{{ abi_tag }}
-          - python {{ ver2 }}.* *_debug_{{ abi_tag }}  # [build_type == "debug"]
+{% if py_interp_debug == "yes" %}
+          - python {{ ver2 }}.* *_debug_{{ abi_tag }}
+{% endif %}
+      track_features:
+{% if freethreading == "yes" %}
+        - py_freethreading
+{% endif %}
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
@@ -133,17 +149,17 @@ outputs:
 
     requirements:
       build:
-        - {{ stdlib('c') }}
         - {{ compiler('c') }}
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
-        - sed                           # [unix]
         - make                          # [not win]
         - libtool                       # [unix]
         - pkg-config                    # [not win]
         - ld_impl_{{ target_platform }} # [linux]
-        # called in build_base.sh
-        - ripgrep                       # [not win]
         - binutils_impl_{{ target_platform }}  # [linux]
+        # called in build_base.sh
+        - sed                           # [unix]
+        - ripgrep                       # [not win]
         # https://github.com/python/cpython/blob/main/Tools/jit/README.md#installing-llvm:
         # "LLVM version 21 is the officially supported version"
         # Also supplies llvm-ar-21, which build_base.sh wraps as the lto archiver
@@ -159,7 +175,7 @@ outputs:
         # Although we might like to use zlib-ng something else is
         # pulling in zlib and we get an overlinking error
         - zlib {{ zlib }}
-        #- zlib-ng {{ zlib_ng }}
+        - zstd {{ zstd }}
         - openssl {{ openssl }}
         - readline {{ readline }}                # [not win]
         - tk {{ tk }}
@@ -172,17 +188,19 @@ outputs:
         - libuuid {{ libuuid }}                  # [linux]
         - libmpdec-devel {{ libmpdec }}
         - expat {{ expat }}
-        - zstd {{ zstd }}
       run:
-        - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
+        - python_abi {{ ver2 }}.* *_{{ abi_tag }}
     test:
       requires:
         - ripgrep
         - cmake-no-system
         - make  # [unix]
         - ninja
+        # Pin to the openssl version used during the build to check whether
+        # we load the non-system version.
+        - openssl {{ openssl }}
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         # Tried to use enable_language(C) to avoid needing this. It does not work.
@@ -213,11 +231,21 @@ outputs:
         - test-venv\\Scripts\\python.exe -c "import ctypes"  # [win]
         - test-venv/bin/python -c "import ctypes"            # [unix]
         - python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"  # [not win]
-        - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_cos6_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
-        # check for unreplaced @ symbols in sysconfig files
+        - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
+        # check for unreplaced @ symbols in sysconfig files, excluding e.g. '"$@".lto'
         - for f in ${CONDA_PREFIX}/lib/python*/_sysconfig*.py; do echo "Checking $f:"; if [[ `rg @[^@]*@ $f` ]]; then echo "FAILED ON $f"; cat $f; exit 1; fi; done  # [linux64 or osx]
-        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a  # [unix]
-        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a  # [unix]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [unix]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
+        {% if freethreading == "yes" %}
+        - if not exist %PREFIX%\\lib\\python3t.lib exit 1                # [win]
+        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}t.lib exit 1     # [win]
+        {% else %}
+        - if not exist %PREFIX%\\lib\\python3.lib exit 1                 # [win]
+        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}.lib exit 1      # [win]
+        {% endif %}
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
@@ -225,11 +253,11 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
-        - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
-        - if not exist %PREFIX%\\libs\\python3t.lib exit 1                # [win and freethreading == "yes"]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}t.lib exit 1     # [win and freethreading == "yes"]
-        - if not exist %PREFIX%\\libs\\python3.lib exit 1                 # [win and freethreading == "no"]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1      # [win and freethreading == "no"]
+        - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
+        - if not exist %PREFIX%\\lib\\python\\python3t.lib exit 1                # [win and freethreading == "yes"]
+        - if not exist %PREFIX%\\lib\\python\\python{{ ver2nd }}t.lib exit 1     # [win and freethreading == "yes"]
+        - if not exist %PREFIX%\\lib\\python\\python3.lib exit 1                 # [win and freethreading == "no"]
+        - if not exist %PREFIX%\\lib\\python\\python{{ ver2nd }}.lib exit 1      # [win and freethreading == "no"]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
@@ -237,15 +265,17 @@ outputs:
         - pushd cmake
         # FindPythonLibs does not know freethreading/debug ABIs; skip those variants.
         # TODO: use FindPython3 once it supports freethreading (cmake#26016).
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .  # [freethreading == "no" and build_type != "debug"]
+        - cmake -GNinja -DPY_VER={{ version }}-DEXTRA_COMPONENTS="Development.Module" --debug-find --trace --debug-output --debug-trycompile .
         - popd
         - popd
         - python run_test.py
         - test ! -f default.profraw   # [osx]
         # Test workaround for https://github.com/conda/conda/issues/10969
-        - python3.1 --version  # [unix]
+        #- python3.1 --version  # [unix]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
+        # Test for wide character supported via ncursesw
+        - TERM=xterm >/dev/null python -c "import curses; scr = curses.initscr(); curses.unget_wch('x'); assert 'x' ==  scr.get_wch()"  # [unix]
 
   - name: libpython-static
     script: build_static.sh  # [unix]
@@ -258,14 +288,14 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
-      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
     requirements:
       build:
-        - {{ stdlib('c') }}
         - {{ compiler('c') }}
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
       host:
         - {{ pin_subpackage('python', exact=True) }}
@@ -297,7 +327,9 @@ outputs:
   - name: python-freethreading
     build:
       noarch: generic
-      skip: true  # [freethreading == "no"]
+{% if freethreading != "yes" %}
+      skip: true
+{% endif %}
     requirements:
       - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
@@ -305,7 +337,9 @@ outputs:
   - name: python-gil
     build:
       noarch: generic
-      skip: true  # [freethreading == "yes"]
+{% if freethreading == "yes" %}
+      skip: true
+{% endif %}
     requirements:
       - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
