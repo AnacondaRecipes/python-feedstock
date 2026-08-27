@@ -156,11 +156,13 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
   BUILD_PYTHON_PREFIX=${PWD}/build-python-install
   mkdir build-python-build
   pushd build-python-build
-    (unset CPPFLAGS LDFLAGS;
-     export CC=${CC_FOR_BUILD} \
+    (export CC=${CC_FOR_BUILD} \
             CXX=${CXX_FOR_BUILD} \
             CPP="${CC_FOR_BUILD} -E" \
-            CFLAGS="-O2" \
+            CFLAGS="-O2 -I${BUILD_PREFIX}/include" \
+            CPPFLAGS="-O2 -I${BUILD_PREFIX}/include" \
+            LDFLAGS=${LDFLAGS//${PREFIX}/${BUILD_PREFIX}} \
+            PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig \
             AR="$(${CC_FOR_BUILD} --print-prog-name=ar)" \
             RANLIB="$(${CC_FOR_BUILD} --print-prog-name=ranlib)" \
             LD="$(${CC_FOR_BUILD} --print-prog-name=ld)" && \
@@ -176,15 +178,17 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
     ln -s ${BUILD_PYTHON_PREFIX}/bin/python${VER} ${BUILD_PYTHON_PREFIX}/bin/python
   popd
   echo "ac_cv_file__dev_ptmx=yes"        > config.site
-  echo "ac_cv_file__dev_ptc=yes"        >> config.site
+  echo "ac_cv_file__dev_ptc=no"         >> config.site
   echo "ac_cv_pthread=yes"              >> config.site
   echo "ac_cv_little_endian_double=yes" >> config.site
-  if [[ ${target_platform} == osx-arm64 ]]; then
+  if [[ "${target_platform}" == "osx-arm64" || "${target_platform}" == "linux-ppc64le" || "${target_platform}" == "linux-aarch64" ]]; then
       echo "ac_cv_aligned_required=no" >> config.site
-      echo "ac_cv_file__dev_ptc=no" >> config.site
       echo "ac_cv_pthread_is_default=yes" >> config.site
       echo "ac_cv_working_tzset=yes" >> config.site
       echo "ac_cv_pthread_system_supported=yes" >> config.site
+  else
+      echo "unknown cross compiling platform"
+      exit 1
   fi
   export CONFIG_SITE=${PWD}/config.site
   # This is needed for libffi:
@@ -401,10 +405,17 @@ if [[ ${target_platform} =~ .*linux.* ]]; then
   ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
 fi
 
-SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
+# Use sysconfigdata and build-details.json from the shared build, as we want packages to prefer
+# linking against the shared library. Issue #565.
+BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
+SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
+
+BUILD_DETAILS=${_buildd_shared}/${BUILD_DIR}/build-details.json
+cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI}/
+
 MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
