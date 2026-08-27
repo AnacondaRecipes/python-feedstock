@@ -1,10 +1,10 @@
-{% set version = "3.10.20" %}
+{% set version = "3.10.21" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "1" %}
+{% set build_number = "0" %}
 {% set channel_targets = ('abc', 'def')  %}
 
 # this makes the linter happy
@@ -48,7 +48,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: de6517421601e39a9a3bc3e1bc4c7b2f239297423ee05e282598c83ec0647505
+    sha256: a0da1e72132e950154eca0f6f47d5db828454700de20e5113667940d81e0db04
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -88,8 +88,6 @@ source:
       - patches/0026-Use-OpenSSL-3-instead-of-1_1.patch
       {% endif %}
       - patches/0027-Unvendor-expat.patch
-      # https://github.com/python/cpython/pull/100373 (OpenSSL 3.5.7 Windows cert-store fix)
-      - patches/0028-Fix-ssl-DER-EOF-detection-for-openssl-3.5.7.patch
       # https://github.com/python/cpython/pull/29791
       - patches/0029-Fix-ctypes-fielddesc-init-for-external-libffi.patch
 
