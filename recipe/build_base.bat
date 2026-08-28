@@ -216,7 +216,9 @@ echo "Testing print() does not print: Hello"
 if %errorlevel% neq 1 exit /b 1
 
 echo "Testing print('Hello') prints: Hello"
-%PREFIX%\python.exe "print('Hello')" 2>&1 | findstr /r /c:"Hello"
+:: Need -c; without it python treats the string as a filename. findstr then
+:: matches Hello in the error path and the test falsely passes.
+%PREFIX%\python.exe -c "print('Hello')" 2>&1 | findstr /r /c:"Hello"
 if %errorlevel% neq 0 exit /b 1
 
 echo "Testing import of os (no DLL needed) does not print: The specified module could not be found"
