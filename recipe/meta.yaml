@@ -1,68 +1,48 @@
-{% set version = "3.14.6" %}
+{% set version = "3.14.7" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
 {% set build_number = 0 %}
-{% set channel_targets = ('abc', 'def')  %}
-# this is just for the initial build, to break dependencies with python -> pip -> libpython-static
+{% set build_number = build_number + 100 %}
+{% set channel_targets = ('abc', 'def') %}
+{% set channel_targets = "channel_targets or 'conda-forge main'" %}
 {% set bootstrap = "false" %}
-
-# this makes the linter happy
-{% set channel_targets = channel_targets or 'conda-forge main' %}
-
-# Sanitize build system env. var tweak parameters
-# (passed to the build scripts via script_env).
-{% set from_source_control = os.environ.get('CONDA_BUILD_FROM_SOURCE_CONTROL', '') %}
-{% if from_source_control == '' or from_source_control == 'no' %}
-  {% set from_source_control = 'no' %}
-{% else %}
-  {% set from_source_control = 'yes' %}
-{% endif %}
-{% set linkage_nature = os.environ.get('PY_INTERP_LINKAGE_NATURE', '') %}
-{% if linkage_nature != '' %}
-  {% set linkage_nature = "_" ~ linkage_nature %}
-{% endif %}
-{% if linkage_nature == 'shared' %}
-  {% set linkage_nature_env = 'shared' %}
-{% else %}
-  {% set linkage_nature_env = 'static' %}
-{% endif %}
+{% set from_source_control = "os.environ.get('CONDA_BUILD_FROM_SOURCE_CONTROL', '')" %}
+{% set from_source_control = "no" %}
+{% set from_source_control = "yes" %}
+{% set linkage_nature = "os.environ.get('PY_INTERP_LINKAGE_NATURE', '')" %}
+{% set linkage_nature = '"_" ~ linkage_nature' %}
+{% set linkage_nature_env = "shared" %}
+{% set linkage_nature_env = "static" %}
 {% set dbg_abi = "" %}
-{% set debug = os.environ.get('PY_INTERP_DEBUG', '') %}
-{% if debug != '' and debug != 'no' %}
-  {% set py_interp_debug = "yes" %}
-  {% set debug = "_dbg" %}
-  {% set dbg_abi = "d" %}  # [win]
-{% else %}
-  {% set py_interp_debug = "no" %}
-{% endif %}
-
-# no-GIL, set using conda_build_config.yaml
-{% if gil_type is defined and gil_type == "disabled" %}
-  {% set py_gil_disabled = "yes" %}
-  {% set abi_suffix = "t" %}
-{% else %}
-  {% set py_gil_disabled = "no" %}
-  {% set abi_suffix = "" %}
-  {% set build_number = build_number + 100 %}
-{% endif %}
+{% set dbg_abi = "d" %}  # [win]
+{% set debug = "os.environ.get('PY_INTERP_DEBUG', '')" %}
+{% set debug = "_dbg" %}
+{% set py_interp_debug = "yes" %}
+{% set py_interp_debug = "no" %}
+{% set py_gil_disabled = "yes" %}
+{% set py_gil_disabled = "no" %}
+{% set abi_suffix = "t" %}
+{% set abi_suffix = "" %}
 {% set abi_tag = "cp" + ver2nd + abi_suffix %}
 
+# this is just for the initial build, to break dependencies with python -> pip -> libpython-static
+# this makes the linter happy
+# Sanitize build system env. var tweak parameters
+# (passed to the build scripts via script_env).
+# no-GIL, set using conda_build_config.yaml
 package:
   name: python-split
   version: {{ version }}{{ dev }}
 
 source:
-{% if from_source_control == 'yes' %}
   - git_url: https://github.com/python/CPython.git
     git_tag: v{{ version }}{{ dev }}
-{% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: 143b1dddefaec3bd2e21e3b839b34a2b7fb9842272883c576420d605e9f30c63
-{% endif %}
+    sha256: 3b48dac8fb59f62eaa67ac83c1eb12bda1b7a08406dd286e252c11a66be27f81
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
       - patches/0002-Win32-Do-not-download-externals.patch
@@ -95,19 +75,16 @@ source:
       - patches/0025-Unvendor-zstd.patch
 
 build:
-  number: {{ build_number }}
+  number: 0
 
 requirements:
   build:
-{% if from_source_control == 'yes' %}
     - git
-{% else %}
-    - msys2-gcc-libs        # [win]
-{% endif %}
+    - msys2-gcc-libs  # [win]
 
 outputs:
   - name: python
-    script: build_base.sh   # [unix]
+    script: build_base.sh  # [unix]
     script: build_base.bat  # [win]
     build:
       number: {{ build_number }}
@@ -115,13 +92,13 @@ outputs:
       # Windows has issues updating python if conda is using files itself.
       # Copy rather than link.
       no_link:
-        - DLLs/_ctypes.pyd       # [win]
-      ignore_run_exports_from:   # [unix]
+        - DLLs/_ctypes.pyd  # [win]
+      ignore_run_exports_from:  # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
         - {{ compiler('cxx') }}  # [unix]
         # These two are just to get the headers needed for tk.h, but is unused
-        - xorg-libx11            # [linux]
-        - xorg-xorgproto         # [linux]
+        - xorg-libx11  # [linux]
+        - xorg-xorgproto  # [linux]
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -135,12 +112,10 @@ outputs:
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard
       skip: true  # [win and int(float(vc)) < 14]
-{% if 'conda-forge' in channel_targets %}
       skip_compile_pyc:
-        - '*.py'            # [build_platform != target_platform]
-{% endif %}
+        - "*.py"  # [build_platform != target_platform]
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
-      track_features:     # [gil_type == "disabled"]
+      track_features:  # [gil_type == "disabled"]
         - free-threading  # [gil_type == "disabled"]
       run_exports:
         noarch:
@@ -154,48 +129,42 @@ outputs:
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
-{% if 'conda-forge' in channel_targets %}
         - CONDA_FORGE=yes
-{% else %}
         - CONDA_FORGE=no
-{% endif %}
-      missing_dso_whitelist:   # [win or linux]
-        - '**/MSVCR71.dll'  # [win]
-        - '**/MSVCR80.dll'  # [win]
+      missing_dso_whitelist:  # [win or linux]
+        - "**/MSVCR71.dll"  # [win]
+        - "**/MSVCR80.dll"  # [win]
         # I have no idea why this is not in C:\Windows\System32\downlevel
-        - '**/api-ms-win-core-path-l1-1-0.dll'  # [win]
+        - "**/api-ms-win-core-path-l1-1-0.dll"  # [win]
         # -=- libs that come from the sysroot.
-        - '$RPATH/libc.so.6'        # [linux]
-        - '$RPATH/libcrypt.so.1'    # [linux]
-        - '$RPATH/libdl.so.2'       # [linux]
-        - '$RPATH/libm.so.6'        # [linux]
-        - '$RPATH/libnsl.so.1'      # [linux]
-        - '$RPATH/libpthread.so.0'  # [linux]
-        - '$RPATH/librt.so.1'       # [linux]
-        - '$RPATH/libutil.so.1'     # [linux]
-
+        - $RPATH/libc.so.6  # [linux]
+        - $RPATH/libcrypt.so.1  # [linux]
+        - $RPATH/libdl.so.2  # [linux]
+        - $RPATH/libm.so.6  # [linux]
+        - $RPATH/libnsl.so.1  # [linux]
+        - $RPATH/libpthread.so.0  # [linux]
+        - $RPATH/librt.so.1  # [linux]
+        - $RPATH/libutil.so.1  # [linux]
     requirements:
       build:
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
-        - sed                           # [unix]
-        - make                          # [not win]
-        - libtool                       # [unix]
-        - pkg-config                    # [not win]
+        - sed  # [unix]
+        - make  # [not win]
+        - libtool  # [unix]
+        - pkg-config  # [not win]
         # configure script looks for llvm-ar for lto
-        - llvm-tools                    # [osx]
-        - ld_impl_{{ target_platform }} # [linux]
+        - llvm-tools  # [osx]
+        - ld_impl_{{ target_platform }}  # [linux]
         # called in build_base.sh
-        - ripgrep                       # [not win]
-{% if 'conda-forge' in channel_targets %}
+        - ripgrep  # [not win]
         - binutils_impl_{{ target_platform }}  # [linux]
-{% endif %}
         # https://github.com/python/cpython/blob/main/Tools/jit/README.md#installing-llvm:
         # "LLVM version 21 is the officially supported version"
-        - clang-19         # [not win]
-        - llvm-tools-19    # [not win]
-        - clang 19.*       # [win]
+        - clang-19  # [not win]
+        - llvm-tools-19  # [not win]
+        - clang 19.*  # [win]
         - llvm-tools 19.*  # [win]
       host:
         - bzip2 {{ bzip2 }}
@@ -206,15 +175,15 @@ outputs:
         - zlib {{ zlib }}
         #- zlib-ng {{ zlib_ng }}
         - openssl {{ openssl }}
-        - readline {{ readline }}                # [not win]
+        - readline {{ readline }}  # [not win]
         - tk {{ tk }}
         # These two are just to get the headers needed for tk.h, but is unused
-        - xorg-libx11 {{ xorg_libx11 }}          # [linux]
-        - xorg-xorgproto {{ xorg_xorgproto }}    # [linux]
-        - ncurses {{ ncurses }}                  # [unix]
+        - xorg-libx11 {{ xorg_libx11 }}  # [linux]
+        - xorg-xorgproto {{ xorg_xorgproto }}  # [linux]
+        - ncurses {{ ncurses }}  # [unix]
         - libffi {{ libffi }}
-        - ld_impl_{{ target_platform }} >=2.35.1 # [linux]
-        - libuuid {{ libuuid }}                  # [linux]
+        - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
+        - libuuid {{ libuuid }}  # [linux]
         - libmpdec-devel {{ libmpdec }}
         - expat {{ expat }}
         - zstd {{ zstd }}
@@ -222,17 +191,13 @@ outputs:
         - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
-{% if 'conda-forge' in channel_targets %}
         - ncurses  # [unix]
       run_constrained:
         - python_abi {{ ver2 }}.* *_cp{{ ver2nd }}
-{% endif %}
     test:
-{% if 'conda-forge' in channel_targets %}
       downstreams:
         - cython
         - setuptools
-{% endif %}
       requires:
         - ripgrep
         - cmake-no-system
@@ -251,7 +216,7 @@ outputs:
         - echo on  # [win]
         - set  # [win]
         - python -V
-        - python3 -V            # [not win]
+        - python3 -V  # [not win]
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -266,9 +231,9 @@ outputs:
         - python -c "from zoneinfo import ZoneInfo; from datetime import datetime; dt = datetime(2020, 10, 31, 12, tzinfo=ZoneInfo('America/Los_Angeles')); print(dt.tzname())"
         - python -m venv test-venv
         - test-venv\\Scripts\\python.exe -c "import ctypes"  # [win]
-        - test-venv/bin/python -c "import ctypes"            # [unix]
+        - test-venv/bin/python -c "import ctypes"  # [unix]
         - python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"  # [not win]
-        - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_cos6_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
+        - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_cos6_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"  # [linux64]
         # check for unreplaced @ symbols in sysconfig files
         - for f in ${CONDA_PREFIX}/lib/python*/_sysconfig*.py; do echo "Checking $f:"; if [[ `rg @[^@]*@ $f` ]]; then echo "FAILED ON $f"; cat $f; exit 1; fi; done  # [linux64 or osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a  # [unix]
@@ -283,30 +248,25 @@ outputs:
         - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
         - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
-        - pushd prefix-replacement    # [unix]
-        - bash build-and-test.sh      # [unix]
-        - popd    # [unix]
+        - pushd prefix-replacement  # [unix]
+        - bash build-and-test.sh  # [unix]
+        - popd  # [unix]
         - pushd cmake
-{% if gil_type is defined and gil_type == "disabled" %}
-       # TODO: cmake does not know about the free-threading ABI and fails to
-       # identify libpython3.13t.dylib as a valid PythonLibs target.
-       # Skip this test for the time being.
-       # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || true           # [unix]
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || type nul>nul   # [win]
-{% else %}
-        - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
-{% endif %}
-        - popd
-        - popd
-        - python run_test.py
-        - test ! -f default.profraw   # [osx]
-        # Test workaround for https://github.com/conda/conda/issues/10969
-        - python3.1 --version  # [unix]
-        # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
-        - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
-
-{% if bootstrap != "true" %}
+        # TODO: cmake does not know about the free-threading ABI and fails to
+        # identify libpython3.13t.dylib as a valid PythonLibs target.
+        # Skip this test for the time being.
+        <conda_recipe_manager.types.SentinelType object at 0x7f1f3358e270>:  # https://gitlab.kitware.com/cmake/cmake/-/issues/26016
+          - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || true  # [unix]
+          - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile . || type nul>nul  # [win]
+          - cmake -GNinja -DPY_VER={{ version }} --debug-find --trace --debug-output --debug-trycompile .
+          - popd
+          - popd
+          - python run_test.py
+          - test ! -f default.profraw  # [osx]
+          # Test workaround for https://github.com/conda/conda/issues/10969
+          - python3.1 --version  # [unix]
+          # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
+          - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
   - name: libpython-static
     script: build_static.sh  # [unix]
     script: build_static.bat  # [win]
@@ -323,9 +283,7 @@ outputs:
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
-{% if from_source_control == 'yes' %}
         - git
-{% endif %}
       host:
         - {{ pin_subpackage('python', exact=True) }}
       run:
@@ -339,51 +297,40 @@ outputs:
         # Tried to use enable_language(C) to avoid needing this. It does not work.
         - {{ compiler('cxx') }}
         - ripgrep
-
       commands:
-        - pushd tests                 # [unix]
-        - pushd prefix-replacement    # [unix]
+        - pushd tests  # [unix]
+        - pushd prefix-replacement  # [unix]
         - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [unix]
         - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}.nolto.a  # [unix]
         - test -f ${PREFIX}/lib/python${PKG_VERSION%.*}{{ abi_suffix }}/config-${PKG_VERSION%.*}{{ abi_suffix }}-darwin/libpython${PKG_VERSION%.*}{{ abi_suffix }}.a  # [osx]
-        - bash build-and-test.sh      # [unix]
-        - popd    # [unix]
-        - popd    # [unix]
-{% endif %}
-
+        - bash build-and-test.sh  # [unix]
+        - popd  # [unix]
+        - popd  # [unix]
   - name: python-freethreading
     build:
       noarch: generic
-{% if gil_type == "normal" %}
-      skip: True
-{% endif %}
+      skip: true
     requirements:
       - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
-
   - name: python-gil
     build:
       noarch: generic
-{% if gil_type == "disabled" %}
-      skip: True
-{% endif %}
+      skip: true
     requirements:
       - python {{ version }}{{ dev }}.*
       - python_abi * *_{{ abi_tag }}
-
   - name: python-jit
-    script: install_jit_activation.sh   # [not win]
+    script: install_jit_activation.sh  # [not win]
     script: install_jit_activation.bat  # [win]
     build:
-{% if gil_type == "disabled" %}
-      skip: True
-{% endif %}
+      skip: true
       skip: true  # [py<313]
       noarch: generic
     requirements:
       - python {{ version }}{{ dev }}
-      - __unix   # [unix]
-      - __win    # [win]
+      - __unix  # [unix]
+      - __win  # [win]
     test:
       files:
         - run_test_jit.py
