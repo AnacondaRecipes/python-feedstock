@@ -405,17 +405,13 @@ if [[ ${target_platform} =~ .*linux.* ]]; then
   ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
 fi
 
-# Use sysconfigdata and build-details.json from the shared build, as we want packages to prefer
-# linking against the shared library. Issue #565.
-BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
-SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
+# AR: keep sysconfig from the *static* build (same as CF install_base.sh).
+# A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
+# libpython-static tests linked the dylib and dyld aborted on osx-arm64.
+SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
-
-BUILD_DETAILS=${_buildd_shared}/${BUILD_DIR}/build-details.json
-cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI}/
-
 MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \

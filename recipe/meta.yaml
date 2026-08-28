@@ -276,10 +276,9 @@ outputs:
         - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
         # check for unreplaced @ symbols in sysconfig files, excluding e.g. '"$@".lto'
         - for f in ${CONDA_PREFIX}/lib/python*/_sysconfig*.py; do echo "Checking $f:"; if [[ `rg @[^@]*@ $f` ]]; then echo "FAILED ON $f"; cat $f; exit 1; fi; done  # [linux64 or osx]
-        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [unix]
+        # AR: no separate libpython output (CF has one). Shared libpython*.so/.dylib
+        # ships in this package, so do not assert their absence. Static libs must not.
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
-        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
-        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
@@ -288,8 +287,10 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
-        - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
-        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
+        # AR: classic Win layout (Lib/, include/, libs/). getpath looks for Lib\os.py;
+        # CF install_base.bat is the same — not lib\python.
+        - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
+        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
