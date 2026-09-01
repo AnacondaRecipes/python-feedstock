@@ -562,7 +562,7 @@ SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
 if [[ ${PY_GIL_DISABLED} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
-
-# A python version independent directory that ABI3 and noarch packages can use.
-# This is unused at the moment, but keeping it here for experimentation.
-echo "${PREFIX}/lib/python/site-packages" >> $SP_DIR/conda-site.pth
+# Do not add ${PREFIX}/lib/python/site-packages (CF experimental ABI3/noarch
+# fallback). That dir is unused here, but a conda-site.pth entry still puts it
+# on sys.path and breaks imports (numba on this 3.15 rc1). AR does not ship
+# CFEP-65 unixy layout.
