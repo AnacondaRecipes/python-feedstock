@@ -1,19 +1,19 @@
-From 04cfcc1728485e2fbdd04f1c34425e8377b72c61 Mon Sep 17 00:00:00 2001
+From 276b560be39f6a6c475fee2f2bf2e56ef582ea6b Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
-Subject: [PATCH 05/24] Unvendor openssl
+Subject: [PATCH 05/25] Unvendor openssl
 
 Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
  PCbuild/openssl.props   | 14 ++------------
  PCbuild/openssl.vcxproj | 32 --------------------------------
- PCbuild/python.props    | 27 ++++++++++++++-------------
+ PCbuild/python.props    | 13 +------------
  PCbuild/python.vcxproj  |  3 +++
  PCbuild/pythonw.vcxproj |  3 +++
- 5 files changed, 22 insertions(+), 57 deletions(-)
+ 5 files changed, 9 insertions(+), 56 deletions(-)
 
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
-index 5fd708b211e..044cefd95ea 100644
+index 5fd708b211..044cefd95e 100644
 --- a/PCbuild/openssl.props
 +++ b/PCbuild/openssl.props
 @@ -2,10 +2,10 @@
@@ -45,7 +45,7 @@ index 5fd708b211e..044cefd95ea 100644
 -  </Target>
  </Project>
 diff --git a/PCbuild/openssl.vcxproj b/PCbuild/openssl.vcxproj
-index 7ca750dda8f..17eee400ebb 100644
+index 7ca750dda8..17eee400eb 100644
 --- a/PCbuild/openssl.vcxproj
 +++ b/PCbuild/openssl.vcxproj
 @@ -60,40 +60,8 @@
@@ -90,10 +90,10 @@ index 7ca750dda8f..17eee400ebb 100644
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
 diff --git a/PCbuild/python.props b/PCbuild/python.props
-index ce4a7781fbd..253aa66f477 100644
+index 8d931bba28..744ce0c540 100644
 --- a/PCbuild/python.props
 +++ b/PCbuild/python.props
-@@ -68,6 +68,7 @@
+@@ -91,6 +91,7 @@
    <!-- Directories of external projects. tcltk is handled in tcltk.props -->
    <PropertyGroup>
      <ExternalsDir Condition="$(ExternalsDir) == ''">$(EXTERNALS_DIR)</ExternalsDir>
@@ -101,13 +101,13 @@ index ce4a7781fbd..253aa66f477 100644
      <ExternalsDir Condition="$(ExternalsDir) == ''">$([System.IO.Path]::GetFullPath(`$(PySourcePath)externals`))</ExternalsDir>
      <ExternalsDir Condition="!HasTrailingSlash($(ExternalsDir))">$(ExternalsDir)\</ExternalsDir>
    </PropertyGroup>
-@@ -75,20 +76,8 @@
+@@ -98,20 +99,8 @@
    <Import Project="$(ExternalProps)" Condition="$(ExternalProps) != '' and Exists('$(ExternalProps)')" />
  
    <PropertyGroup>
--    <sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.50.4.0\</sqlite3Dir>
+-    <sqlite3Dir Condition="$(sqlite3Dir) == ''">$(ExternalsDir)sqlite-3.53.2.0\</sqlite3Dir>
 -    <bz2Dir Condition="$(bz2Dir) == ''">$(ExternalsDir)bzip2-1.0.8\</bz2Dir>
--    <lzmaDir Condition="$(lzmaDir) == ''">$(ExternalsDir)xz-5.2.5\</lzmaDir>
+-    <lzmaDir Condition="$(lzmaDir) == ''">$(ExternalsDir)xz-5.8.1.1\</lzmaDir>
 -    <libffiDir Condition="$(libffiDir) == ''">$(ExternalsDir)libffi-3.4.4\</libffiDir>
 -    <libffiOutDir Condition="$(libffiOutDir) == ''">$(libffiDir)$(ArchName)\</libffiOutDir>
 -    <libffiIncludeDir Condition="$(libffiIncludeDir) == ''">$(libffiOutDir)include</libffiIncludeDir>
@@ -123,7 +123,7 @@ index ce4a7781fbd..253aa66f477 100644
  
    <PropertyGroup>
 diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
-index 70dabaa3c8b..255be6ab910 100644
+index 417ede34c5..c73404ad2a 100644
 --- a/PCbuild/python.vcxproj
 +++ b/PCbuild/python.vcxproj
 @@ -110,6 +110,9 @@
@@ -137,7 +137,7 @@ index 70dabaa3c8b..255be6ab910 100644
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
-index c6a5b8ce90a..8645a7bf438 100644
+index 244cdf622a..03376ab24f 100644
 --- a/PCbuild/pythonw.vcxproj
 +++ b/PCbuild/pythonw.vcxproj
 @@ -105,6 +105,9 @@
@@ -151,5 +151,5 @@ index c6a5b8ce90a..8645a7bf438 100644
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

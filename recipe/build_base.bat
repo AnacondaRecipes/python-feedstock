@@ -1,8 +1,15 @@
 setlocal EnableDelayedExpansion
 echo on
 
+:: Avoids fetching nuget.exe from the internet.
+set PYTHON=%CONDA_PYTHON_EXE%
+
 :: Compile python, extensions and external libraries
-if "%ARCH%"=="64" (
+if "%ARCH%"=="arm64" (
+   set PLATFORM=ARM64
+   set VC_PATH=arm64
+   set BUILD_PATH=arm64
+) else if "%ARCH%"=="64" (
    set PLATFORM=x64
    set VC_PATH=x64
    set BUILD_PATH=amd64
@@ -44,24 +51,35 @@ if "%DEBUG_C%"=="yes" (
   set PGO=--pgo
 )
 
+:: AP doesn't support PGO atm?
+set PGO=
+
 if "%PY_GIL_DISABLED%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
+  :: Free-threaded MSBuild output goes to PCbuild\amd64t\ / arm64t\ / win32t\,
+  :: not the non-t dirs. Upstream python.props sets BuildPath*t when DisableGil=true;
+  :: BUILD_PATH below stages those files into %PREFIX% — wrong path → xcopy miss.
+  set BUILD_PATH=%BUILD_PATH%t
 ) else (
   set "FREETHREADING=--experimental-jit-off"
   set "THREAD="
   set "EXE_T="
 )
 
-:: AP doesn't support PGO atm?
-set PGO=
+:: Pin Tcl/Tk from the 'tk' CBC variant (feedstock overrides aggregate 8.6 → 9.0;
+:: host tk 9.0.4 from pkgs/main). Upstream tcltk.props
+:: with TclMajorVersion=9 sets tkPrefix=tcl9 → tcl90.lib / tcl9tk90.lib (no threaded t).
+set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
 cd PCbuild
 
 :: Twice because:
 :: error : importlib_zipimport.h updated. You will need to rebuild pythoncore to see the changes.
-call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM%
+call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM% %TCLTK_MSBUILD_PROPS%
+if errorlevel 1 exit 1
+call build.bat %PGO% %CONFIG% %FREETHREADING% -m -e -v -p %PLATFORM% %TCLTK_MSBUILD_PROPS%
 if errorlevel 1 exit 1
 cd ..
 
@@ -74,7 +92,7 @@ for %%x in (python%VERNODOTS%%THREAD%%_D%.dll python3%THREAD%%_D%.dll python%EXE
   )
 )
 
-for %%x in (python%_D%.pdb python%VERNODOTS%%_D%.pdb pythonw%_D%.pdb) do (
+for %%x in (python%THREAD%%_D%.pdb python%VERNODOTS%%THREAD%%_D%.pdb pythonw%THREAD%%_D%.pdb) do (
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x (
     copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x %PREFIX%
   ) else (
@@ -84,6 +102,8 @@ for %%x in (python%_D%.pdb python%VERNODOTS%%_D%.pdb pythonw%_D%.pdb) do (
 
 @echo on
 
+:: AR: classic Win prefix (DLLs/, Lib/, libs/, include/). CPython getpath
+:: landmarks Lib\os.py; CF install_base.bat uses the same layout.
 copy %SRC_DIR%\LICENSE %PREFIX%\LICENSE_PYTHON.txt
 if errorlevel 1 exit 1
 
@@ -145,7 +165,7 @@ del %PREFIX%\libs\libpython*.a
 xcopy /s /y %SRC_DIR%\Lib %PREFIX%\Lib\
 if errorlevel 1 exit 1
 
-:: Copy venv[w]launcher scripts to venv\srcipts\nt
+:: Copy venv[w]launcher scripts to venv\scripts\nt
 :: See https://github.com/python/cpython/blob/b4a316087c32d83e375087fd35fc511bc430ee8b/Lib/venv/__init__.py#L334-L376
 if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe (
   @rem We did copy pythonw.exe until 3.12 but starting with 3.13 we seem to need the latter. Should we omit the first?
@@ -162,7 +182,6 @@ if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe (
 ) else (
   echo "WARNING :: %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe does not exist"
 )
-
 
 :: Remove test data to save space.
 :: Though keep `support` as some things use that.
@@ -181,26 +200,30 @@ if errorlevel 1 exit 1
 if "%_D%" neq "" copy %PREFIX%\python%_D%.exe %PREFIX%\python.exe
 if "%EXE_T%" neq "" copy %PREFIX%\python%EXE_T%.exe %PREFIX%\python.exe
 
-%PREFIX%\python.exe -Wi %PREFIX%\Lib\compileall.py -f -q -x "bad_coding|badsyntax|py2_" %PREFIX%\Lib
+set "PYTHON=%PREFIX%\python.exe"
+:: bytecode compile the standard library
+%PYTHON% -Wi %PREFIX%\Lib\compileall.py -f -q -x "bad_coding|badsyntax|py2_" %PREFIX%\Lib
 if errorlevel 1 exit 1
 
 :: Ensure that scripts are generated
 :: https://github.com/conda-forge/python-feedstock/issues/384
-%PREFIX%\python.exe %RECIPE_DIR%\fix_staged_scripts.py
+%PYTHON% %RECIPE_DIR%\fix_staged_scripts.py
 if errorlevel 1 exit 1
 
 :: Some quick tests for common failures
 echo "Testing print() does not print: Hello"
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -c "print()" 2>&1 | findstr /r /c:"Hello"
+%PREFIX%\python.exe -c "print()" 2>&1 | findstr /r /c:"Hello"
 if %errorlevel% neq 1 exit /b 1
 
 echo "Testing print('Hello') prints: Hello"
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe "print('Hello')" 2>&1 | findstr /r /c:"Hello"
+:: Need -c; without it python treats the string as a filename. findstr then
+:: matches Hello in the error path and the test falsely passes.
+%PREFIX%\python.exe -c "print('Hello')" 2>&1 | findstr /r /c:"Hello"
 if %errorlevel% neq 0 exit /b 1
 
 echo "Testing import of os (no DLL needed) does not print: The specified module could not be found"
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import os" 2>&1
-%CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import os" 2>&1 | findstr /r /c:"The specified module could not be found"
+%PREFIX%\python.exe -v -c "import os" 2>&1
+%PREFIX%\python.exe -v -c "import os" 2>&1 | findstr /r /c:"The specified module could not be found"
 if %errorlevel% neq 1 exit /b 1
 
 echo "Testing import of %%m (DLL located via PATH needed) does not print: The specified module could not be found"
@@ -210,8 +233,8 @@ echo "Testing import of %%m (DLL located via PATH needed) does not print: The sp
 :: Also %errorlevel% will not be updated round the loop so use && to
 :: catch a successfull findstr, ie. a failure to load the underlying DLL
 for %%m in (_ssl _sqlite3 _bz2 _tkinter _lzma _decimal _zstd) do (
-   %CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -c "import %%m" 2>&1 | findstr /r /c:"The specified module could not be found" && (
-      %CONDA_EXE% run -p %PREFIX% cd %PREFIX% & %PREFIX%\python.exe -v -c "import %%m"
+   %PREFIX%\python.exe -c "import %%m" 2>&1 | findstr /r /c:"The specified module could not be found" && (
+      %PREFIX%\python.exe -v -c "import %%m"
       exit /b 1
    )
 )

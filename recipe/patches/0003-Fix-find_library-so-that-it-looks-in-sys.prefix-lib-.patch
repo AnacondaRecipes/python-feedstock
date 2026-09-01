@@ -1,7 +1,7 @@
-From c48a3c1cc321e00bd361f5fce271a18c03c4a202 Mon Sep 17 00:00:00 2001
+From 32a92008fe83a0f9484ad0df5162485dfb7a637b Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 5 Dec 2017 22:47:59 +0000
-Subject: [PATCH 03/24] Fix find_library so that it looks in sys.prefix/lib
+Subject: [PATCH 03/25] Fix find_library so that it looks in sys.prefix/lib
  first
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH 03/24] Fix find_library so that it looks in sys.prefix/lib
  2 files changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/ctypes/macholib/dyld.py b/Lib/ctypes/macholib/dyld.py
-index 583c47daff3..ab9b01c87e2 100644
+index 583c47daff..ab9b01c87e 100644
 --- a/Lib/ctypes/macholib/dyld.py
 +++ b/Lib/ctypes/macholib/dyld.py
 @@ -93,6 +93,10 @@ def dyld_executable_path_search(name, executable_path=None):
@@ -25,10 +25,10 @@ index 583c47daff3..ab9b01c87e2 100644
          yield os.path.join(executable_path, name[len('@executable_path/'):])
  
 diff --git a/Lib/ctypes/util.py b/Lib/ctypes/util.py
-index 378f12167c6..bf45580ab9f 100644
+index 35ac5b6bfd..09c3e1703d 100644
 --- a/Lib/ctypes/util.py
 +++ b/Lib/ctypes/util.py
-@@ -129,7 +129,8 @@ def dllist():
+@@ -136,7 +136,8 @@ def dllist():
  elif os.name == "posix" and sys.platform in {"darwin", "ios", "tvos", "watchos"}:
      from ctypes.macholib.dyld import dyld_find as _dyld_find
      def find_library(name):
@@ -38,7 +38,7 @@ index 378f12167c6..bf45580ab9f 100644
                      '%s.dylib' % name,
                      '%s.framework/%s' % (name, name)]
          for name in possible:
-@@ -430,10 +431,30 @@ def _findLib_ld(name):
+@@ -437,10 +438,30 @@ def _findLib_ld(name):
                  pass  # result will be None
              return result
  
@@ -70,7 +70,7 @@ index 378f12167c6..bf45580ab9f 100644
 +                        _get_soname(_findLib_gcc(name)) or _get_soname(_findLib_ld(name))
  
  
- # Listing loaded libraries on other systems will try to use
+ # On platforms which provide dl_iterate_phdr(), dllist() is implemented
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 

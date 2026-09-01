@@ -1,25 +1,25 @@
-From 2e62556e56120f7b6d15ba97fdf8733deebb9ea9 Mon Sep 17 00:00:00 2001
+From 679fdc73eded852c9d17ab4cc811d52a25735af9 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Thu, 7 Sep 2017 11:35:47 +0100
-Subject: [PATCH 02/24] Win32: Do not download externals
+Subject: [PATCH 02/25] Win32: Do not download externals
 
 ---
  PCbuild/build.bat | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/PCbuild/build.bat b/PCbuild/build.bat
-index 60235704886..867a352057f 100644
+index 9d2f032f5a..f062963991 100644
 --- a/PCbuild/build.bat
 +++ b/PCbuild/build.bat
-@@ -113,7 +113,7 @@ if "%IncludeSSL%"=="" set IncludeSSL=true
+@@ -118,7 +118,7 @@ if "%IncludeSSL%"=="" set IncludeSSL=true
  if "%IncludeTkinter%"=="" set IncludeTkinter=true
  if "%UseJIT%" NEQ "true" set IncludeLLVM=false
  
 -if "%IncludeExternals%"=="true" call "%dir%get_externals.bat"
 +rem if "%IncludeExternals%"=="true" call "%dir%get_externals.bat"
  
- if "%do_pgo%" EQU "true" if "%platf%" EQU "x64" (
-     if "%PROCESSOR_ARCHITEW6432%" NEQ "AMD64" if "%PROCESSOR_ARCHITECTURE%" NEQ "AMD64" (
+ if /I "%target%"=="Clean" set clean=true
+ if /I "%target%"=="CleanAll" set clean=true
 -- 
-2.50.1 (Apple Git-155)
+2.51.0
 
