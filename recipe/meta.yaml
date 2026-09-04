@@ -1,5 +1,5 @@
 {% set version = "3.15.0" %}
-{% set dev = "rc1" %}
+{% set dev = "rc2" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
@@ -61,7 +61,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: f84dad680ab2147417d2739355c2678f0f9acffe4ae8ef77895de1454b384b07
+    sha256: 8d93af5eaaaea5adfd41bd786a7ba3f03f2ad1ab57c6a65e0b963deab91d5ad7
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -88,12 +88,16 @@ source:
       - patches/0017-Do-not-pass-g-to-GCC-when-not-Py_DEBUG.patch
       - patches/0018-Unvendor-expat.patch
       - patches/0019-Remove-unused-readelf.patch
+      - patches/0020-Don-t-checksharedmods-if-cross-compiling.patch
       - patches/0021-Override-configure-LIBFFI.patch
       - patches/0022-Unvendor-libmpdec.patch
       - patches/0023-branding.patch
-      - patches/0024-Unvendor-zlib-ng.patch
+      - patches/0024-Do-not-define-pid_t-as-it-might-conflict-with-the-ac.patch
       - patches/0025-Unvendor-zstd.patch
-      - patches/0026-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
+      - patches/0026-Set-Py_GIL_DISABLED-in-windows-to-match-unix.patch  # [win and gil_type == "disabled"]
+      - patches/0027-More-unixy-layout-for-windows.patch
+      - patches/0028-Unvendor-zlib-ng.patch
+      - patches/0029-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
 
 build:
   number: {{ build_number }}
@@ -287,9 +291,8 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
-        # AR: classic Win layout (Lib/, include/, libs/). getpath looks for Lib\os.py;
-        # CF install_base.bat is the same — not lib\python.
-        - if not exist %PREFIX%\\include\\pyconfig.h exit 1  # [win]
+        # 0027 unixy Win layout: getpath landmarks lib\python\os.py and include\python.
+        - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
         - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
@@ -424,3 +427,4 @@ extra:
     - xhochy
   skip-lints:
     - license_file_overspecified
+    - parsing_jinja_failure  # gil_type / channel_targets jinja; linter cannot expand this recipe
