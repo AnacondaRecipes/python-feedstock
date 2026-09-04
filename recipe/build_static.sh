@@ -10,7 +10,7 @@ if [[ ${DEBUG_PY} == yes ]]; then
 else
   DBG=
 fi
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
   THREAD=t
 else
   THREAD=

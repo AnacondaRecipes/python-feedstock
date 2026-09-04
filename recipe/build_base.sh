@@ -71,7 +71,7 @@ else
   DBG=
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
   # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
@@ -269,7 +269,7 @@ _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -l
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -280,7 +280,7 @@ if [[ "${target_platform}" == osx-* ]]; then
     _common_configure_args+=(--with-tail-call-interp)
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     _common_configure_args+=(--disable-gil)
 fi
 
@@ -559,7 +559,7 @@ fi
 # <prefix>/lib/python3.13t/site-packages.
 # Note that these directories are not added to sys.path if they do not exist.
 SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
 # Do not add ${PREFIX}/lib/python/site-packages (CF experimental ABI3/noarch

@@ -54,7 +54,7 @@ if "%DEBUG_C%"=="yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
-if "%PY_GIL_DISABLED%" == "yes" (
+if "%PY_FREETHREADING%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"

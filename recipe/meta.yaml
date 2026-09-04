@@ -39,12 +39,12 @@
   {% set py_interp_debug = "no" %}
 {% endif %}
 
-# no-GIL, set using conda_build_config.yaml
-{% if gil_type is defined and gil_type == "disabled" %}
-  {% set py_gil_disabled = "yes" %}
+{% if freethreading is not defined %}
+  {% set freethreading = "no" %}
+{% endif %}
+{% if freethreading == "yes" %}
   {% set abi_suffix = "t" %}
 {% else %}
-  {% set py_gil_disabled = "no" %}
   {% set abi_suffix = "" %}
   {% set build_number = build_number + 100 %}
 {% endif %}
@@ -94,10 +94,10 @@ source:
       - patches/0023-branding.patch
       - patches/0024-Do-not-define-pid_t-as-it-might-conflict-with-the-ac.patch
       - patches/0025-Unvendor-zstd.patch
-      - patches/0026-Set-Py_GIL_DISABLED-in-windows-to-match-unix.patch  # [win and gil_type == "disabled"]
+      - patches/0026-Set-Py_GIL_DISABLED-in-windows-to-match-unix.patch  # [win and freethreading == "yes"]
       - patches/0027-More-unixy-layout-for-windows.patch
       - patches/0028-Unvendor-zlib-ng.patch
-      - patches/0029-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
+      - patches/0029-xxlimited-freethreading-stable-abi-link.patch  # [win and freethreading == "yes"]
 
 build:
   number: {{ build_number }}
@@ -150,12 +150,12 @@ outputs:
           - python
         weak:
           - python_abi {{ ver2 }}.* *_{{ abi_tag }}
-      track_features:     # [gil_type == "disabled"]
-        - free-threading  # [gil_type == "disabled"]
+      track_features:     # [freethreading == "yes"]
+        - py_freethreading  # [freethreading == "yes"]
       script_env:
         - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
         - PY_INTERP_DEBUG={{ py_interp_debug }}
-        - PY_GIL_DISABLED={{ py_gil_disabled }}
+        - PY_FREETHREADING={{ freethreading }}
         # Putting these here means they get emitted to build_env_setup.{sh,bat} meaning we can launch IDEs
         # after sourcing or calling that script without examine the contents of conda_build.{sh,bat} for
         # important env. vars.
@@ -316,13 +316,13 @@ outputs:
     build:
       number: {{ build_number }}
       force_use_keys:
-        - gil_type
+        - freethreading
       activate_in_script: true
       ignore_run_exports:
         - python_abi
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       script_env:
-        - PY_GIL_DISABLED={{ py_gil_disabled }}
+        - PY_FREETHREADING={{ freethreading }}
     requirements:
       build:
         - {{ stdlib('c') }}
@@ -359,7 +359,7 @@ outputs:
   - name: python-freethreading
     build:
       noarch: generic
-{% if gil_type == "normal" %}
+{% if freethreading != "yes" %}
       skip: True
 {% endif %}
     requirements:
@@ -369,7 +369,7 @@ outputs:
   - name: python-gil
     build:
       noarch: generic
-{% if gil_type == "disabled" %}
+{% if freethreading == "yes" %}
       skip: True
 {% endif %}
     requirements:
@@ -380,7 +380,7 @@ outputs:
     script: install_jit_activation.sh   # [not win]
     script: install_jit_activation.bat  # [win]
     build:
-{% if gil_type == "disabled" %}
+{% if freethreading == "yes" %}
       skip: True
 {% endif %}
       skip: true  # [py<313]
