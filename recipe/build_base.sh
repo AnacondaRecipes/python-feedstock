@@ -40,14 +40,6 @@ _buildd_shared=build-shared
 _ENABLE_SHARED=--enable-shared
 # We *still* build a shared lib here for non-static embedded use cases
 _DISABLE_SHARED=--disable-shared
-# Hack to allow easily comparing static vs shared interpreter performance
-# .. hack because we just build it shared in both the build-static and
-# build-shared directories.
-# Yes this hack is a bit confusing, sorry about that.
-if [[ ${PY_INTERP_LINKAGE_NATURE} == shared ]]; then
-  _DISABLE_SHARED=--enable-shared
-  _ENABLE_SHARED=--enable-shared
-fi
 
 # For debugging builds, set this to no to disable profile-guided optimization
 if [[ ${PY_INTERP_DEBUG} == yes || ${DEBUG_C} == yes ]]; then
@@ -402,24 +394,14 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Install the shared library (for people who embed Python only, e.g. GDB).
-# Linking module extensions to this on Linux is redundant (but harmless).
-# Linking module extensions to this on Darwin is harmful (multiply defined symbols).
-shopt -s extglob
-cp -pf ${_buildd_shared}/libpython*${SHLIB_EXT}!(.lto) ${PREFIX}/lib/
-shopt -u extglob
-if [[ ${target_platform} =~ .*linux.* ]]; then
-  ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
-fi
-
-# AR: keep sysconfig from the *static* build (same as CF install_base.sh).
-# A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
-# libpython-static tests linked the dylib and dyld aborted on osx-arm64.
-SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
+# Use sysconfig from the shared build so extensions prefer .so (CF #565 / C17).
+# Shared libpython*.so/.dylib is installed by the libpython output (C16), not here.
+BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
+SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
-    > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
-MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
+    > ${PREFIX}/lib/python${VERABI_NO_DBG}/$(basename ${SYSCONFIG})
+MAKEFILE=$(find ${PREFIX}/lib/python${VERABI_NO_DBG}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
@@ -441,7 +423,7 @@ ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
 # Remove test data to save space
 # Though keep `support` as some things use that.
 # TODO :: Make a subpackage for this once we implement multi-level testing.
-pushd ${PREFIX}/lib/python${VERABI}
+pushd ${PREFIX}/lib/python${VERABI_NO_DBG}
   mkdir test_keep
   mv test/__init__.py test/support test/test_support* test/test_script_helper* test_keep/
   rm -rf test */test
@@ -454,7 +436,7 @@ pushd ${PREFIX}
     chmod +w lib/libpython${VERABI}.a
     ${STRIP} -S lib/libpython${VERABI}.a
   fi
-  CONFIG_LIBPYTHON=$(find lib/python${VERABI}/config-${VERABI}* -name "libpython${VERABI}.a")
+  CONFIG_LIBPYTHON=$(find lib/python${VERABI_NO_DBG}/config-${VERABI}* -name "libpython${VERABI}.a")
   if [[ -f lib/libpython${VERABI}.a ]] && [[ -f ${CONFIG_LIBPYTHON} ]]; then
     chmod +w ${CONFIG_LIBPYTHON}
     rm ${CONFIG_LIBPYTHON}
@@ -480,7 +462,7 @@ esac
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
-pushd "${PREFIX}"/lib/python${VERABI}
+pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   # On Python 3.5 _sysconfigdata.py was getting copied in here and compiled for some reason.
   # This breaks our attempt to find the right one as recorded_name.
   find lib-dynload -name "_sysconfigdata*.py*" -exec rm {} \;

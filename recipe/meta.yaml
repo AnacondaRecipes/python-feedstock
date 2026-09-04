@@ -281,9 +281,10 @@ outputs:
         - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
         # check for unreplaced @ symbols in sysconfig files, excluding e.g. '"$@".lto'
         - for f in ${CONDA_PREFIX}/lib/python*/_sysconfig*.py; do echo "Checking $f:"; if [[ `rg @[^@]*@ $f` ]]; then echo "FAILED ON $f"; cat $f; exit 1; fi; done  # [linux64 or osx]
-        # AR: no separate libpython output (CF has one). Shared libpython*.so/.dylib
-        # ships in this package, so do not assert their absence. Static libs must not.
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
@@ -310,9 +311,53 @@ outputs:
         # Test for wide character supported via ncursesw
         - TERM=xterm >/dev/null python -c "import curses; scr = curses.initscr(); curses.unget_wch('x'); assert 'x' ==  scr.get_wch()"  # [unix]
 
+  - name: libpython
+    script: install_shared.sh   # [unix]
+    build:
+      number: {{ build_number }}
+      activate_in_script: true
+      ignore_run_exports:
+        - python_abi
+      script_env:
+        - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - PY_FREETHREADING={{ freethreading }}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ stdlib('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - {{ pin_subpackage('python', exact=True) }}
+      run:
+        - {{ pin_subpackage('python', exact=True) }}
+    test:
+      files:
+        - tests/cmake/*
+        - tests/prefix-replacement/*
+      requires:
+        - {{ stdlib('c') }}
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - ripgrep
+        - cmake-no-system
+        - ninja-base
+      commands:
+        - VER=${PKG_VERSION%.*}    # [not win]
+        - VERABI=${VER}            # [not win]
+{% if freethreading == "yes" %}
+        - VERABI=${VERABI}t        # [not win]
+{% endif %}
+        - VERABI_NO_DBG=${VERABI}  # [not win]
+{% if py_interp_debug == "yes" %}
+        - VERABI=${VERABI}d        # [not win]
+{% endif %}
+        - test -f ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}       # [unix]
+        - test -f ${PREFIX}/lib/libpython3${SHLIB_EXT}               # [unix and build_type == "release"]
+
 {% if bootstrap != "true" %}
   - name: libpython-static
-    script: build_static.sh  # [unix]
+    script: install_static.sh  # [unix]
     script: build_static.bat  # [win]
     build:
       number: {{ build_number }}
@@ -324,6 +369,7 @@ outputs:
         - python_abi
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       script_env:
+        - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
     requirements:
       build:
