@@ -427,3 +427,4 @@ extra:
     - xhochy
   skip-lints:
     - license_file_overspecified
+    - parsing_jinja_failure  # gil_type / channel_targets jinja; linter cannot expand this recipe
