@@ -141,8 +141,6 @@ outputs:
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard
       skip: true  # [win and int(float(vc)) < 14]
-      skip_compile_pyc:
-        - '*.py'            # [build_platform != target_platform]
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}
       run_exports:
@@ -313,6 +311,9 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
+      ignore_run_exports_from:   # [unix]
+        # Install-only output; CXX is not linked into libpython*.so.
+        - {{ compiler('cxx') }}  # [unix]
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
@@ -370,6 +371,9 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
+      ignore_run_exports_from:   # [unix]
+        # Install-only output; CXX is not linked into libpython*.a.
+        - {{ compiler('cxx') }}  # [unix]
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
@@ -448,6 +452,9 @@ outputs:
     script: install_jit_activation.sh   # [not win]
     script: install_jit_activation.bat  # [win]
     build:
+{% if freethreading == "yes" %}
+      skip: true
+{% endif %}
       skip: true  # [py<313]
       noarch: generic
     requirements:
@@ -513,3 +520,4 @@ extra:
     - xhochy
   skip-lints:
     - license_file_overspecified
+    - parsing_jinja_failure  # freethreading / channel_targets jinja; linter cannot expand this recipe
