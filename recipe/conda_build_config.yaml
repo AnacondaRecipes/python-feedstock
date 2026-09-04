@@ -20,6 +20,12 @@ freethreading:
   - yes  # [not (s390x or (osx and x86_64))]
   - no
 
+# Debug interpreter on unix only. Do not zip with channel_targets (F94):
+# all variants upload to ad-testing/label/py315.
+build_type:
+  - release
+  - debug                      # [not win]
+
 # Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
 # (Tools/jit/_llvm.py); mixing compiler('c')=20 with clang-21/llvm-tools-21
 # breaks osx-arm64 LTO+PGO (___llvm_profile_runtime) and JIT tool discovery.

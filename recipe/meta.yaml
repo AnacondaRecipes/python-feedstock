@@ -29,14 +29,15 @@
 {% else %}
   {% set linkage_nature_env = 'static' %}
 {% endif %}
-{% set dbg_abi = "" %}
-{% set debug = os.environ.get('PY_INTERP_DEBUG', '') %}
-{% if debug != '' and debug != 'no' %}
+{% if build_type is not defined %}
+  {% set build_type = "release" %}
+{% endif %}
+{% if build_type == "debug" %}
   {% set py_interp_debug = "yes" %}
-  {% set debug = "_dbg" %}
-  {% set dbg_abi = "d" %}  # [win]
+  {% set debug = "_debug" %}
 {% else %}
   {% set py_interp_debug = "no" %}
+  {% set debug = "" %}
 {% endif %}
 
 {% if freethreading is not defined %}
@@ -317,6 +318,7 @@ outputs:
       number: {{ build_number }}
       force_use_keys:
         - freethreading
+        - build_type
       activate_in_script: true
       ignore_run_exports:
         - python_abi

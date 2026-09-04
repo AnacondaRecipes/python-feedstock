@@ -50,7 +50,7 @@ if [[ ${PY_INTERP_LINKAGE_NATURE} == shared ]]; then
 fi
 
 # For debugging builds, set this to no to disable profile-guided optimization
-if [[ ${DEBUG_C} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes || ${DEBUG_C} == yes ]]; then
   _OPTIMIZED=no
 else
   _OPTIMIZED=yes
@@ -63,7 +63,7 @@ if [[ ${target_platform} == linux-ppc64le ]]; then
 fi
 
 declare -a _dbg_opts
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   # This Python will not be usable with non-debug Python modules.
   _dbg_opts+=(--with-pydebug)
   DBG=d
@@ -78,8 +78,9 @@ else
   THREAD=
 fi
 
-ABIFLAGS=${DBG}
+ABIFLAGS=${DBG}${THREAD}
 VERABI=${VER}${THREAD}${DBG}
+VERABI_NO_DBG=${VER}${THREAD}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -116,6 +117,12 @@ if [[ ${_OPTIMIZED} = yes ]]; then
   CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O3/g")
   CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O3/g")
   CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O3/g")
+fi
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O0/g")
+  CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O0/g")
+  CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O0/g")
 fi
 
 if [[ "$target_platform" == linux-* ]]; then
@@ -269,7 +276,7 @@ _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -l
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_FREETHREADING} == yes ]]; then
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -376,7 +383,7 @@ fi
 # build a static library with PIC objects and without LTO/PGO
 make -j${CPU_COUNT} -C ${_buildd_shared} \
         EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-        LIBRARY=libpython${VERABI}-pic.a libpython${VERABI}-pic.a
+        LIBRARY=libpython${VERABI_NO_DBG}-pic.a libpython${VERABI_NO_DBG}-pic.a
 
 make -C ${_buildd_static} install
 
@@ -542,6 +549,13 @@ fi
 
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
 rm ${PREFIX}/lib/libpython${VERABI}.a
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  rm ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/bin/python${VERABI} ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/include/python${VERABI} ${PREFIX}/include/python${VER}
+fi
+
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi
