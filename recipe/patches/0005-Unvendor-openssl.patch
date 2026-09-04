@@ -1,7 +1,7 @@
-From 276b560be39f6a6c475fee2f2bf2e56ef582ea6b Mon Sep 17 00:00:00 2001
+From 8650098599959095301e15c2cecf74da06e709c3 Mon Sep 17 00:00:00 2001
 From: Nehal J Wani <nehaljw.kkd1@gmail.com>
 Date: Sat, 24 Nov 2018 20:38:02 -0600
-Subject: [PATCH 05/25] Unvendor openssl
+Subject: [PATCH 05/27] Unvendor openssl
 
 Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 ---
@@ -13,7 +13,7 @@ Co-authored-by: Isuru Fernando <isuruf@gmail.com>
  5 files changed, 9 insertions(+), 56 deletions(-)
 
 diff --git a/PCbuild/openssl.props b/PCbuild/openssl.props
-index 5fd708b211..044cefd95e 100644
+index 5fd708b211e..044cefd95ea 100644
 --- a/PCbuild/openssl.props
 +++ b/PCbuild/openssl.props
 @@ -2,10 +2,10 @@
@@ -45,7 +45,7 @@ index 5fd708b211..044cefd95e 100644
 -  </Target>
  </Project>
 diff --git a/PCbuild/openssl.vcxproj b/PCbuild/openssl.vcxproj
-index 7ca750dda8..17eee400eb 100644
+index 7ca750dda8f..17eee400ebb 100644
 --- a/PCbuild/openssl.vcxproj
 +++ b/PCbuild/openssl.vcxproj
 @@ -60,40 +60,8 @@
@@ -90,7 +90,7 @@ index 7ca750dda8..17eee400eb 100644
    <Target Name="CleanAll">
      <Delete Files="$(TargetPath);$(BuildPath)$(tclDLLName)" />
 diff --git a/PCbuild/python.props b/PCbuild/python.props
-index 8d931bba28..744ce0c540 100644
+index 79f705a1ed3..744ce0c540a 100644
 --- a/PCbuild/python.props
 +++ b/PCbuild/python.props
 @@ -91,6 +91,7 @@
@@ -112,8 +112,8 @@ index 8d931bba28..744ce0c540 100644
 -    <libffiOutDir Condition="$(libffiOutDir) == ''">$(libffiDir)$(ArchName)\</libffiOutDir>
 -    <libffiIncludeDir Condition="$(libffiIncludeDir) == ''">$(libffiOutDir)include</libffiIncludeDir>
      <mpdecimalDir Condition="$(mpdecimalDir) == ''">$(ExternalsDir)\mpdecimal-4.0.0\</mpdecimalDir>
--    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.5.7\</opensslDir>
--    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.5.7\$(ArchName)\</opensslOutDir>
+-    <opensslDir Condition="$(opensslDir) == ''">$(ExternalsDir)openssl-3.5.8\</opensslDir>
+-    <opensslOutDir Condition="$(opensslOutDir) == ''">$(ExternalsDir)openssl-bin-3.5.8\$(ArchName)\</opensslOutDir>
 -    <opensslIncludeDir Condition="$(opensslIncludeDir) == ''">$(opensslOutDir)include</opensslIncludeDir>
      <nasmDir Condition="$(nasmDir) == ''">$(ExternalsDir)\nasm-2.11.06\</nasmDir>
 -    <zlibDir Condition="$(zlibDir) == ''">$(ExternalsDir)\zlib-1.3.1\</zlibDir>
@@ -123,7 +123,7 @@ index 8d931bba28..744ce0c540 100644
  
    <PropertyGroup>
 diff --git a/PCbuild/python.vcxproj b/PCbuild/python.vcxproj
-index 417ede34c5..c73404ad2a 100644
+index 417ede34c54..75f2bd9984a 100644
 --- a/PCbuild/python.vcxproj
 +++ b/PCbuild/python.vcxproj
 @@ -110,6 +110,9 @@
@@ -131,13 +131,13 @@ index 417ede34c5..c73404ad2a 100644
    <ItemGroup>
      <ClCompile Include="..\Programs\python.c" />
 +    <ClCompile Include="$(condaDir)include\openssl\applink.c">
-+        <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
 +    </ClCompile>
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
 diff --git a/PCbuild/pythonw.vcxproj b/PCbuild/pythonw.vcxproj
-index 244cdf622a..03376ab24f 100644
+index 244cdf622ad..03ba2a20dd2 100644
 --- a/PCbuild/pythonw.vcxproj
 +++ b/PCbuild/pythonw.vcxproj
 @@ -105,6 +105,9 @@
@@ -145,11 +145,8 @@ index 244cdf622a..03376ab24f 100644
    <ItemGroup>
      <ClCompile Include="..\PC\WinMain.c" />
 +    <ClCompile Include="$(condaDir)include\openssl\applink.c">
-+        <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)</PreprocessorDefinitions>
 +    </ClCompile>
    </ItemGroup>
    <ItemGroup>
      <ProjectReference Include="pythoncore.vcxproj">
--- 
-2.51.0
-
