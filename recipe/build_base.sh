@@ -9,6 +9,7 @@ cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 # https://docs.python.org/3.14/using/configure.html#cmdoption-enable-experimental-jit
 # says we want a python>=3.11 to build python.
 if [[ ! -d ${SRC_DIR}/python-bin ]]; then
+    # AR: bootstrap from main (CF uses -c conda-forge).
     CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
     export PATH=${SRC_DIR}/python-bin/bin:${PATH}
 fi
@@ -47,6 +48,13 @@ if [[ ${PY_INTERP_DEBUG} == yes || ${DEBUG_C} == yes ]]; then
 else
   _OPTIMIZED=yes
 fi
+
+# CF (skipped): debug builds on conda-forge main must not ship; AR has no python_debug channel.
+# if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+#   if [[ "$CI" != "" && "$channel_targets" == "conda-forge main" ]]; then
+#     exit 1
+#   fi
+# fi
 
 if [[ ${target_platform} == linux-ppc64le ]]; then
   _OPTIMIZED=no
@@ -180,6 +188,7 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
   echo "ac_cv_file__dev_ptc=no"         >> config.site
   echo "ac_cv_pthread=yes"              >> config.site
   echo "ac_cv_little_endian_double=yes" >> config.site
+  # CF also lists linux-riscv64 here; AR does not build it.
   if [[ "${target_platform}" == "osx-arm64" || "${target_platform}" == "linux-ppc64le" || "${target_platform}" == "linux-aarch64" ]]; then
       echo "ac_cv_aligned_required=no" >> config.site
       echo "ac_cv_pthread_is_default=yes" >> config.site
@@ -217,6 +226,7 @@ if [[ ${target_platform} == osx-64 ]]; then
   # TODO: check with LLVM 12 if the following hack is needed.
   # https://reviews.llvm.org/D76461 may have fixed the need for the following hack.
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
+  # AR: versioned llvm-ar (CF uses unversioned llvm-ar → LLVM 20 Abort).
   echo "$BUILD_PREFIX/bin/llvm-ar-$LLVM_VER --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch x86_64"
@@ -264,11 +274,13 @@ _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
+# AR: tk 9 SONAME is libtcl9tk9.0.so (CF uses -ltk${TCLTK_VER}).
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"64" || ${PY_FREETHREADING} == yes ]]; then
+# CF glob is *"-64" so linux-aarch64 does not enable JIT (x86_64 only).
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"-64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -344,29 +356,16 @@ pushd ${_buildd_static}
                        ${_DISABLE_SHARED} "${_PROFILE_TASK[@]}"
 popd
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 >make-static.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
-fi
+make -j${CPU_COUNT} -C ${_buildd_static} \
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
+        ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
 if rg "Failed to build these modules" make-static.log; then
   echo "(static) :: Failed to build some modules, check the log"
   exit 1
 fi
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 >make-shared.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
-fi
+make -j${CPU_COUNT} -C ${_buildd_shared} \
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
 if rg "Failed to build these modules" make-shared.log; then
   echo "(shared) :: Failed to build some modules, check the log"
   exit 1
@@ -401,6 +400,15 @@ SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -prin
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${PREFIX}/lib/python${VERABI_NO_DBG}/$(basename ${SYSCONFIG})
+# CF copies build-details.json from the shared build (#565). Native only:
+# AR does not cross-compile (CONDA_BUILD_CROSS_COMPILATION is never 1).
+# if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
+#   # build-details.json is incorrect when cross-compiling:
+#   # https://github.com/python/cpython/issues/136267
+#   ...
+# fi
+BUILD_DETAILS=${_buildd_shared}/${BUILD_DIR}/build-details.json
+cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI_NO_DBG}/
 MAKEFILE=$(find ${PREFIX}/lib/python${VERABI_NO_DBG}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
@@ -523,6 +531,7 @@ pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
 popd
 
 if [[ ${HOST} =~ .*linux.* ]]; then
+  # AR: historical path (CF uses share/python_compiler_compat).
   mkdir -p ${PREFIX}/compiler_compat
   ln -s ${PREFIX}/bin/${HOST}-ld ${PREFIX}/compiler_compat/ld
   echo "Files in this folder are to enhance backwards compatibility of anaconda software with older compilers."   > ${PREFIX}/compiler_compat/README
