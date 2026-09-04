@@ -394,8 +394,8 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Use sysconfig from the shared build so extensions prefer .so (CF #565 / C17).
-# Shared libpython*.so/.dylib is installed by the libpython output (C16), not here.
+# Use sysconfig from the shared build so extensions prefer .so (CF #565).
+# Shared libpython*.so/.dylib is installed by the libpython output, not here.
 BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
 SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
