@@ -1,7 +1,7 @@
-From 963af4cbd75892a8f2ee510732321eac654d40ae Mon Sep 17 00:00:00 2001
+From 7a3599e45ce0e457d8c17ba47ac180d1388d4d03 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 24 Dec 2019 18:37:17 +0100
-Subject: [PATCH 07/25] Add CondaEcosystemModifyDllSearchPath()
+Subject: [PATCH 07/27] Add CondaEcosystemModifyDllSearchPath()
 
   The python interpreter is modifed so that it works as if the python interpreter
   was called with the following conda directories.
@@ -33,7 +33,7 @@ Co-authored-by: Isuru Fernando <isuruf@gmail.com>
  1 file changed, 95 insertions(+)
 
 diff --git a/Python/pylifecycle.c b/Python/pylifecycle.c
-index 3933c321ed..9a4a8c5a02 100644
+index 516d467141a..156524cc7ce 100644
 --- a/Python/pylifecycle.c
 +++ b/Python/pylifecycle.c
 @@ -88,6 +88,10 @@
@@ -152,6 +152,3 @@ index 3933c321ed..9a4a8c5a02 100644
      return _PyRuntimeState_Init(&_PyRuntime);
  }
  
--- 
-2.51.0
-

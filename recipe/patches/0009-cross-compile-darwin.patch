@@ -1,15 +1,35 @@
-From e26e3077221a90864c2a5f295cc7c98f6bc0c449 Mon Sep 17 00:00:00 2001
-From: Isuru Fernando <isuruf@gmail.com>
-Date: Thu, 26 Nov 2020 18:47:37 +0000
-Subject: [PATCH 09/25] Allow cross compiling for Darwin
+From 3c3434e2e741c2c2bf1a9a4bab9d71dc6d1935c1 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Fri, 2 Oct 2020 00:03:12 +0200
+Subject: [PATCH 09/27] cross compile darwin
 
+By Isuru Fernando.
 ---
- configure    | 3 +++
- configure.ac | 3 +++
- 2 files changed, 6 insertions(+)
+ Lib/platform.py | 7 ++++++-
+ configure       | 6 ++++++
+ configure.ac    | 6 ++++++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
+diff --git a/Lib/platform.py b/Lib/platform.py
+index 36489d4fdd9..37278847c0a 100644
+--- a/Lib/platform.py
++++ b/Lib/platform.py
+@@ -474,7 +474,12 @@ def win32_ver(release='', version='', csd='', ptype=''):
+ def _mac_ver_xml():
+     fn = '/System/Library/CoreServices/SystemVersion.plist'
+     if not os.path.exists(fn):
+-        return None
++        if 'SDKROOT' in os.environ:
++            fn = os.environ['SDKROOT'] + fn
++            if not os.path.exists(fn):
++                return None
++        else:
++            return None
+ 
+     try:
+         import plistlib
 diff --git a/configure b/configure
-index 08a7c663ce..10a347ff0a 100755
+index a68a98c5a4d..a7d9fa69814 100755
 --- a/configure
 +++ b/configure
 @@ -4155,6 +4155,9 @@ then
@@ -22,8 +42,18 @@ index 08a7c663ce..10a347ff0a 100755
  	*-*-cygwin*)
  		ac_sys_system=Cygwin
  		;;
+@@ -4638,6 +4641,9 @@ if test "$cross_compiling" = yes; then
+ 		esac
+ 		;;
+ 	*-gnu)
++		_host_ident=$host_cpu
++                ;;
++	*-*-darwin*)
+ 		_host_ident=$host_cpu
+ 		;;
+ 	*-*-cygwin*)
 diff --git a/configure.ac b/configure.ac
-index ead82d6da0..48f0fda91a 100644
+index ed8b53dd3a4..cc9554e5b39 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -333,6 +333,9 @@ then
@@ -36,6 +66,13 @@ index ead82d6da0..48f0fda91a 100644
  	*-*-cygwin*)
  		ac_sys_system=Cygwin
  		;;
--- 
-2.51.0
-
+@@ -786,6 +789,9 @@ if test "$cross_compiling" = yes; then
+ 	*-gnu)
+ 		_host_ident=$host_cpu
+ 		;;
++	*-*-darwin*)
++		_host_ident=$host_cpu
++		;;
+ 	*-*-cygwin*)
+ 		_host_ident=
+ 		;;

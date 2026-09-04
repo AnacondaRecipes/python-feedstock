@@ -54,7 +54,7 @@ if "%DEBUG_C%"=="yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
-if "%PY_GIL_DISABLED%" == "yes" (
+if "%PY_FREETHREADING%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
@@ -74,6 +74,13 @@ if "%PY_GIL_DISABLED%" == "yes" (
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
 cd PCbuild
+
+:: CF (skipped): CONDA_BUILD_CROSS_COMPILATION host-vs-build extra MSBuild.
+:: AR native workers only; ARCH/BUILD_PATH above, not CF HOST_DIR/BUILD_DIR.
+:: if "%CONDA_BUILD_CROSS_COMPILATION%" == "1" (
+::   set LIBRARY_PREFIX=%BUILD_PREFIX%\\Library
+::   call build.bat %CONFIG% %FREETHREADING% -m -e -v -p %BUILD_PLATFORM% %TCLTK_MSBUILD_PROPS%
+:: )
 
 :: Twice because:
 :: error : importlib_zipimport.h updated. You will need to rebuild pythoncore to see the changes.
@@ -102,43 +109,44 @@ for %%x in (python%THREAD%%_D%.pdb python%VERNODOTS%%THREAD%%_D%.pdb pythonw%THR
 
 @echo on
 
-:: AR: classic Win prefix (DLLs/, Lib/, libs/, include/). CPython getpath
-:: landmarks Lib\os.py; CF install_base.bat uses the same layout.
-copy %SRC_DIR%\LICENSE %PREFIX%\LICENSE_PYTHON.txt
+:: 0027 unixy Win prefix (lib\python, include\python). getpath landmarks lib\python\os.py.
+mkdir %PREFIX%\lib\python
+copy %SRC_DIR%\LICENSE %PREFIX%\lib\python\LICENSE_PYTHON.txt
 if errorlevel 1 exit 1
 
-:: Populate the DLLs directory
-mkdir %PREFIX%\DLLs
-xcopy /s /y %SRC_DIR%\PCBuild\%BUILD_PATH%\*.pyd %PREFIX%\DLLs\
+:: Populate lib-dynload (was DLLs)
+mkdir %PREFIX%\lib\python\lib-dynload
+xcopy /s /y %SRC_DIR%\PCBuild\%BUILD_PATH%\*.pyd %PREFIX%\lib\python\lib-dynload\
 if errorlevel 1 exit 1
 
-copy /Y %SRC_DIR%\PC\icons\py.ico %PREFIX%\DLLs\
+copy /Y %SRC_DIR%\PC\icons\py.ico %PREFIX%\lib\python\lib-dynload\
 if errorlevel 1 exit 1
-copy /Y %SRC_DIR%\PC\icons\pyc.ico %PREFIX%\DLLs\
+copy /Y %SRC_DIR%\PC\icons\pyc.ico %PREFIX%\lib\python\lib-dynload\
 if errorlevel 1 exit 1
 
 
 :: Populate the Tools directory
-mkdir %PREFIX%\Tools
-xcopy /s /y /i %SRC_DIR%\Tools\i18n %PREFIX%\Tools\i18n
+mkdir %PREFIX%\lib\python\Tools
+xcopy /s /y /i %SRC_DIR%\Tools\i18n %PREFIX%\lib\python\Tools\i18n
 if errorlevel 1 exit 1
-xcopy /s /y /i %SRC_DIR%\Tools\scripts %PREFIX%\Tools\scripts
-if errorlevel 1 exit 1
-
-del %PREFIX%\Tools\scripts\README
-if errorlevel 1 exit 1
-del %PREFIX%\Tools\scripts\idle3
+xcopy /s /y /i %SRC_DIR%\Tools\scripts %PREFIX%\lib\python\Tools\scripts
 if errorlevel 1 exit 1
 
-move /y %PREFIX%\Tools\scripts\pydoc3 %PREFIX%\Tools\scripts\pydoc3.py
+del %PREFIX%\lib\python\Tools\scripts\README
+if errorlevel 1 exit 1
+del %PREFIX%\lib\python\Tools\scripts\idle3
+if errorlevel 1 exit 1
+
+move /y %PREFIX%\lib\python\Tools\scripts\pydoc3 %PREFIX%\lib\python\Tools\scripts\pydoc3.py
 if errorlevel 1 exit 1
 
 :: Populate the include directory
-xcopy /s /y %SRC_DIR%\Include %PREFIX%\include\
+mkdir %PREFIX%\include\python
+xcopy /s /y %SRC_DIR%\Include %PREFIX%\include\python\
 if errorlevel 1 exit 1
 
 :: Copy generated pyconfig.h
-copy /Y %SRC_DIR%\PC\pyconfig.h %PREFIX%\include\
+copy /Y %SRC_DIR%\PC\pyconfig.h %PREFIX%\include\python\
 if errorlevel 1 exit 1
 
 :: Populate the Scripts directory
@@ -150,50 +158,52 @@ for %%x in (idle pydoc) do (
     if errorlevel 1 exit 1
 )
 
-:: Populate the libs directory
-if not exist %PREFIX%\libs mkdir %PREFIX%\libs
-if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\libs\
-if errorlevel 1 exit 1
-if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\libs\
-if errorlevel 1 exit 1
-if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\libs\
-if errorlevel 1 exit 1
+:: Populate the libs directory (and lib, matching CF unixy layout)
+for %%x in (lib libs) do (
+  if not exist %PREFIX%\%%x mkdir %PREFIX%\%%x
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\%%x\
+  if errorlevel 1 exit 1
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\%%x\
+  if errorlevel 1 exit 1
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\%%x\
+  if errorlevel 1 exit 1
+)
 
 
-:: Populate the Lib directory
-del %PREFIX%\libs\libpython*.a
-xcopy /s /y %SRC_DIR%\Lib %PREFIX%\Lib\
+:: Populate lib\python (stdlib)
+del %PREFIX%\lib\libpython*.a
+xcopy /s /y %SRC_DIR%\Lib %PREFIX%\lib\python\
 if errorlevel 1 exit 1
 
 :: Copy venv[w]launcher scripts to venv\scripts\nt
 :: See https://github.com/python/cpython/blob/b4a316087c32d83e375087fd35fc511bc430ee8b/Lib/venv/__init__.py#L334-L376
 if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe (
   @rem We did copy pythonw.exe until 3.12 but starting with 3.13 we seem to need the latter. Should we omit the first?
-  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe %PREFIX%\Lib\venv\scripts\nt\python.exe
-  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe %PREFIX%\Lib\venv\scripts\nt\venvlauncher%THREAD%%_D%.exe
+  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe %PREFIX%\lib\python\venv\scripts\nt\python.exe
+  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe %PREFIX%\lib\python\venv\scripts\nt\venvlauncher%THREAD%%_D%.exe
 ) else (
   echo "WARNING :: %SRC_DIR%\PCbuild\%BUILD_PATH%\venvlauncher%THREAD%%_D%.exe does not exist"
 )
 
 if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe (
   @rem We did copy pythonw.exe until 3.12 but starting with 3.13 we seem to need the latter. Should we omit the first?
-  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe %PREFIX%\Lib\venv\scripts\nt\pythonw.exe
-  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe %PREFIX%\Lib\venv\scripts\nt\venvwlauncher%THREAD%%_D%.exe
+  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe %PREFIX%\lib\python\venv\scripts\nt\pythonw.exe
+  copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe %PREFIX%\lib\python\venv\scripts\nt\venvwlauncher%THREAD%%_D%.exe
 ) else (
   echo "WARNING :: %SRC_DIR%\PCbuild\%BUILD_PATH%\venvwlauncher%THREAD%%_D%.exe does not exist"
 )
 
 :: Remove test data to save space.
 :: Though keep `support` as some things use that.
-mkdir %PREFIX%\Lib\test_keep
+mkdir %PREFIX%\lib\python\test_keep
 if errorlevel 1 exit 1
-move %PREFIX%\Lib\test\__init__.py %PREFIX%\Lib\test_keep\
+move %PREFIX%\lib\python\test\__init__.py %PREFIX%\lib\python\test_keep\
 if errorlevel 1 exit 1
-move %PREFIX%\Lib\test\support %PREFIX%\Lib\test_keep\
+move %PREFIX%\lib\python\test\support %PREFIX%\lib\python\test_keep\
 if errorlevel 1 exit 1
-rd /s /q %PREFIX%\Lib\test
+rd /s /q %PREFIX%\lib\python\test
 if errorlevel 1 exit 1
-move %PREFIX%\Lib\test_keep %PREFIX%\Lib\test
+move %PREFIX%\lib\python\test_keep %PREFIX%\lib\python\test
 if errorlevel 1 exit 1
 
 :: We need our Python to be found!
@@ -202,7 +212,7 @@ if "%EXE_T%" neq "" copy %PREFIX%\python%EXE_T%.exe %PREFIX%\python.exe
 
 set "PYTHON=%PREFIX%\python.exe"
 :: bytecode compile the standard library
-%PYTHON% -Wi %PREFIX%\Lib\compileall.py -f -q -x "bad_coding|badsyntax|py2_" %PREFIX%\Lib
+%PYTHON% -Wi %PREFIX%\lib\python\compileall.py -f -q -x "bad_coding|badsyntax|py2_" %PREFIX%\lib\python
 if errorlevel 1 exit 1
 
 :: Ensure that scripts are generated
@@ -227,7 +237,7 @@ echo "Testing import of os (no DLL needed) does not print: The specified module 
 if %errorlevel% neq 1 exit /b 1
 
 echo "Testing import of %%m (DLL located via PATH needed) does not print: The specified module could not be found"
-:: The names are our unvendored modules mapped to ...\DLLs\X.pyd
+:: The names are our unvendored modules mapped to ...\lib\python\lib-dynload\X.pyd
 :: missing: libffi, expat, zlib(-ng)
 
 :: Also %errorlevel% will not be updated round the loop so use && to

@@ -9,6 +9,7 @@ cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 # https://docs.python.org/3.14/using/configure.html#cmdoption-enable-experimental-jit
 # says we want a python>=3.11 to build python.
 if [[ ! -d ${SRC_DIR}/python-bin ]]; then
+    # AR: bootstrap from main (CF uses -c conda-forge).
     CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
     export PATH=${SRC_DIR}/python-bin/bin:${PATH}
 fi
@@ -40,21 +41,20 @@ _buildd_shared=build-shared
 _ENABLE_SHARED=--enable-shared
 # We *still* build a shared lib here for non-static embedded use cases
 _DISABLE_SHARED=--disable-shared
-# Hack to allow easily comparing static vs shared interpreter performance
-# .. hack because we just build it shared in both the build-static and
-# build-shared directories.
-# Yes this hack is a bit confusing, sorry about that.
-if [[ ${PY_INTERP_LINKAGE_NATURE} == shared ]]; then
-  _DISABLE_SHARED=--enable-shared
-  _ENABLE_SHARED=--enable-shared
-fi
 
 # For debugging builds, set this to no to disable profile-guided optimization
-if [[ ${DEBUG_C} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes || ${DEBUG_C} == yes ]]; then
   _OPTIMIZED=no
 else
   _OPTIMIZED=yes
 fi
+
+# CF (skipped): debug builds on conda-forge main must not ship; AR has no python_debug channel.
+# if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+#   if [[ "$CI" != "" && "$channel_targets" == "conda-forge main" ]]; then
+#     exit 1
+#   fi
+# fi
 
 if [[ ${target_platform} == linux-ppc64le ]]; then
   _OPTIMIZED=no
@@ -63,7 +63,7 @@ if [[ ${target_platform} == linux-ppc64le ]]; then
 fi
 
 declare -a _dbg_opts
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   # This Python will not be usable with non-debug Python modules.
   _dbg_opts+=(--with-pydebug)
   DBG=d
@@ -71,15 +71,16 @@ else
   DBG=
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
   # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
   THREAD=
 fi
 
-ABIFLAGS=${DBG}
+ABIFLAGS=${DBG}${THREAD}
 VERABI=${VER}${THREAD}${DBG}
+VERABI_NO_DBG=${VER}${THREAD}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -116,6 +117,12 @@ if [[ ${_OPTIMIZED} = yes ]]; then
   CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O3/g")
   CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O3/g")
   CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O3/g")
+fi
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O0/g")
+  CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O0/g")
+  CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O0/g")
 fi
 
 if [[ "$target_platform" == linux-* ]]; then
@@ -181,6 +188,7 @@ if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
   echo "ac_cv_file__dev_ptc=no"         >> config.site
   echo "ac_cv_pthread=yes"              >> config.site
   echo "ac_cv_little_endian_double=yes" >> config.site
+  # CF also lists linux-riscv64 here; AR does not build it.
   if [[ "${target_platform}" == "osx-arm64" || "${target_platform}" == "linux-ppc64le" || "${target_platform}" == "linux-aarch64" ]]; then
       echo "ac_cv_aligned_required=no" >> config.site
       echo "ac_cv_pthread_is_default=yes" >> config.site
@@ -218,6 +226,7 @@ if [[ ${target_platform} == osx-64 ]]; then
   # TODO: check with LLVM 12 if the following hack is needed.
   # https://reviews.llvm.org/D76461 may have fixed the need for the following hack.
   echo '#!/bin/bash' > $BUILD_PREFIX/bin/$HOST-llvm-ar
+  # AR: versioned llvm-ar (CF uses unversioned llvm-ar → LLVM 20 Abort).
   echo "$BUILD_PREFIX/bin/llvm-ar-$LLVM_VER --format=darwin" '"$@"' >> $BUILD_PREFIX/bin/$HOST-llvm-ar
   chmod +x $BUILD_PREFIX/bin/$HOST-llvm-ar
   export ARCHFLAGS="-arch x86_64"
@@ -265,11 +274,13 @@ _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
 _common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
+# AR: tk 9 SONAME is libtcl9tk9.0.so (CF uses -ltk${TCLTK_VER}).
 _common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+# CF glob is *"-64" so linux-aarch64 does not enable JIT (x86_64 only).
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"-64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -280,7 +291,7 @@ if [[ "${target_platform}" == osx-* ]]; then
     _common_configure_args+=(--with-tail-call-interp)
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     _common_configure_args+=(--disable-gil)
 fi
 
@@ -345,29 +356,16 @@ pushd ${_buildd_static}
                        ${_DISABLE_SHARED} "${_PROFILE_TASK[@]}"
 popd
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 >make-static.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
-fi
+make -j${CPU_COUNT} -C ${_buildd_static} \
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
+        ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
 if rg "Failed to build these modules" make-static.log; then
   echo "(static) :: Failed to build some modules, check the log"
   exit 1
 fi
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 >make-shared.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
-fi
+make -j${CPU_COUNT} -C ${_buildd_shared} \
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
 if rg "Failed to build these modules" make-shared.log; then
   echo "(shared) :: Failed to build some modules, check the log"
   exit 1
@@ -376,7 +374,7 @@ fi
 # build a static library with PIC objects and without LTO/PGO
 make -j${CPU_COUNT} -C ${_buildd_shared} \
         EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-        LIBRARY=libpython${VERABI}-pic.a libpython${VERABI}-pic.a
+        LIBRARY=libpython${VERABI_NO_DBG}-pic.a libpython${VERABI_NO_DBG}-pic.a
 
 make -C ${_buildd_static} install
 
@@ -395,24 +393,23 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Install the shared library (for people who embed Python only, e.g. GDB).
-# Linking module extensions to this on Linux is redundant (but harmless).
-# Linking module extensions to this on Darwin is harmful (multiply defined symbols).
-shopt -s extglob
-cp -pf ${_buildd_shared}/libpython*${SHLIB_EXT}!(.lto) ${PREFIX}/lib/
-shopt -u extglob
-if [[ ${target_platform} =~ .*linux.* ]]; then
-  ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
-fi
-
-# AR: keep sysconfig from the *static* build (same as CF install_base.sh).
-# A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
-# libpython-static tests linked the dylib and dyld aborted on osx-arm64.
-SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
+# Use sysconfig from the shared build so extensions prefer .so (CF #565).
+# Shared libpython*.so/.dylib is installed by the libpython output, not here.
+BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
+SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
-    > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
-MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
+    > ${PREFIX}/lib/python${VERABI_NO_DBG}/$(basename ${SYSCONFIG})
+# CF copies build-details.json from the shared build (#565). Native only:
+# AR does not cross-compile (CONDA_BUILD_CROSS_COMPILATION is never 1).
+# if [[ "${CONDA_BUILD_CROSS_COMPILATION}" == "1" ]]; then
+#   # build-details.json is incorrect when cross-compiling:
+#   # https://github.com/python/cpython/issues/136267
+#   ...
+# fi
+BUILD_DETAILS=${_buildd_shared}/${BUILD_DIR}/build-details.json
+cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI_NO_DBG}/
+MAKEFILE=$(find ${PREFIX}/lib/python${VERABI_NO_DBG}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
@@ -434,7 +431,7 @@ ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
 # Remove test data to save space
 # Though keep `support` as some things use that.
 # TODO :: Make a subpackage for this once we implement multi-level testing.
-pushd ${PREFIX}/lib/python${VERABI}
+pushd ${PREFIX}/lib/python${VERABI_NO_DBG}
   mkdir test_keep
   mv test/__init__.py test/support test/test_support* test/test_script_helper* test_keep/
   rm -rf test */test
@@ -447,7 +444,7 @@ pushd ${PREFIX}
     chmod +w lib/libpython${VERABI}.a
     ${STRIP} -S lib/libpython${VERABI}.a
   fi
-  CONFIG_LIBPYTHON=$(find lib/python${VERABI}/config-${VERABI}* -name "libpython${VERABI}.a")
+  CONFIG_LIBPYTHON=$(find lib/python${VERABI_NO_DBG}/config-${VERABI}* -name "libpython${VERABI}.a")
   if [[ -f lib/libpython${VERABI}.a ]] && [[ -f ${CONFIG_LIBPYTHON} ]]; then
     chmod +w ${CONFIG_LIBPYTHON}
     rm ${CONFIG_LIBPYTHON}
@@ -473,7 +470,7 @@ esac
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
-pushd "${PREFIX}"/lib/python${VERABI}
+pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   # On Python 3.5 _sysconfigdata.py was getting copied in here and compiled for some reason.
   # This breaks our attempt to find the right one as recorded_name.
   find lib-dynload -name "_sysconfigdata*.py*" -exec rm {} \;
@@ -534,6 +531,7 @@ pushd "${PREFIX}"/lib/python${VERABI}
 popd
 
 if [[ ${HOST} =~ .*linux.* ]]; then
+  # AR: historical path (CF uses share/python_compiler_compat).
   mkdir -p ${PREFIX}/compiler_compat
   ln -s ${PREFIX}/bin/${HOST}-ld ${PREFIX}/compiler_compat/ld
   echo "Files in this folder are to enhance backwards compatibility of anaconda software with older compilers."   > ${PREFIX}/compiler_compat/README
@@ -542,6 +540,13 @@ fi
 
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
 rm ${PREFIX}/lib/libpython${VERABI}.a
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  rm ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/bin/python${VERABI} ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/include/python${VERABI} ${PREFIX}/include/python${VER}
+fi
+
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi
@@ -559,7 +564,7 @@ fi
 # <prefix>/lib/python3.13t/site-packages.
 # Note that these directories are not added to sys.path if they do not exist.
 SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
 # Do not add ${PREFIX}/lib/python/site-packages (CF experimental ABI3/noarch
