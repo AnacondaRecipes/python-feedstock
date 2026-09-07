@@ -151,16 +151,14 @@ for %%x in (idle pydoc) do (
     if errorlevel 1 exit 1
 )
 
-:: Populate the libs directory (and lib, matching CF unixy layout)
-for %%x in (lib libs) do (
-  if not exist %PREFIX%\%%x mkdir %PREFIX%\%%x
-  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\%%x\
-  if errorlevel 1 exit 1
-  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\%%x\
-  if errorlevel 1 exit 1
-  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\%%x\
-  if errorlevel 1 exit 1
-)
+:: Import libs into lib\ (unixy). Not libs\ (old Win layout) and not lib\python\ (stdlib).
+if not exist %PREFIX%\lib mkdir %PREFIX%\lib
+if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\lib\
+if errorlevel 1 exit 1
+if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\lib\
+if errorlevel 1 exit 1
+if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\lib\
+if errorlevel 1 exit 1
 
 
 :: Populate lib\python (stdlib)

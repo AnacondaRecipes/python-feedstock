@@ -293,7 +293,7 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
         # 0027 unixy Win layout: getpath landmarks lib\python\os.py and include\python.
         - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
+        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
