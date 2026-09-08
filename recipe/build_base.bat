@@ -127,8 +127,6 @@ if errorlevel 1 exit 1
 
 :: Populate the Tools directory
 mkdir %PREFIX%\lib\python\Tools
-xcopy /s /y /i %SRC_DIR%\Tools\i18n %PREFIX%\lib\python\Tools\i18n
-if errorlevel 1 exit 1
 xcopy /s /y /i %SRC_DIR%\Tools\scripts %PREFIX%\lib\python\Tools\scripts
 if errorlevel 1 exit 1
 

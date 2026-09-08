@@ -245,9 +245,9 @@ outputs:
         # For tkinter, but we expect from system
         - xorg-libx11   # [unix]
       files:
-         - tests/cmake/*
-         - tests/cython/*
-         - run_test.py
+        - tests/cmake/*
+        - tests/cython/*
+        - run_test.py
       commands:
         - echo on  # [win]
         - set  # [win]
