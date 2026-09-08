@@ -56,12 +56,6 @@ else
   _OPTIMIZED=yes
 fi
 
-if [[ ${target_platform} == linux-ppc64le ]]; then
-  _OPTIMIZED=no
-  # ppc64le cdt need to be rebuilt with files in powerpc64le-conda-linux-gnu instead of powerpc64le-conda_cos7-linux-gnu. In the mean time:
-  cp --force --archive --update --link $BUILD_PREFIX/powerpc64le-conda_cos7-linux-gnu/. $BUILD_PREFIX/powerpc64le-conda-linux-gnu
-fi
-
 declare -a _dbg_opts
 if [[ ${DEBUG_PY} == yes ]]; then
   # This Python will not be usable with non-debug Python modules.
@@ -566,3 +560,4 @@ fi
 # fallback). That dir is unused here, but a conda-site.pth entry still puts it
 # on sys.path and breaks imports (numba on this 3.15 rc1). AR does not ship
 # CFEP-65 unixy layout.
+#echo "${PREFIX}/lib/python/site-packages" >> $SP_DIR/conda-site.pth
