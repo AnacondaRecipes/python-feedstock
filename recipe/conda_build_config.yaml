@@ -1,16 +1,30 @@
+# Clobber aggregate's python zip (python/numpy/is_freethreading/is_python_min).
+# conda-build requires ALL four keys at the same length; otherwise 3.15 is not a
+# subspace of aggregate python 3.10–3.14 (no rocket) and PY_VER stays 3.10.
 python:
-  - 3.15  # [ANACONDA_ROCKET_ENABLE_PY315]
+  - 3.15
+numpy:
+  - 2.5
+is_freethreading:
+  - false
+is_python_min:
+  - false
 python_impl:
   - cpython
-numpy:
-  - 2.5  # [ANACONDA_ROCKET_ENABLE_PY315]
 # Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
-gil_type:
-  - normal
-  # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855
-  - disabled # [not (s390x or (osx and x86_64))]
+# Whether to build free-threaded Python (3.13+). Skip FT on s390x and osx-64
+# (same skip as former gil_type=disabled).
+freethreading:
+  - yes  # [not (s390x or (osx and x86_64))]
+  - no
+
+# Debug interpreter on unix only. Do not zip with channel_targets (F94):
+# all variants upload to ad-testing/label/py315.
+build_type:
+  - release
+  - debug                      # [not win]
 
 # Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
 # (Tools/jit/_llvm.py); mixing compiler('c')=20 with clang-21/llvm-tools-21
