@@ -156,7 +156,9 @@ for %%x in (idle pydoc) do (
     if errorlevel 1 exit 1
 )
 
-:: Populate the libs directory (and lib, matching CF unixy layout)
+:: Import libs into BOTH lib\ (CFEP-27 unixy layout) and libs\ (link-time compat:
+:: distutils/setuptools build_ext hardcodes exec_prefix\libs on nt; meson cannot
+:: query it either. CFEP-27 section 6 / conda-forge PR 918 — do not drop libs\.)
 for %%x in (lib libs) do (
   if not exist %PREFIX%\%%x mkdir %PREFIX%\%%x
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\%%x\
