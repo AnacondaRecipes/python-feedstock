@@ -399,6 +399,28 @@ if [[ ${target_platform} =~ .*linux.* ]]; then
   ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
 fi
 
+# create libpython3.dylib; linux gets libpython3.so from upstream's Makefile,
+# macOS has no upstream rule — build the stable-ABI re-export dylib ourselves
+# (same as CF install_shared.sh). Release only, matching linux.
+if [[ "$target_platform" == osx-* && ${PY_INTERP_DEBUG} == no ]]; then
+  # need to filter out windows-specific symbols & PyOS_CheckStack from
+  # https://github.com/python/cpython/blob/main/Doc/data/stable_abi.dat
+  awk -F',' '
+    ($1 == "func" || $1 == "data") &&
+    $4 != "on Windows" &&
+    $2 != "PyOS_CheckStack" {
+      print "_" $2
+    }
+  ' ${SRC_DIR}/Doc/data/stable_abi.dat > ${_buildd_shared}/stable_abi_exports.txt
+
+  $CC -dynamiclib \
+   -install_name @rpath/libpython3.dylib \
+   -compatibility_version 3.0 -current_version ${VER}.0 \
+   -Wl,-reexport_library,${PREFIX}/lib/libpython${VERABI}.dylib \
+   -Wl,-exported_symbols_list,${_buildd_shared}/stable_abi_exports.txt \
+   -o ${PREFIX}/lib/libpython3.dylib
+fi
+
 # AR: keep sysconfig from the *static* build (same as CF install_base.sh).
 # A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
 # libpython-static tests linked the dylib and dyld aborted on osx-arm64.

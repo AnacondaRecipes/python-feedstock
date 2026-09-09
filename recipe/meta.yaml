@@ -284,6 +284,8 @@ outputs:
         # ships in this package, so do not assert their absence. Static libs must not.
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
+        # stable-ABI re-export dylib (upstream has no macOS rule; CF install_shared.sh parity)
+        - test -f ${PREFIX}/lib/libpython3.dylib                          # [osx]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
