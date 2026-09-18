@@ -253,6 +253,7 @@ _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
+# TODO: Remove this comment in PR#256
 # Dropped dead tcltk configure flags — log-confirmed unused in 3.15.0rc2:
 # configure: WARNING: unrecognized options: --with-tcltk-includes, --with-tcltk-libs
 # _tkinter already comes from pkg-config.
