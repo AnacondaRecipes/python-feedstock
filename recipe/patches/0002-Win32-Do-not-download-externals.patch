@@ -1,25 +1,22 @@
-From 679fdc73eded852c9d17ab4cc811d52a25735af9 Mon Sep 17 00:00:00 2001
+From dbc1c91f800e11a162eb14c42c806564802ba167 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Thu, 7 Sep 2017 11:35:47 +0100
-Subject: [PATCH 02/25] Win32: Do not download externals
+Subject: [PATCH 02/27] Win32: Do not download externals
 
 ---
  PCbuild/build.bat | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/PCbuild/build.bat b/PCbuild/build.bat
-index 9d2f032f5a..f062963991 100644
+index 9d2f032f5a9..faad274fc9d 100644
 --- a/PCbuild/build.bat
 +++ b/PCbuild/build.bat
-@@ -118,7 +118,7 @@ if "%IncludeSSL%"=="" set IncludeSSL=true
+@@ -112,7 +112,7 @@ if "%~1"=="--no-ctypes" (set IncludeCTypes=false) & shift & goto CheckOpts
+ if "%~1"=="--no-ssl" (set IncludeSSL=false) & shift & goto CheckOpts
+ if "%~1"=="--no-tkinter" (set IncludeTkinter=false) & shift & goto CheckOpts
+ 
+-if "%IncludeExternals%"=="" set IncludeExternals=true
++@rem if "%IncludeExternals%"=="" set IncludeExternals=true
+ if "%IncludeCTypes%"=="" set IncludeCTypes=true
+ if "%IncludeSSL%"=="" set IncludeSSL=true
  if "%IncludeTkinter%"=="" set IncludeTkinter=true
- if "%UseJIT%" NEQ "true" set IncludeLLVM=false
- 
--if "%IncludeExternals%"=="true" call "%dir%get_externals.bat"
-+rem if "%IncludeExternals%"=="true" call "%dir%get_externals.bat"
- 
- if /I "%target%"=="Clean" set clean=true
- if /I "%target%"=="CleanAll" set clean=true
--- 
-2.51.0
-

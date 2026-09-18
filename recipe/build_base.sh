@@ -24,14 +24,9 @@ fi
 VERFULL=${PKG_VERSION}
 VER=${PKG_VERSION%.*}
 VERNODOTS=${VER//./}
-# tk 9 ships libtcl9.0.so + libtcl9tk9.0.so (not libtk9.0.so).
-TCLTK_VER=${tk}
-TK_MAJOR_VER=${tk%.*}
 # LLVM version to use for LTO/PGO. Align it with c_compiler_version on osx-arm64.
 LLVM_VER=${c_compiler_version%.*}
-if [[ ${target_platform} == osx-arm64 ]]; then
-  LLVM_VER=21
-fi
+
 # Disables some PGO/LTO
 QUICK_BUILD=no
 
@@ -54,12 +49,6 @@ if [[ ${DEBUG_C} == yes ]]; then
   _OPTIMIZED=no
 else
   _OPTIMIZED=yes
-fi
-
-if [[ ${target_platform} == linux-ppc64le ]]; then
-  _OPTIMIZED=no
-  # ppc64le cdt need to be rebuilt with files in powerpc64le-conda-linux-gnu instead of powerpc64le-conda_cos7-linux-gnu. In the mean time:
-  cp --force --archive --update --link $BUILD_PREFIX/powerpc64le-conda_cos7-linux-gnu/. $BUILD_PREFIX/powerpc64le-conda-linux-gnu
 fi
 
 declare -a _dbg_opts
@@ -264,8 +253,10 @@ _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
-_common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
-_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
+# TODO: Remove this comment in PR#256
+# Dropped dead tcltk configure flags — log-confirmed unused in 3.15.0rc2:
+# configure: WARNING: unrecognized options: --with-tcltk-includes, --with-tcltk-libs
+# _tkinter already comes from pkg-config.
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
@@ -405,6 +396,28 @@ if [[ ${target_platform} =~ .*linux.* ]]; then
   ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
 fi
 
+# create libpython3.dylib; linux gets libpython3.so from upstream's Makefile,
+# macOS has no upstream rule — build the stable-ABI re-export dylib ourselves
+# (same as CF install_shared.sh). Release only, matching linux.
+if [[ "$target_platform" == osx-* && ${PY_INTERP_DEBUG} == no ]]; then
+  # need to filter out windows-specific symbols & PyOS_CheckStack from
+  # https://github.com/python/cpython/blob/main/Doc/data/stable_abi.dat
+  awk -F',' '
+    ($1 == "func" || $1 == "data") &&
+    $4 != "on Windows" &&
+    $2 != "PyOS_CheckStack" {
+      print "_" $2
+    }
+  ' ${SRC_DIR}/Doc/data/stable_abi.dat > ${_buildd_shared}/stable_abi_exports.txt
+
+  $CC -dynamiclib \
+   -install_name @rpath/libpython3.dylib \
+   -compatibility_version 3.0 -current_version ${VER}.0 \
+   -Wl,-reexport_library,${PREFIX}/lib/libpython${VERABI}.dylib \
+   -Wl,-exported_symbols_list,${_buildd_shared}/stable_abi_exports.txt \
+   -o ${PREFIX}/lib/libpython3.dylib
+fi
+
 # AR: keep sysconfig from the *static* build (same as CF install_base.sh).
 # A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
 # libpython-static tests linked the dylib and dyld aborted on osx-arm64.
@@ -454,22 +467,6 @@ pushd ${PREFIX}
   fi
 popd
 
-# OLD_HOST is with CentOS version in them. When building this recipe
-# with the compilers from conda-forge OLD_HOST != HOST, but when building
-# with the compilers from defaults OLD_HOST == HOST. Both cases are handled in the
-# code below
-case "$target_platform" in
-  linux-64)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos6-/g')
-    ;;
-  linux-*)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos7-/g')
-    ;;
-  *)
-    OLD_HOST=$HOST
-    ;;
-esac
-
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
@@ -500,13 +497,9 @@ pushd "${PREFIX}"/lib/python${VERABI}
   sed -i.bak "s/'GNULD': 'yes'/'GNULD': 'no'/g" sysconfigfile
   cp sysconfigfile ${our_compilers_name}
 
-  sed -i.bak "s@${HOST}@${OLD_HOST}@g" sysconfigfile
-  old_compiler_name=_sysconfigdata_$(echo ${OLD_HOST} | sed -e 's/[.-]/_/g').py
-  cp sysconfigfile ${old_compiler_name}
-
   # For system gcc remove the triple
-  sed -i.bak "s@$OLD_HOST-c++@g++@g" sysconfigfile
-  sed -i.bak "s@$OLD_HOST-@@g" sysconfigfile
+  sed -i.bak "s@$HOST-c++@g++@g" sysconfigfile
+  sed -i.bak "s@$HOST-@@g" sysconfigfile
   if [[ "$target_platform" == linux* ]]; then
     # For linux, make sure the system gcc uses our linker
     sed -i.bak "s@-pthread@-pthread -B $PREFIX/compiler_compat@g" sysconfigfile
@@ -566,3 +559,4 @@ fi
 # fallback). That dir is unused here, but a conda-site.pth entry still puts it
 # on sys.path and breaks imports (numba on this 3.15 rc1). AR does not ship
 # CFEP-65 unixy layout.
+#echo "${PREFIX}/lib/python/site-packages" >> $SP_DIR/conda-site.pth

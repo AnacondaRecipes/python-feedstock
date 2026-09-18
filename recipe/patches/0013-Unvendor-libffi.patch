@@ -1,14 +1,14 @@
-From 7a26480947fe09db5ed1b030abdb14b48527d905 Mon Sep 17 00:00:00 2001
+From edca283a374525e9b4faa0d9f8542ffa4affb5bd Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Mon, 16 Aug 2021 03:07:40 -0700
-Subject: [PATCH 13/25] Unvendor libffi
+Subject: [PATCH 13/27] Unvendor libffi
 
 ---
  PCbuild/libffi.props | 15 +++------------
  1 file changed, 3 insertions(+), 12 deletions(-)
 
 diff --git a/PCbuild/libffi.props b/PCbuild/libffi.props
-index 22c9550e2c..97fb5966bf 100644
+index 22c9550e2c0..97fb5966bfb 100644
 --- a/PCbuild/libffi.props
 +++ b/PCbuild/libffi.props
 @@ -2,20 +2,11 @@
@@ -36,6 +36,3 @@ index 22c9550e2c..97fb5966bf 100644
 -  </Target>
  </Project>
 \ No newline at end of file
--- 
-2.51.0
-

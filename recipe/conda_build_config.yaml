@@ -1,9 +1,16 @@
+# Clobber aggregate's python zip (python/numpy/is_freethreading/is_python_min).
+# conda-build requires ALL four keys at the same length; otherwise 3.15 is not a
+# subspace of aggregate python 3.10–3.14 (no rocket) and PY_VER stays 3.10.
 python:
-  - 3.15  # [ANACONDA_ROCKET_ENABLE_PY315]
+  - 3.15
+numpy:
+  - 2.5
+is_freethreading:
+  - false
+is_python_min:
+  - false
 python_impl:
   - cpython
-numpy:
-  - 2.5  # [ANACONDA_ROCKET_ENABLE_PY315]
 # Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
