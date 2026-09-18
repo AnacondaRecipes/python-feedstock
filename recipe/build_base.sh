@@ -395,6 +395,28 @@ if [[ ${target_platform} =~ .*linux.* ]]; then
   ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
 fi
 
+# create libpython3.dylib; linux gets libpython3.so from upstream's Makefile,
+# macOS has no upstream rule — build the stable-ABI re-export dylib ourselves
+# (same as CF install_shared.sh). Release only, matching linux.
+if [[ "$target_platform" == osx-* && ${PY_INTERP_DEBUG} == no ]]; then
+  # need to filter out windows-specific symbols & PyOS_CheckStack from
+  # https://github.com/python/cpython/blob/main/Doc/data/stable_abi.dat
+  awk -F',' '
+    ($1 == "func" || $1 == "data") &&
+    $4 != "on Windows" &&
+    $2 != "PyOS_CheckStack" {
+      print "_" $2
+    }
+  ' ${SRC_DIR}/Doc/data/stable_abi.dat > ${_buildd_shared}/stable_abi_exports.txt
+
+  $CC -dynamiclib \
+   -install_name @rpath/libpython3.dylib \
+   -compatibility_version 3.0 -current_version ${VER}.0 \
+   -Wl,-reexport_library,${PREFIX}/lib/libpython${VERABI}.dylib \
+   -Wl,-exported_symbols_list,${_buildd_shared}/stable_abi_exports.txt \
+   -o ${PREFIX}/lib/libpython3.dylib
+fi
+
 # AR: keep sysconfig from the *static* build (same as CF install_base.sh).
 # A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
 # libpython-static tests linked the dylib and dyld aborted on osx-arm64.
@@ -444,22 +466,6 @@ pushd ${PREFIX}
   fi
 popd
 
-# OLD_HOST is with CentOS version in them. When building this recipe
-# with the compilers from conda-forge OLD_HOST != HOST, but when building
-# with the compilers from defaults OLD_HOST == HOST. Both cases are handled in the
-# code below
-case "$target_platform" in
-  linux-64)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos6-/g')
-    ;;
-  linux-*)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos7-/g')
-    ;;
-  *)
-    OLD_HOST=$HOST
-    ;;
-esac
-
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
@@ -490,13 +496,9 @@ pushd "${PREFIX}"/lib/python${VERABI}
   sed -i.bak "s/'GNULD': 'yes'/'GNULD': 'no'/g" sysconfigfile
   cp sysconfigfile ${our_compilers_name}
 
-  sed -i.bak "s@${HOST}@${OLD_HOST}@g" sysconfigfile
-  old_compiler_name=_sysconfigdata_$(echo ${OLD_HOST} | sed -e 's/[.-]/_/g').py
-  cp sysconfigfile ${old_compiler_name}
-
   # For system gcc remove the triple
-  sed -i.bak "s@$OLD_HOST-c++@g++@g" sysconfigfile
-  sed -i.bak "s@$OLD_HOST-@@g" sysconfigfile
+  sed -i.bak "s@$HOST-c++@g++@g" sysconfigfile
+  sed -i.bak "s@$HOST-@@g" sysconfigfile
   if [[ "$target_platform" == linux* ]]; then
     # For linux, make sure the system gcc uses our linker
     sed -i.bak "s@-pthread@-pthread -B $PREFIX/compiler_compat@g" sysconfigfile

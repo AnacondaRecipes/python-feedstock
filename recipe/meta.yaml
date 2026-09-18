@@ -285,6 +285,8 @@ outputs:
         # ships in this package, so do not assert their absence. Static libs must not.
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
+        # stable-ABI re-export dylib (upstream has no macOS rule; CF install_shared.sh parity)
+        - test -f ${PREFIX}/lib/libpython3.dylib                          # [osx]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
@@ -295,6 +297,8 @@ outputs:
         # 0027 unixy Win layout: getpath landmarks lib\python\os.py and include\python.
         - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
         - if not exist %PREFIX%\\lib\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
+        # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
+        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
         - pushd prefix-replacement    # [unix]
         - bash build-and-test.sh      # [unix]
