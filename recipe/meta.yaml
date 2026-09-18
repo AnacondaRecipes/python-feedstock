@@ -96,8 +96,9 @@ source:
       - patches/0025-Unvendor-zstd.patch
       - patches/0026-Set-Py_GIL_DISABLED-in-windows-to-match-unix.patch  # [win and gil_type == "disabled"]
       - patches/0027-More-unixy-layout-for-windows.patch
-      - patches/0028-Unvendor-zlib-ng.patch
-      - patches/0029-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
+      - patches/0028-Avoid-erroring-when-conda-site.pth-has-non-existent-.patch
+      - patches/0029-Unvendor-zlib-ng.patch
+      - patches/0030-xxlimited-freethreading-stable-abi-link.patch  # [win and gil_type == "disabled"]
 
 build:
   number: {{ build_number }}

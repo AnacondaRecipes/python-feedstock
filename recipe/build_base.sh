@@ -24,14 +24,9 @@ fi
 VERFULL=${PKG_VERSION}
 VER=${PKG_VERSION%.*}
 VERNODOTS=${VER//./}
-# tk 9 ships libtcl9.0.so + libtcl9tk9.0.so (not libtk9.0.so).
-TCLTK_VER=${tk}
-TK_MAJOR_VER=${tk%.*}
 # LLVM version to use for LTO/PGO. Align it with c_compiler_version on osx-arm64.
 LLVM_VER=${c_compiler_version%.*}
-if [[ ${target_platform} == osx-arm64 ]]; then
-  LLVM_VER=21
-fi
+
 # Disables some PGO/LTO
 QUICK_BUILD=no
 
@@ -258,8 +253,9 @@ _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
-_common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
-_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
+# Dropped dead tcltk configure flags — log-confirmed unused in 3.15.0rc2:
+# configure: WARNING: unrecognized options: --with-tcltk-includes, --with-tcltk-libs
+# _tkinter already comes from pkg-config.
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
