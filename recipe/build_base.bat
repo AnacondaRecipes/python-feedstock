@@ -54,7 +54,7 @@ if "%DEBUG_C%"=="yes" (
 :: AP doesn't support PGO atm?
 set PGO=
 
-if "%PY_GIL_DISABLED%" == "yes" (
+if "%PY_FREETHREADING%" == "yes" (
   set "FREETHREADING=--disable-gil"
   set "THREAD=t"
   set "EXE_T=%VER%t"
@@ -74,6 +74,13 @@ if "%PY_GIL_DISABLED%" == "yes" (
 set TCLTK_MSBUILD_PROPS="/p:TclVersion=%tk%" "/p:TkVersion=%tk%"
 
 cd PCbuild
+
+:: CF (skipped): CONDA_BUILD_CROSS_COMPILATION host-vs-build extra MSBuild.
+:: AR native workers only; ARCH/BUILD_PATH above, not CF HOST_DIR/BUILD_DIR.
+:: if "%CONDA_BUILD_CROSS_COMPILATION%" == "1" (
+::   set LIBRARY_PREFIX=%BUILD_PREFIX%\\Library
+::   call build.bat %CONFIG% %FREETHREADING% -m -e -v -p %BUILD_PLATFORM% %TCLTK_MSBUILD_PROPS%
+:: )
 
 :: Twice because:
 :: error : importlib_zipimport.h updated. You will need to rebuild pythoncore to see the changes.
