@@ -14,9 +14,9 @@ python_impl:
 # Override aggregate global tk 8.6 — build/test against tk 9 from pkgs/main
 tk:
   - '9.0'
-# Whether to build free-threaded Python (3.13+). Skip FT on s390x and osx-64.
+# Whether to build free-threaded Python (3.13+)
 freethreading:
-  - yes  # [not (s390x or (osx and x86_64))]
+  - yes
   - no
 
 # Debug interpreter on unix only. Do not zip with channel_targets (F94):

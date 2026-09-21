@@ -25,14 +25,9 @@ fi
 VERFULL=${PKG_VERSION}
 VER=${PKG_VERSION%.*}
 VERNODOTS=${VER//./}
-# tk 9 ships libtcl9.0.so + libtcl9tk9.0.so (not libtk9.0.so).
-TCLTK_VER=${tk}
-TK_MAJOR_VER=${tk%.*}
 # LLVM version to use for LTO/PGO. Align it with c_compiler_version on osx-arm64.
 LLVM_VER=${c_compiler_version%.*}
-if [[ ${target_platform} == osx-arm64 ]]; then
-  LLVM_VER=21
-fi
+
 # Disables some PGO/LTO
 QUICK_BUILD=no
 
@@ -267,13 +262,12 @@ _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
-_common_configure_args+=(--with-tcltk-includes="-I${PREFIX}/include")
-# AR: tk 9 SONAME is libtcl9tk9.0.so (CF uses -ltk${TCLTK_VER}).
-_common_configure_args+=("--with-tcltk-libs=-L${PREFIX}/lib -ltcl${TCLTK_VER} -ltcl${TK_MAJOR_VER}tk${TCLTK_VER}")
+# Dropped dead tcltk configure flags — log-confirmed unused in 3.15.0rc2:
+# configure: WARNING: unrecognized options: --with-tcltk-includes, --with-tcltk-libs
+# _tkinter already comes from pkg-config.
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-# CF glob is *"-64" so linux-aarch64 does not enable JIT (x86_64 only).
 if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"-64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
@@ -445,22 +439,6 @@ pushd ${PREFIX}
   fi
 popd
 
-# OLD_HOST is with CentOS version in them. When building this recipe
-# with the compilers from conda-forge OLD_HOST != HOST, but when building
-# with the compilers from defaults OLD_HOST == HOST. Both cases are handled in the
-# code below
-case "$target_platform" in
-  linux-64)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos6-/g')
-    ;;
-  linux-*)
-    OLD_HOST=$(echo ${HOST} | sed -e 's/-conda-/-conda_cos7-/g')
-    ;;
-  *)
-    OLD_HOST=$HOST
-    ;;
-esac
-
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
@@ -491,13 +469,9 @@ pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   sed -i.bak "s/'GNULD': 'yes'/'GNULD': 'no'/g" sysconfigfile
   cp sysconfigfile ${our_compilers_name}
 
-  sed -i.bak "s@${HOST}@${OLD_HOST}@g" sysconfigfile
-  old_compiler_name=_sysconfigdata_$(echo ${OLD_HOST} | sed -e 's/[.-]/_/g').py
-  cp sysconfigfile ${old_compiler_name}
-
   # For system gcc remove the triple
-  sed -i.bak "s@$OLD_HOST-c++@g++@g" sysconfigfile
-  sed -i.bak "s@$OLD_HOST-@@g" sysconfigfile
+  sed -i.bak "s@$HOST-c++@g++@g" sysconfigfile
+  sed -i.bak "s@$HOST-@@g" sysconfigfile
   if [[ "$target_platform" == linux* ]]; then
     # For linux, make sure the system gcc uses our linker
     sed -i.bak "s@-pthread@-pthread -B $PREFIX/compiler_compat@g" sysconfigfile
