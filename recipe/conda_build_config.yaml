@@ -19,11 +19,11 @@ freethreading:
   - yes
   - no
 
-# Debug interpreter on unix only. Do not zip with channel_targets (F94):
-# all variants upload to ad-testing/label/py315.
+# Debug interpreter is PKG-2624 (spike), not this PR.
+# Do not zip with channel_targets (F94): all variants upload to
+# ad-testing/label/py315.
 build_type:
   - release
-  - debug                      # [not win]
 
 # Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
 # (Tools/jit/_llvm.py); mixing compiler('c')=20 with clang-21/llvm-tools-21
