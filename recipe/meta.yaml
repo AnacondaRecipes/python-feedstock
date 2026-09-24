@@ -257,6 +257,8 @@ outputs:
         - set  # [win]
         - python -V
         - python3 -V            # [not win]
+        # This graph is debug-only; do not rely on PY_INTERP_DEBUG getenv in tests.
+        - python -c "import sys; assert 'd' in sys.abiflags; assert hasattr(sys, 'gettotalrefcount'); print(sys.abiflags, sys.gettotalrefcount())"  # [unix]
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]

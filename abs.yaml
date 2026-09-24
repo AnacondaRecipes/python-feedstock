@@ -5,9 +5,10 @@ build_parameters:
   - "--error-overlinking"
   - "--error-overdepending"
 
-# Upload testing artifacts: ad-testing/label/py315
+# Upload testing artifacts: ad-testing/label/py315-debug (PKG-2624 spike).
+# Release 3.15 stays on PR #256 → ad-testing/label/py315.
 upload_channels:
-  - ad-testing/label/py315
+  - ad-testing/label/py315-debug
 
 build_env_vars:
   ANACONDA_ROCKET_ENABLE_PY315: yes

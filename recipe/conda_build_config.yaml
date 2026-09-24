@@ -19,12 +19,12 @@ freethreading:
   - yes
   - no
 
-# Unix debug interpreter for ad-testing/label/py315 only (PKG-2624).
-# Do not zip with channel_targets (F94): all variants upload to that
-# testing label. Disable the debug line before any pkgs/main / stable
-# 3.15.0+ release — debug must not ship on the main channel.
+# Unix debug-only graph → ad-testing/label/py315-debug (PKG-2624 spike).
+# Do not zip with channel_targets (F94): PBP upload_channels is graph-wide.
+# Windows has zero variants (# [not win]); empty/skip win PBP tasks are expected.
+# Restore `release` and retarget abs.yaml before any pkgs/main / #256-style
+# py315 upload — debug must not ship on the main channel.
 build_type:
-  - release
   - debug                      # [not win]
 
 # Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
