@@ -57,7 +57,7 @@
   # because we want to use binaries from `build:`), we want the exact opposite when running tests.
   {% set cmake_test_args=cmake_test_args ~ " -DCMAKE_POLICY_DEFAULT_CMP0094=NEW -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=ONLY -DCMAKE_FIND_ROOT_PATH=${PREFIX}" %}
 {% elif win %}
-  {% set cmake_test_args=cmake_test_args ~ " -DPython_ROOT_DIR=%PREFIX% -DPython_EXECUTABLE=%PREFIX%\\python.exe -DPython_FIND_REGISTRY=NEVER -DPython_FIND_STRATEGY=LOCATION" %}
+  {% set cmake_test_args=cmake_test_args ~ " -DPython_ROOT_DIR=%PREFIX% -DPython_EXECUTABLE=%PREFIX%\\python.exe -DPython_LIBRARY=%PREFIX%\\libs\\python" ~ ver2nd ~ win_lib_sfx ~ ".lib -DPython_FIND_REGISTRY=NEVER -DPython_FIND_STRATEGY=LOCATION" %}
 {% endif %}
 
 # extremely noisy; only use if needing to debug how CMake finds our libraries
