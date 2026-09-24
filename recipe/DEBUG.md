@@ -8,7 +8,7 @@ Time-boxed technical spike stacked on python-feedstock#256. **Not pkgs/main.** P
 |-------|----------------|---------------------|
 | **This graph** (`--with-pydebug`) | `Py_DEBUG`, `'d' in sys.abiflags`, `sys.gettotalrefcount()`, `libpython3.15d.so` / `libpython3.15td.so` | DWARF-complete unstripped objects (conda-build may strip `.symtab` / `.debug_info`) |
 | **`python -X dev`** | Runtime development checks on a **release** interpreter | `d` ABI, refcount APIs, debug libpython |
-| **Windows `PCbuild -d` / `python3XX_d.lib`** | MSVC debug CRT import libs | **Out of this spike.** CBC is `# [not win]`; win PBP tasks are empty/skip |
+| **Windows `PCbuild -d` / `python3XX_d.lib`** | MSVC debug CRT import libs | **Out of this spike.** `skip: true  # [win]`; do not ship win debug or win release on this dest |
 
 Do not confuse the three. This dest is Unix `--with-pydebug` only.
 
@@ -18,7 +18,7 @@ PBP `upload_channels` is **graph-wide**. Do **not** zip `channel_targets` with `
 
 | File | Debug spike (this PR) | Before pkgs/main / #256-style py315 |
 |------|------------------------|--------------------------------------|
-| `recipe/conda_build_config.yaml` | `build_type: debug # [not win]` only; `freethreading: yes/no` | Restore `release` (and drop `debug` unless dest is still a testing label) |
+| `recipe/conda_build_config.yaml` | `build_type: debug` only; `freethreading: yes/no`; win skipped in `meta.yaml` | Restore `release` (and drop `debug` unless dest is still a testing label) |
 | `abs.yaml` | `upload_channels: [ad-testing/label/py315-debug]` | `#256` keeps `ad-testing/label/py315`. Never point debug variants at `main` |
 
 Release 3.15 stays on **#256** → `ad-testing/label/py315`. This PR is a **second graph**.
@@ -48,7 +48,7 @@ Debug Python **cannot load release extensions** (and vice versa). `abiflags` `d`
 - **No `release` on this graph**
 - GIL debug lib: `libpython3.15d.so` (`abiflags` contains `d`)
 - FT debug lib: `libpython3.15td.so` (`abiflags` contains `td`; assert `'d' in sys.abiflags` covers both)
-- Windows: **zero variants**. Do not add a win release variant onto `py315-debug`.
+- Windows: `skip: true  # [win]`. CBC keeps unselected `build_type: debug` so PBP can render win-64 (empty `build_type` → `KeyError`). Do not add a win release variant onto `py315-debug`.
 
 ## Local conda-build
 

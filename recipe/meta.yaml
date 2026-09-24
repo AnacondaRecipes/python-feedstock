@@ -111,6 +111,7 @@ source:
 
 build:
   number: {{ build_number }}
+  skip: true  # [win]
 
 requirements:
   build:
@@ -145,6 +146,7 @@ outputs:
       #   - lib/python{{ ver2 }}/lib-dynload/_hashlib.cpython-{{ ver2nd }}-x86_64-linux-gnu.so  # [linux]
       #   - lib/libpython3.dylib  # [osx]
       # match python.org compiler standard
+      skip: true  # [win]
       skip: true  # [win and int(float(vc)) < 14]
       string: {{ dev_ }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ debug }}_{{ abi_tag }}
       python_site_packages_path: {{ site_packages_path }}

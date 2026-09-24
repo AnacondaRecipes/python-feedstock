@@ -21,11 +21,13 @@ freethreading:
 
 # Unix debug-only graph → ad-testing/label/py315-debug (PKG-2624 spike).
 # Do not zip with channel_targets (F94): PBP upload_channels is graph-wide.
-# Windows has zero variants (# [not win]); empty/skip win PBP tasks are expected.
+# Keep `debug` unselected so win-64 still has a build_type key (PBP renders
+# every platform; empty list → KeyError). meta.yaml `skip: true  # [win]`
+# drops the win tasks — do not add a win release variant onto this dest.
 # Restore `release` and retarget abs.yaml before any pkgs/main / #256-style
 # py315 upload — debug must not ship on the main channel.
 build_type:
-  - debug                      # [not win]
+  - debug
 
 # Override aggregate global clang 20 on osx. CPython 3.15 JIT requires LLVM 21
 # (Tools/jit/_llvm.py); mixing compiler('c')=20 with clang-21/llvm-tools-21
