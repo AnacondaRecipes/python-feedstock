@@ -210,6 +210,7 @@ outputs:
       host:
         - bzip2 {{ bzip2 }}
         - expat {{ expat }}
+        - libexpat {{ libexpat }}
         - ld_impl_{{ target_platform }} >=2.36.1 # [linux]
         - libffi {{ libffi }}
         - xz {{ xz }}
