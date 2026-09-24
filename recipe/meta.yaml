@@ -33,6 +33,10 @@
   {% set py_interp_debug = "no" %}
   {% set debug = "" %}
 {% endif %}
+{% set win_lib_sfx = "t" if freethreading == "yes" else "" %}
+{% if py_interp_debug == "yes" %}
+  {% set win_lib_sfx = win_lib_sfx ~ "_d" %}
+{% endif %}
 
 {% if win %}
   {% set site_packages_path = "lib/python/site-packages" %}
@@ -53,7 +57,7 @@
   # because we want to use binaries from `build:`), we want the exact opposite when running tests.
   {% set cmake_test_args=cmake_test_args ~ " -DCMAKE_POLICY_DEFAULT_CMP0094=NEW -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=ONLY -DCMAKE_FIND_ROOT_PATH=${PREFIX}" %}
 {% elif win %}
-  {% set cmake_test_args=cmake_test_args ~ " -DPython_ROOT_DIR=%PREFIX%" %}
+  {% set cmake_test_args=cmake_test_args ~ " -DPython_ROOT_DIR=%PREFIX% -DPython_EXECUTABLE=%PREFIX%\\python.exe -DPython_FIND_REGISTRY=NEVER -DPython_FIND_STRATEGY=LOCATION" %}
 {% endif %}
 
 # extremely noisy; only use if needing to debug how CMake finds our libraries
@@ -297,19 +301,11 @@ outputs:
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
-        {% if freethreading == "yes" %}
-        - if not exist %PREFIX%\\lib\\python3t.lib exit 1                # [win]
-        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}t.lib exit 1     # [win]
-        # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
-        - if not exist %PREFIX%\\libs\\python3t.lib exit 1               # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}t.lib exit 1    # [win]
-        {% else %}
-        - if not exist %PREFIX%\\lib\\python3.lib exit 1                 # [win]
-        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}.lib exit 1      # [win]
-        # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
-        - if not exist %PREFIX%\\libs\\python3.lib exit 1                # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1     # [win]
-        {% endif %}
+         - if not exist %PREFIX%\\lib\\python3{{ win_lib_sfx }}.lib exit 1             # [win]
+         - if not exist %PREFIX%\\lib\\python{{ ver2nd }}{{ win_lib_sfx }}.lib exit 1  # [win]
+         # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
+         - if not exist %PREFIX%\\libs\\python3{{ win_lib_sfx }}.lib exit 1            # [win]
+         - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ win_lib_sfx }}.lib exit 1 # [win]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
