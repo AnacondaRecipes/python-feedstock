@@ -231,6 +231,7 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.36.1  # [linux]
         - tzdata
         - python_abi {{ ver2 }}.* *_{{ abi_tag }}
+        - {{ pin_compatible('libexpat') }}
     test:
       #downstreams:
       #  - cython
