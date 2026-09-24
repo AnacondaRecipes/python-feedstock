@@ -133,6 +133,12 @@ outputs:
         # These two are just to get the headers needed for tk.h, but is unused
         - xorg-libx11            # [unix]
         - xorg-xorgproto         # [unix]
+{% if py_interp_debug == "yes" %}
+      ignore_run_exports:        # [win]
+        # PCbuild -d links the debug CRT, not release ucrt / vc14_runtime.
+        - ucrt                   # [win]
+        - vc14_runtime           # [win]
+{% endif %}
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
