@@ -1,4 +1,4 @@
-# Unix Py_DEBUG spike (PKG-2624)
+# Py_DEBUG spike (PKG-2624)
 
 Time-boxed technical spike stacked on python-feedstock#256. **Not pkgs/main.** Product ticket PKG-2624 is closed (no market).
 
@@ -6,11 +6,11 @@ Time-boxed technical spike stacked on python-feedstock#256. **Not pkgs/main.** P
 
 | Build | What you get | What you do not get |
 |-------|----------------|---------------------|
-| **This graph** (`--with-pydebug`) | `Py_DEBUG`, `'d' in sys.abiflags`, `sys.gettotalrefcount()`, `libpython3.15d.so` / `libpython3.15td.so` | DWARF-complete unstripped objects (conda-build may strip `.symtab` / `.debug_info`) |
+| **Unix** (`--with-pydebug`) | `Py_DEBUG`, `'d' in sys.abiflags`, `sys.gettotalrefcount()`, `libpython3.15d.so` / `libpython3.15td.so` | DWARF-complete unstripped objects (conda-build may strip `.symtab` / `.debug_info`) |
+| **Windows** (`PCbuild -d`) | `python315_d.lib` / `python3_d.lib` / `_tkinter_d.lib`, `gettotalrefcount`, debug CRT | Not the same as Unix `abiflags` (`sys.abiflags` is Unix-only) |
 | **`python -X dev`** | Runtime development checks on a **release** interpreter | `d` ABI, refcount APIs, debug libpython |
-| **Windows `PCbuild -d` / `python3XX_d.lib`** | MSVC debug CRT import libs | **Out of this spike.** `skip: true  # [win]`; do not ship win debug or win release on this dest |
 
-Do not confuse the three. This dest is Unix `--with-pydebug` only.
+Do not confuse Py_DEBUG / PCbuild `-d` with `-X dev`. This dest ships debug interpreters on unix **and** win-64.
 
 ## Gate: keep debug off pkgs/main
 
@@ -18,7 +18,7 @@ PBP `upload_channels` is **graph-wide**. Do **not** zip `channel_targets` with `
 
 | File | Debug spike (this PR) | Before pkgs/main / #256-style py315 |
 |------|------------------------|--------------------------------------|
-| `recipe/conda_build_config.yaml` | `build_type: debug` only; `freethreading: yes/no`; win skipped in `meta.yaml` | Restore `release` (and drop `debug` unless dest is still a testing label) |
+| `recipe/conda_build_config.yaml` | `build_type: debug` only; `freethreading: yes/no`; unix+win | Restore `release` (and drop `debug` unless dest is still a testing label) |
 | `abs.yaml` | `upload_channels: [ad-testing/label/py315-debug]` | `#256` keeps `ad-testing/label/py315`. Never point debug variants at `main` |
 
 Release 3.15 stays on **#256** → `ad-testing/label/py315`. This PR is a **second graph**.
@@ -48,7 +48,7 @@ Debug Python **cannot load release extensions** (and vice versa). `abiflags` `d`
 - **No `release` on this graph**
 - GIL debug lib: `libpython3.15d.so` (`abiflags` contains `d`)
 - FT debug lib: `libpython3.15td.so` (`abiflags` contains `td`; assert `'d' in sys.abiflags` covers both)
-- Windows: `skip: true  # [win]`. CBC keeps unselected `build_type: debug` so PBP can render win-64 (empty `build_type` → `KeyError`). Do not add a win release variant onto `py315-debug`.
+- Windows: PCbuild `-d`. Import libs in `libs\`: `python315_d.lib` / `python315t_d.lib`, `python3_d.lib` / `python3t_d.lib`, `_tkinter_d.lib`. Do not add a win **release** variant onto `py315-debug`.
 
 ## Local conda-build
 
@@ -105,8 +105,7 @@ If gdb backtraces are shallow, that is strip quality, not a missing `Py_DEBUG`. 
 
 ## Out of scope
 
-- Windows `PCbuild -d` / `python3XX_d.lib`
-- numpy / pybind11 debug extension chain (later product)
+- numpy / pybind11 debug extension chain (follow-on after this python graph publishes to `py315-debug`; numpy-feedstock currently `skip: true  # [py>=315]`)
 - conda-forge `python_debug` `zip_keys` / real `channel_targets`
-- pkgs/main, sanitizer/valgrind builds, paying-customer packaging
+- pkgs/main, sanitizer/valgrind builds, commercial packaging
 - Merging this PR (human-only; never pkgs/main)

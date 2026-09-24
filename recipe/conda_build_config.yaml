@@ -19,11 +19,9 @@ freethreading:
   - yes
   - no
 
-# Unix debug-only graph → ad-testing/label/py315-debug (PKG-2624 spike).
+# Debug-only graph → ad-testing/label/py315-debug (PKG-2624 spike).
+# Unix: --with-pydebug. Windows: PCbuild -d / python3XX_d.lib.
 # Do not zip with channel_targets (F94): PBP upload_channels is graph-wide.
-# Keep `debug` unselected so win-64 still has a build_type key (PBP renders
-# every platform; empty list → KeyError). meta.yaml `skip: true  # [win]`
-# drops the win tasks — do not add a win release variant onto this dest.
 # Restore `release` and retarget abs.yaml before any pkgs/main / #256-style
 # py315 upload — debug must not ship on the main channel.
 build_type:
