@@ -220,7 +220,6 @@ outputs:
       host:
         - bzip2 {{ bzip2 }}
         - expat {{ expat }}
-        - libexpat {{ libexpat }}
         - ld_impl_{{ target_platform }} >=2.36.1 # [linux]
         - libffi {{ libffi }}
         - xz {{ xz }}
@@ -243,7 +242,6 @@ outputs:
         - ld_impl_{{ target_platform }} >=2.36.1  # [linux]
         - tzdata
         - python_abi {{ ver2 }}.* *_{{ abi_tag }}
-        - {{ pin_compatible('libexpat') }}
     test:
       #downstreams:
       #  - cython
@@ -276,7 +274,7 @@ outputs:
         - python -c "import sys; assert hasattr(sys, 'gettotalrefcount'); print(sys.gettotalrefcount())"  # [win]
         - if not exist %PREFIX%\libs\python{{ ver2nd }}{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
         - if not exist %PREFIX%\libs\python3{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
-        - if not exist %PREFIX%\libs\_tkinter{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
+        - if not exist %PREFIX%\libs\_tkinter_d.lib exit 1  # [win]
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -309,11 +307,11 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
         - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
-        - pushd tests
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd tests                                              # [unix]
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
         - python run_test.py
         - test ! -f default.profraw   # [osx]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
@@ -376,12 +374,12 @@ outputs:
         - pushd prefix-replacement  # [unix]
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
 
-  - name: libpython-static
+   - name: libpython-static
     script: install_static.sh   # [unix]
     build:
       number: {{ build_number }}
@@ -437,12 +435,12 @@ outputs:
         - pushd prefix-replacement  # [unix]
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
 
-  - name: cpython
+   - name: cpython
     build:
       noarch: generic
     requirements:
