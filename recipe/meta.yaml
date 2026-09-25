@@ -276,7 +276,7 @@ outputs:
         - python -c "import sys; assert hasattr(sys, 'gettotalrefcount'); print(sys.gettotalrefcount())"  # [win]
         - if not exist %PREFIX%\libs\python{{ ver2nd }}{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
         - if not exist %PREFIX%\libs\python3{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
-         - if not exist %PREFIX%\libs\_tkinter{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
+        - if not exist %PREFIX%\libs\_tkinter{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -299,10 +299,10 @@ outputs:
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
-         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
-         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
-         # https://github.com/conda-forge/python-feedstock/issues/384
-         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
+        # https://github.com/conda-forge/python-feedstock/issues/384
+        - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc-script.py exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\idle-script.py exit 1  # [win]
