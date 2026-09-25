@@ -379,7 +379,7 @@ outputs:
         - popd                                                     # [unix]
         - popd                                                     # [unix]
 
-   - name: libpython-static
+  - name: libpython-static
     script: install_static.sh   # [unix]
     build:
       number: {{ build_number }}
@@ -440,7 +440,7 @@ outputs:
         - popd                                                     # [unix]
         - popd                                                     # [unix]
 
-   - name: cpython
+  - name: cpython
     build:
       noarch: generic
     requirements:
