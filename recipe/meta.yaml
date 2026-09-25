@@ -274,7 +274,9 @@ outputs:
         - python -c "import sys; assert hasattr(sys, 'gettotalrefcount'); print(sys.gettotalrefcount())"  # [win]
         - if not exist %PREFIX%\libs\python{{ ver2nd }}{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
         - if not exist %PREFIX%\libs\python3{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
+{% if freethreading != "yes" %}
         - if not exist %PREFIX%\libs\_tkinter_d.lib exit 1  # [win]
+{% endif %}
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]

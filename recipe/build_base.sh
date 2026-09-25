@@ -7,10 +7,12 @@ cd ${SRC_DIR}
 cp $BUILD_PREFIX/share/libtool/build-aux/config.* .
 
 # https://docs.python.org/3.14/using/configure.html#cmdoption-enable-experimental-jit
-# says we want a python>=3.11 to build python.
-if [[ ! -d ${SRC_DIR}/python-bin ]]; then
-    # AR: bootstrap from main (CF uses -c conda-forge).
-    CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c main --override-channels --yes --quiet
+# says we want a python>=3.11 to build python. Prefer the build env (PBP is 3.14)
+# so we do not hit conda.anaconda.org/main HTTP 403 on aarch64 workers.
+if python -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+    :
+elif [[ ! -d ${SRC_DIR}/python-bin ]]; then
+    CONDA_SUBDIR=$build_platform conda create -p ${SRC_DIR}/python-bin "python>=3.11" -c defaults --override-channels --yes --quiet
     export PATH=${SRC_DIR}/python-bin/bin:${PATH}
 fi
 
