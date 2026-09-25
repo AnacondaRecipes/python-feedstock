@@ -167,6 +167,8 @@ for %%x in (lib libs) do (
   if errorlevel 1 exit 1
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\%%x\
   if errorlevel 1 exit 1
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%THREAD%%_D%.lib %PREFIX%\%%x\
+  if errorlevel 1 exit 1
 )
 
 
