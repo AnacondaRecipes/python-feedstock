@@ -386,8 +386,8 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Shared libpython*.so/.dylib is installed by the libpython output (install_shared.sh).
-
+# Use sysconfigdata from the shared build, as we want packages to prefer
+# linking against the shared library. Issue #565.
 SYSCONFIG=$(find ${_buildd_shared}/$(cat ${_buildd_shared}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
