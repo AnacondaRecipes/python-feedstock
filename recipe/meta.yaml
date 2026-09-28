@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = 0 %}
+{% set build_number = 1 %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
 {% set bootstrap = "false" %}
@@ -255,7 +255,6 @@ outputs:
       files:
         - tests/cmake/*
         - tests/cython/*
-        - tests/prefix-replacement/*
         - run_test.py
       commands:
         - echo on  # [win]
@@ -281,12 +280,11 @@ outputs:
         - _CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_linux_gnu python -c "import sysconfig; print(sysconfig.get_config_var('CC'))"   # [linux64]
         # check for unreplaced @ symbols in sysconfig files, excluding e.g. '"$@".lto'
         - for f in ${CONDA_PREFIX}/lib/python*/_sysconfig*.py; do echo "Checking $f:"; if [[ `rg @[^@]*@ $f` ]]; then echo "FAILED ON $f"; cat $f; exit 1; fi; done  # [linux64 or osx]
-        # AR: no separate libpython output (CF has one). Shared libpython*.so/.dylib
-        # ships in this package, so do not assert their absence. Static libs must not.
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [unix]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.a            # [unix]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
+        - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
-        # stable-ABI re-export dylib (upstream has no macOS rule; CF install_shared.sh parity)
-        - test -f ${PREFIX}/lib/libpython3.dylib                          # [osx]
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
@@ -300,9 +298,6 @@ outputs:
         # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
         - if not exist %PREFIX%\\libs\\python{{ ver2nd }}{{ abi_suffix }}.lib exit 1  # [win]
         - pushd tests
-        - pushd prefix-replacement    # [unix]
-        - bash build-and-test.sh      # [unix]
-        - popd    # [unix]
         - pushd cmake
         - cmake -GNinja -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" --debug-find --trace --debug-output --debug-trycompile .
         - popd
@@ -314,10 +309,63 @@ outputs:
         # Test for wide character supported via ncursesw
         - TERM=xterm >/dev/null python -c "import curses; scr = curses.initscr(); curses.unget_wch('x'); assert 'x' ==  scr.get_wch()"  # [unix]
 
+  # this output is empty on windows
+  - name: libpython
+    script: install_shared.sh   # [unix]
+    build:
+      number: {{ build_number }}
+      activate_in_script: true
+      ignore_run_exports:
+        - python_abi
+      ignore_run_exports_from:   # [unix]
+        # Install-only output; CXX is not linked into libpython*.so.
+        - {{ compiler('cxx') }}  # [unix]
+      script_env:
+        - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - PY_FREETHREADING={{ py_gil_disabled }}
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      run_exports:                                                           # [unix]
+        weak:                                                                # [unix]
+          - {{ pin_subpackage("libpython", min_pin="x.x", max_pin="x") }}    # [unix]
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ stdlib('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - {{ pin_subpackage('python', exact=True) }}
+      run:
+        - {{ pin_subpackage('python', exact=True) }}
+    test:
+      files:
+        - tests/prefix-replacement/*
+      requires:
+        - {{ stdlib('c') }}
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - ripgrep
+      commands:
+        - VER=${PKG_VERSION%.*}    # [unix]
+        - VERABI=${VER}            # [unix]
+{% if py_gil_disabled == "yes" %}
+        - VERABI=${VERABI}t        # [unix]
+{% endif %}
+{% if py_interp_debug == "yes" %}
+        - VERABI=${VERABI}d        # [unix]
+{% endif %}
+        - test -f ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}       # [unix]
+{% if py_interp_debug == "no" %}
+        - test -f ${PREFIX}/lib/libpython3${SHLIB_EXT}               # [unix]
+{% endif %}
+        - pushd tests                 # [unix]
+        - pushd prefix-replacement    # [unix]
+        - bash build-and-test.sh      # [unix]
+        - popd                        # [unix]
+        - popd                        # [unix]
+
 {% if bootstrap != "true" %}
   - name: libpython-static
-    script: build_static.sh  # [unix]
-    script: build_static.bat  # [win]
+    script: install_static.sh  # [unix]
     build:
       number: {{ build_number }}
       force_use_keys:
@@ -325,9 +373,14 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
+      ignore_run_exports_from:   # [unix]
+        # Install-only output; CXX is not linked into libpython*.a.
+        - {{ compiler('cxx') }}  # [unix]
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       script_env:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
+        - PY_INTERP_DEBUG={{ py_interp_debug }}
+        - PY_FREETHREADING={{ py_gil_disabled }}
     requirements:
       build:
         - {{ stdlib('c') }}
