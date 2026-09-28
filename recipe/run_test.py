@@ -90,10 +90,11 @@ if sys.platform != 'win32':
     import syslog
     import termios
 
-if os.getenv('PY_INTERP_DEBUG') == 'yes':
-    if sys.platform != 'win32':
-        assert 'd' in sys.abiflags
-    assert 'gettotalrefcount' in dir(sys)
+# This graph is debug-only (PKG-2624). Do not rely on PY_INTERP_DEBUG getenv;
+# script_env does not reliably reach the test env.
+if sys.platform != 'win32':
+    assert 'd' in sys.abiflags
+assert hasattr(sys, 'gettotalrefcount')
 
 if not (armv6l or armv7l or ppc64le or osx105 or arm64):
     import tkinter

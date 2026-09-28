@@ -33,6 +33,10 @@
   {% set py_interp_debug = "no" %}
   {% set debug = "" %}
 {% endif %}
+{% set win_lib_sfx = "t" if freethreading == "yes" else "" %}
+{% if py_interp_debug == "yes" %}
+  {% set win_lib_sfx = win_lib_sfx ~ "_d" %}
+{% endif %}
 
 {% if win %}
   {% set site_packages_path = "lib/python/site-packages" %}
@@ -52,6 +56,8 @@
   # `CMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER`; while that's useful for building (i.e. don't look in `host:`,
   # because we want to use binaries from `build:`), we want the exact opposite when running tests.
   {% set cmake_test_args=cmake_test_args ~ " -DCMAKE_POLICY_DEFAULT_CMP0094=NEW -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=ONLY -DCMAKE_FIND_ROOT_PATH=${PREFIX}" %}
+{% elif win %}
+  {% set cmake_test_args=cmake_test_args ~ " -DPython_ROOT_DIR=%PREFIX% -DPython_EXECUTABLE=%PREFIX%\\python.exe -DPython_LIBRARY=%PREFIX%\\libs\\python" ~ ver2nd ~ win_lib_sfx ~ ".lib -DPython_INCLUDE_DIR=%PREFIX%\\include\\python -DPython_FIND_REGISTRY=NEVER -DPython_FIND_STRATEGY=LOCATION" %}
 {% endif %}
 
 # extremely noisy; only use if needing to debug how CMake finds our libraries
@@ -133,6 +139,12 @@ outputs:
         # These two are just to get the headers needed for tk.h, but is unused
         - xorg-libx11            # [unix]
         - xorg-xorgproto         # [unix]
+{% if py_interp_debug == "yes" %}
+      ignore_run_exports:        # [win]
+        # PCbuild -d links the debug CRT, not release ucrt / vc14_runtime.
+        - ucrt                   # [win]
+        - vc14_runtime           # [win]
+{% endif %}
       # Disabled until verified to work correctly
       detect_binary_files_with_prefix: true
       # detect_binary_files_with_prefix: False
@@ -257,6 +269,14 @@ outputs:
         - set  # [win]
         - python -V
         - python3 -V            # [not win]
+        # This graph is debug-only; do not rely on PY_INTERP_DEBUG getenv in tests.
+        - python -c "import sys; assert 'd' in sys.abiflags; assert hasattr(sys, 'gettotalrefcount'); print(sys.abiflags, sys.gettotalrefcount())"  # [unix]
+        - python -c "import sys; assert hasattr(sys, 'gettotalrefcount'); print(sys.gettotalrefcount())"  # [win]
+        - if not exist %PREFIX%\libs\python{{ ver2nd }}{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
+        - if not exist %PREFIX%\libs\python3{% if freethreading == "yes" %}t{% endif %}_d.lib exit 1  # [win]
+{% if freethreading != "yes" %}
+        - if not exist %PREFIX%\libs\_tkinter_d.lib exit 1  # [win]
+{% endif %}
         - pydoc -h
         - python3-config --help  # [not win]
         - set "PIP_NO_BUILD_ISOLATION=False"  # [win]
@@ -281,19 +301,6 @@ outputs:
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.so           # [linux]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.dylib        # [osx]
         - test ! -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}.nolto.a      # [unix]
-        {% if freethreading == "yes" %}
-        - if not exist %PREFIX%\\lib\\python3t.lib exit 1                # [win]
-        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}t.lib exit 1     # [win]
-        # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
-        - if not exist %PREFIX%\\libs\\python3t.lib exit 1               # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}t.lib exit 1    # [win]
-        {% else %}
-        - if not exist %PREFIX%\\lib\\python3.lib exit 1                 # [win]
-        - if not exist %PREFIX%\\lib\\python{{ ver2nd }}.lib exit 1      # [win]
-        # libs\ kept for link-time compat (CFEP-27 section 6, conda-forge PR 918)
-        - if not exist %PREFIX%\\libs\\python3.lib exit 1                # [win]
-        - if not exist %PREFIX%\\libs\\python{{ ver2nd }}.lib exit 1     # [win]
-        {% endif %}
         # https://github.com/conda-forge/python-feedstock/issues/384
         - if exist %PREFIX%\\Scripts\\pydoc exit 1  # [win]
         - if exist %PREFIX%\\Scripts\\idle exit 1  # [win]
@@ -302,11 +309,11 @@ outputs:
         - if not exist %PREFIX%\\Scripts\\idle.exe exit 1  # [win]
         - if not exist %PREFIX%\\Scripts\\pydoc.exe exit 1  # [win]
         - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
-        - pushd tests
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd tests                                              # [unix]
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
         - python run_test.py
         - test ! -f default.profraw   # [osx]
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
@@ -369,10 +376,10 @@ outputs:
         - pushd prefix-replacement  # [unix]
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
 
   - name: libpython-static
     script: install_static.sh   # [unix]
@@ -430,10 +437,10 @@ outputs:
         - pushd prefix-replacement  # [unix]
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
-        - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
-        - popd
-        - popd
+        - pushd cmake                                              # [unix]
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .  # [unix]
+        - popd                                                     # [unix]
+        - popd                                                     # [unix]
 
   - name: cpython
     build:

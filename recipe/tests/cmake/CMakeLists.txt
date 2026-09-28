@@ -10,7 +10,10 @@ set(PY_VER "" CACHE STRING "Python version to use")
 set(EXTRA_COMPONENTS "" CACHE STRING "Additional Python components to check for")
 
 # Since 3.16, CMake does not accept freethreaded interpreter by default
-# anymore. Allow it explicitly.
+# anymore. Allow it explicitly unless the caller passed -DPython_FIND_ABI
+# (debug builds need the first tuple element ON).
 # https://cmake.org/cmake/help/latest/module/FindPython.html#hints
-set(Python_FIND_ABI "ANY" "ANY" "ANY" "ANY")
+if(NOT DEFINED Python_FIND_ABI)
+  set(Python_FIND_ABI "ANY" "ANY" "ANY" "ANY")
+endif()
 find_package(Python ${PY_VER} COMPONENTS Interpreter ${EXTRA_COMPONENTS} REQUIRED)
