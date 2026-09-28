@@ -12,10 +12,14 @@ if (sys.version_info[0] == 3 and sys.version_info[1] >= 14) or sys.version_info[
             sys.exit(0)
         else:
             print("JIT available but not enabled", file=sys.stderr)
+            sys.exit(1)
     else:
-        print("JIT not available", file=sys.stderr)
+        # python-jit is noarch and PBP tests it against every python variant.
+        # configure disables JIT for debug, freethreading, and some arches;
+        # the metapackage is a no-op there.
+        print("JIT not compiled into this interpreter; skip")
+        sys.exit(0)
 else:
     print(f"WARNING: cannot validate JIT using Python {sys.version}", file=sys.stderr)
-    print(f"WARNING: validate using Python >= 3.14", file=sys.stderr)
-
-sys.exit(1)
+    print("WARNING: validate using Python >= 3.14", file=sys.stderr)
+    sys.exit(1)
