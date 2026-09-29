@@ -344,8 +344,24 @@ if rg "Failed to build these modules" make-static.log; then
   exit 1
 fi
 
+# The macOS dylib's install name points at PREFIX/lib, but it is built in
+# build-shared first. Make it available at that path while PGO runs Python.
+if [[ ${target_platform} == osx-* ]]; then
+  shared_lib_link=${PREFIX}/lib/libpython${VERABI}.dylib
+  if [[ -e ${shared_lib_link} || -L ${shared_lib_link} ]]; then
+    echo "Refusing to replace existing ${shared_lib_link}"
+    exit 1
+  fi
+  ln -s "${SRC_DIR}/${_buildd_shared}/libpython${VERABI}.dylib" "${shared_lib_link}"
+  trap 'rm -f "${shared_lib_link}"' EXIT
+fi
+
 make -j${CPU_COUNT} -C ${_buildd_shared} \
         EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
+if [[ ${target_platform} == osx-* ]]; then
+  rm -f "${shared_lib_link}"
+  trap - EXIT
+fi
 if rg "Failed to build these modules" make-shared.log; then
   echo "(shared) :: Failed to build some modules, check the log"
   exit 1
