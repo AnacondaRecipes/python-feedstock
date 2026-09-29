@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = 1 %}
+{% set build_number = 2 %}
 {% set llvm_version_win = 20 %}
 {% set channel_targets = ('abc', 'def')  %}
 # this is just for the initial build, to break dependencies with python -> pip -> libpython-static
@@ -98,6 +98,18 @@ source:
 
 build:
   number: {{ build_number }}
+  script: build.sh  # [unix]
+  script: bld.bat   # [win]
+  script_env:
+    - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
+    - PY_INTERP_DEBUG={{ py_interp_debug }}
+    - PY_GIL_DISABLED={{ py_gil_disabled }}
+    - LLVM_VERSION={{ llvm_version_win }}  # [win]
+{% if 'conda-forge' in channel_targets %}
+    - CONDA_FORGE=yes
+{% else %}
+    - CONDA_FORGE=no
+{% endif %}
 
 requirements:
   build:
@@ -106,11 +118,45 @@ requirements:
 {% else %}
     - msys2-gcc-libs        # [win]
 {% endif %}
+    - {{ stdlib('c') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - sed                           # [unix]
+    - make                          # [not win]
+    - libtool                       # [unix]
+    - pkg-config                    # [not win]
+    - llvm-tools                    # [osx]
+    - ld_impl_{{ target_platform }} # [linux]
+    - ripgrep                       # [not win]
+{% if 'conda-forge' in channel_targets %}
+    - binutils_impl_{{ target_platform }}  # [linux]
+{% endif %}
+    - clang-19         # [not win]
+    - llvm-tools-19    # [not win]
+    - clang {{ llvm_version_win }}.*       # [win]
+    - llvm-tools {{ llvm_version_win }}.*  # [win]
+  host:
+    - bzip2 {{ bzip2 }}
+    - sqlite {{ sqlite }}
+    - xz {{ xz }}
+    - zlib {{ zlib }}
+    - openssl {{ openssl }}
+    - readline {{ readline }}                # [not win]
+    - tk {{ tk }}
+    - xorg-libx11 {{ xorg_libx11 }}          # [linux]
+    - xorg-xorgproto {{ xorg_xorgproto }}    # [linux]
+    - ncurses {{ ncurses }}                  # [unix]
+    - libffi {{ libffi }}
+    - ld_impl_{{ target_platform }} >=2.35.1 # [linux]
+    - libuuid {{ libuuid }}                  # [linux]
+    - libmpdec-devel {{ libmpdec }}
+    - expat {{ expat }}
+    - zstd {{ zstd }}
 
 outputs:
   - name: python
-    script: build_base.sh   # [unix]
-    script: build_base.bat  # [win]
+    script: install_base.sh   # [unix]
+    script: install_base.bat  # [win]
     build:
       number: {{ build_number }}
       activate_in_script: true
@@ -189,7 +235,7 @@ outputs:
         # configure script looks for llvm-ar for lto
         - llvm-tools                    # [osx]
         - ld_impl_{{ target_platform }} # [linux]
-        # called in build_base.sh
+        # called in build.sh
         - ripgrep                       # [not win]
 {% if 'conda-forge' in channel_targets %}
         - binutils_impl_{{ target_platform }}  # [linux]
@@ -201,6 +247,7 @@ outputs:
         - clang {{ llvm_version_win }}.*       # [win]
         - llvm-tools {{ llvm_version_win }}.*  # [win]
       host:
+        - {{ pin_subpackage('libpython', exact=True) }}
         - bzip2 {{ bzip2 }}
         - sqlite {{ sqlite }}
         - xz {{ xz }}
@@ -222,6 +269,7 @@ outputs:
         - expat {{ expat }}
         - zstd {{ zstd }}
       run:
+        - {{ pin_subpackage('libpython', exact=True) }}
         - python_abi * *_{{ abi_tag }}
         - ld_impl_{{ target_platform }} >=2.35.1  # [linux]
         - tzdata
@@ -309,10 +357,30 @@ outputs:
         # Test for segfault on osx-64 with libffi=3.4, see https://bugs.python.org/issue44556
         - python -c "from ctypes import CFUNCTYPE; CFUNCTYPE(None)(id)"
 
+  - name: libpython
+    script: install_shared.sh  # [unix]
+    build:
+      number: {{ build_number }}
+      activate_in_script: true
+      ignore_run_exports:
+        - python_abi
+      string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
+      script_env:
+        - PY_GIL_DISABLED={{ py_gil_disabled }}
+    requirements:
+      build:
+        - {{ stdlib('c') }}
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+    test:
+      commands:
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}${SHLIB_EXT}  # [unix and py_interp_debug == "no"]
+        - test -f ${PREFIX}/lib/libpython${PKG_VERSION%.*}{{ abi_suffix }}d${SHLIB_EXT}  # [unix and py_interp_debug == "yes"]
+
 {% if bootstrap != "true" %}
   - name: libpython-static
-    script: build_static.sh  # [unix]
-    script: build_static.bat  # [win]
+    script: install_static.sh  # [unix]
+    script: install_static.bat  # [win]
     build:
       number: {{ build_number }}
       activate_in_script: true
