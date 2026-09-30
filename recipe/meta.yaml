@@ -331,13 +331,13 @@ outputs:
         - {{ compiler('c') }}
         - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
-        - {{ pin_subpackage('python', exact=True) }}
       host: []
       run: []
     test:
       files:
         - tests/prefix-replacement/*
       requires:
+        - {{ pin_subpackage('python', exact=True) }}
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
