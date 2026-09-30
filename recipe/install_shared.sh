@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+cd ${SRC_DIR}
+
 _buildd_shared=build-shared
 if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   DBG=d
