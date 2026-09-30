@@ -168,7 +168,9 @@ outputs:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_GIL_DISABLED={{ py_gil_disabled }}
         - LLVM_VERSION={{ llvm_version_win }}  # [win]
-
+      missing_dso_whitelist:   # [win]
+        # I have no idea why this is not in C:\Windows\System32\downlevel
+        - '**/api-ms-win-core-path-l1-1-0.dll'  # [win]
     requirements:
       build:
         - {{ stdlib('c') }}
@@ -287,7 +289,10 @@ outputs:
       number: {{ build_number }}
       activate_in_script: true
       ignore_run_exports:
-        - python_abi
+        - python_abi      
+      ignore_run_exports_from:   # [unix]
+        # C++ only installed so CXX is defined for distutils/sysconfig.
+        - {{ compiler('cxx') }}  # [unix]
       string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}{{ linkage_nature }}{{ debug }}_{{ abi_tag }}
       script_env:
         - PY_GIL_DISABLED={{ py_gil_disabled }}
