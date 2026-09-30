@@ -148,6 +148,10 @@ outputs:
       # Copy rather than link.
       no_link:
         - DLLs/_ctypes.pyd       # [win]
+      # libpython was part of python; keep the explicit run pin even when
+      # the interpreter does not link to its shared library.
+      ignore_run_exports:
+        - libpython
       ignore_run_exports_from:   # [unix]
         # C++ only installed so CXX is defined for distutils/sysconfig.
         - {{ compiler('cxx') }}  # [unix]
