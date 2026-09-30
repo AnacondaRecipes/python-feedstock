@@ -331,10 +331,9 @@ outputs:
         - {{ compiler('c') }}
         - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
-      host:
         - {{ pin_subpackage('python', exact=True) }}
-      run:
-        - {{ pin_subpackage('python', exact=True) }}
+      host: []
+      run: []
     test:
       files:
         - tests/prefix-replacement/*
@@ -419,8 +418,9 @@ outputs:
       skip: True
 {% endif %}
     requirements:
-      - python {{ version }}{{ dev }}.*
-      - python_abi * *_{{ abi_tag }}
+      run:
+        - python {{ version }}{{ dev }}.*
+        - python_abi * *_{{ abi_tag }}
 
   - name: python-gil
     build:
@@ -429,8 +429,9 @@ outputs:
       skip: True
 {% endif %}
     requirements:
-      - python {{ version }}{{ dev }}.*
-      - python_abi * *_{{ abi_tag }}
+      run:
+        - python {{ version }}{{ dev }}.*
+        - python_abi * *_{{ abi_tag }}
 
   - name: python-jit
     script: install_jit_activation.sh   # [not win]
@@ -442,9 +443,10 @@ outputs:
       skip: true  # [py<313]
       noarch: generic
     requirements:
-      - python {{ version }}{{ dev }}
-      - __unix   # [unix]
-      - __win    # [win]
+      run:
+        - python {{ version }}{{ dev }}
+        - __unix   # [unix]
+        - __win    # [win]
     test:
       files:
         - run_test_jit.py
