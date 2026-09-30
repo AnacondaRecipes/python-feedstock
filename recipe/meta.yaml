@@ -92,8 +92,6 @@ source:
 
 build:
   number: {{ build_number }}
-  script: build.sh  # [unix]
-  script: bld.bat   # [win]
   script_env:
     - PY_INTERP_LINKAGE_NATURE={{ linkage_nature_env }}
     - PY_INTERP_DEBUG={{ py_interp_debug }}
