@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -exo pipefail
 
 cd ${SRC_DIR}
 
@@ -336,28 +336,31 @@ pushd ${_buildd_static}
                        ${_DISABLE_SHARED} "${_PROFILE_TASK[@]}"
 popd
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 >make-static.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_static} \
-       EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-       ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
-fi
+make -j${CPU_COUNT} -C ${_buildd_static} \
+      EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
+      ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
 if rg "Failed to build these modules" make-static.log; then
   echo "(static) :: Failed to build some modules, check the log"
   exit 1
 fi
 
-if [[ "${CI}" == "travis" ]]; then
-  # Travis has issues with long logs
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 >make-shared.log
-else
-  make -j${CPU_COUNT} -C ${_buildd_shared} \
-          EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
+# The macOS dylib's install name points at PREFIX/lib, but it is built in
+# build-shared first. Make it available at that path while PGO runs Python.
+if [[ ${target_platform} == osx-* ]]; then
+  shared_lib_link=${PREFIX}/lib/libpython${VERABI}.dylib
+  if [[ -e ${shared_lib_link} || -L ${shared_lib_link} ]]; then
+    echo "Refusing to replace existing ${shared_lib_link}"
+    exit 1
+  fi
+  ln -s "${SRC_DIR}/${_buildd_shared}/libpython${VERABI}.dylib" "${shared_lib_link}"
+  trap 'rm -f "${shared_lib_link}"' EXIT
+fi
+
+make -j${CPU_COUNT} -C ${_buildd_shared} \
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" 2>&1 | tee make-shared.log
+if [[ ${target_platform} == osx-* ]]; then
+  rm -f "${shared_lib_link}"
+  trap - EXIT
 fi
 if rg "Failed to build these modules" make-shared.log; then
   echo "(shared) :: Failed to build some modules, check the log"
@@ -386,42 +389,9 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Install the shared library (for people who embed Python only, e.g. GDB).
-# Linking module extensions to this on Linux is redundant (but harmless).
-# Linking module extensions to this on Darwin is harmful (multiply defined symbols).
-shopt -s extglob
-cp -pf ${_buildd_shared}/libpython*${SHLIB_EXT}!(.lto) ${PREFIX}/lib/
-shopt -u extglob
-if [[ ${target_platform} =~ .*linux.* ]]; then
-  ln -sf ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}.1.0 ${PREFIX}/lib/libpython${VERABI}${SHLIB_EXT}
-fi
-
-# create libpython3.dylib; linux gets libpython3.so from upstream's Makefile,
-# macOS has no upstream rule — build the stable-ABI re-export dylib ourselves
-# (same as CF install_shared.sh). Release only, matching linux.
-if [[ "$target_platform" == osx-* && ${PY_INTERP_DEBUG} == no ]]; then
-  # need to filter out windows-specific symbols & PyOS_CheckStack from
-  # https://github.com/python/cpython/blob/main/Doc/data/stable_abi.dat
-  awk -F',' '
-    ($1 == "func" || $1 == "data") &&
-    $4 != "on Windows" &&
-    $2 != "PyOS_CheckStack" {
-      print "_" $2
-    }
-  ' ${SRC_DIR}/Doc/data/stable_abi.dat > ${_buildd_shared}/stable_abi_exports.txt
-
-  $CC -dynamiclib \
-   -install_name @rpath/libpython3.dylib \
-   -compatibility_version 3.0 -current_version ${VER}.0 \
-   -Wl,-reexport_library,${PREFIX}/lib/libpython${VERABI}.dylib \
-   -Wl,-exported_symbols_list,${_buildd_shared}/stable_abi_exports.txt \
-   -o ${PREFIX}/lib/libpython3.dylib
-fi
-
-# AR: keep sysconfig from the *static* build (same as CF install_base.sh).
-# A shared-build sysconfig made python3-config --embed emit -lpython3.15, so
-# libpython-static tests linked the dylib and dyld aborted on osx-arm64.
-SYSCONFIG=$(find ${_buildd_static}/$(cat ${_buildd_static}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
+# Use sysconfigdata from the shared build, as we want packages to prefer
+# linking against the shared library. Issue #565.
+SYSCONFIG=$(find ${_buildd_shared}/$(cat ${_buildd_shared}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
     > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})

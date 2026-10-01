@@ -1,22 +1,24 @@
 #!/bin/bash
 set -ex
 
-cd ${SRC_DIR}
-
 _buildd_static=build-static
 _buildd_shared=build-shared
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   DBG=d
 else
   DBG=
 fi
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
+  # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
   THREAD=
 fi
+
 VER=${PKG_VERSION%.*}
-VERABI=${VER}${DBG}${THREAD}
+ABIFLAGS=${DBG}${THREAD}
+VERABI=${VER}${THREAD}${DBG}
+VERABI_NO_DBG=${VER}${THREAD}
 
 case "$target_platform" in
   linux-64)

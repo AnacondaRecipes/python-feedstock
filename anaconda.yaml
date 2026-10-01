@@ -7,6 +7,7 @@ upstream_sources:
       from_pattern: ^v(\d+\.\d+\.\d+)$
       to_pattern: \1
     packages:
+      - libpython
       - libpython-static
       - python
       - python-freethreading
@@ -16,6 +17,7 @@ upstream_sources:
       url: https://www.python.org/ftp/python/
       regex: href="(3\.14\.\d+)/"
     packages:
+      - libpython
       - libpython-static
       - python
       - python-freethreading
@@ -27,6 +29,7 @@ upstream_sources:
       url: https://www.python.org/ftp/python/
       regex: href="(3\.13\.\d+)/"
     packages:
+      - libpython
       - libpython-static
       - python
       - python-freethreading
@@ -38,6 +41,7 @@ upstream_sources:
       url: https://www.python.org/ftp/python/
       regex: href="(3\.12\.\d+)/"
     packages:
+      - libpython
       - libpython-static
       - python
     feedstock_branch: 'main-3.12'
@@ -47,6 +51,7 @@ upstream_sources:
       url: https://www.python.org/ftp/python/
       regex: href="(3\.11\.\d+)/"
     packages:
+      - libpython
       - libpython-static
       - python
     feedstock_branch: 'main-3.11'
