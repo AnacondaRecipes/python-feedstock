@@ -4,15 +4,7 @@ python_impl:
   - cpython
 libffi:  # [win]
   - 3.4  # [win] 
-# Aggregate zips python/numpy/is_freethreading/is_python_min. conda-build requires
-# all four keys at the same length, else this recipe is not a subspace of the
-# aggregate python 3.10-3.14 zip and PY_VER falls back to the build interpreter.
-# Values below match the aggregate's python 3.10 row.
 numpy:
   - 2.1
-is_freethreading:
-  - false
-is_python_min:
-  - true
 MACOSX_SDK_VERSION:            # [osx and x86_64]
   - 11.0                       # [osx and x86_64]
