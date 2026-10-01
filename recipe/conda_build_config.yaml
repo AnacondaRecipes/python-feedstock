@@ -5,6 +5,10 @@ python_impl:
 libffi:  # [win]
   - 3.4  # [win] 
 numpy:
-  - 1.16
+  - 2.1
+is_freethreading:
+  - false
+is_python_min:
+  - true
 MACOSX_SDK_VERSION:            # [osx and x86_64]
   - 11.0                       # [osx and x86_64]
