@@ -4,17 +4,17 @@ Date: Wed, 29 Mar 2023 23:07:10 -0500
 Subject: [PATCH 18/22] Unvendor expat
 
 ---
- PCbuild/_elementtree.vcxproj         | 26 ++----------
- PCbuild/_elementtree.vcxproj.filters | 61 +---------------------------
- PCbuild/pyexpat.vcxproj              | 14 ++-----
- PCbuild/pyexpat.vcxproj.filters      | 25 +-----------
- 4 files changed, 10 insertions(+), 116 deletions(-)
+ PCbuild/_elementtree.vcxproj         | 27 +++------------
+ PCbuild/_elementtree.vcxproj.filters | 64 +-----------------------------------
+ PCbuild/pyexpat.vcxproj              | 15 +++------
+ PCbuild/pyexpat.vcxproj.filters      | 28 +---------------
+ 4 files changed, 10 insertions(+), 124 deletions(-)
 
 diff --git a/PCbuild/_elementtree.vcxproj b/PCbuild/_elementtree.vcxproj
-index fb1589557da..f47bcd8e4e6 100644
+index b28a32c..045b7c6 100644
 --- a/PCbuild/_elementtree.vcxproj
 +++ b/PCbuild/_elementtree.vcxproj
-@@ -93,37 +93,19 @@
+@@ -93,38 +93,19 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -37,6 +37,7 @@ index fb1589557da..f47bcd8e4e6 100644
 -    <ClInclude Include="..\Modules\expat\expat_config.h" />
 -    <ClInclude Include="..\Modules\expat\expat_external.h" />
 -    <ClInclude Include="..\Modules\expat\fallthrough.h" />
+-    <ClInclude Include="..\Modules\expat\hash_table.h" />
 -    <ClInclude Include="..\Modules\expat\iasciitab.h" />
 -    <ClInclude Include="..\Modules\expat\internal.h" />
 -    <ClInclude Include="..\Modules\expat\latin1tab.h" />
@@ -57,10 +58,10 @@ index fb1589557da..f47bcd8e4e6 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/_elementtree.vcxproj.filters b/PCbuild/_elementtree.vcxproj.filters
-index f6b55d8ff82..7cc8e9a3b9b 100644
+index 36f023c..498c7e6 100644
 --- a/PCbuild/_elementtree.vcxproj.filters
 +++ b/PCbuild/_elementtree.vcxproj.filters
-@@ -17,73 +17,14 @@
+@@ -17,76 +17,14 @@
        <UniqueIdentifier>{f99990ba-cd06-40cc-8f28-d2d424ec13be}</UniqueIdentifier>
      </Filter>
    </ItemGroup>
@@ -81,6 +82,9 @@ index f6b55d8ff82..7cc8e9a3b9b 100644
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\fallthrough.h">
+-      <Filter>Header Files\expat</Filter>
+-    </ClInclude>
+-    <ClInclude Include="..\Modules\expat\hash_table.h">
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\iasciitab.h">
@@ -137,10 +141,10 @@ index f6b55d8ff82..7cc8e9a3b9b 100644
 \ No newline at end of file
 +</Project>
 diff --git a/PCbuild/pyexpat.vcxproj b/PCbuild/pyexpat.vcxproj
-index 833ab5e9f7e..ec5d4b64b3c 100644
+index f8b5731..22f36ef 100644
 --- a/PCbuild/pyexpat.vcxproj
 +++ b/PCbuild/pyexpat.vcxproj
-@@ -90,25 +90,19 @@
+@@ -90,26 +90,19 @@
    <PropertyGroup Label="UserMacros" />
    <ItemDefinitionGroup>
      <ClCompile>
@@ -158,6 +162,7 @@ index 833ab5e9f7e..ec5d4b64b3c 100644
    </ItemDefinitionGroup>
 -  <ItemGroup>
 -    <ClInclude Include="..\Modules\expat\fallthrough.h" />
+-    <ClInclude Include="..\Modules\expat\hash_table.h" />
 -    <ClInclude Include="..\Modules\expat\memory_sanitizer.h" />
 -    <ClInclude Include="..\Modules\expat\xmlrole.h" />
 -    <ClInclude Include="..\Modules\expat\xmltok.h" />
@@ -171,15 +176,18 @@ index 833ab5e9f7e..ec5d4b64b3c 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/pyexpat.vcxproj.filters b/PCbuild/pyexpat.vcxproj.filters
-index 230531033fc..41c73b434b9 100644
+index e3a4a64..9bd83cb 100644
 --- a/PCbuild/pyexpat.vcxproj.filters
 +++ b/PCbuild/pyexpat.vcxproj.filters
-@@ -11,37 +11,14 @@
+@@ -11,40 +11,14 @@
        <UniqueIdentifier>{f1dbbdb5-41e5-4a88-bf8e-13da010c0ce4}</UniqueIdentifier>
      </Filter>
    </ItemGroup>
 -  <ItemGroup>
 -    <ClInclude Include="..\Modules\expat\fallthrough.h">
+-      <Filter>Header Files</Filter>
+-    </ClInclude>
+-    <ClInclude Include="..\Modules\expat\hash_table.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\memory_sanitizer.h">
