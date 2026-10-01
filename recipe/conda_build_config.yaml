@@ -5,7 +5,11 @@ python_impl:
 libffi:  # [win]
   - 3.4  # [win] 
 numpy:
-  - 1.21
+  - 2.3
+is_freethreading:
+  - false
+is_python_min:
+  - false
 MACOSX_SDK_VERSION:  # [osx and x86_64]
   - 10.14            # [osx and x86_64]
 CONDA_BUILD_SYSROOT:  # [osx and x86_64]
