@@ -3,7 +3,7 @@ python:
 python_impl:
   - cpython
 numpy:
-  - 1.26
+  - 2.3
 gil_type:
   - normal
   # Will be enabled as part of https://anaconda.atlassian.net/browse/PKG-5855
