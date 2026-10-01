@@ -3,7 +3,11 @@ python:
 python_impl:
   - cpython
 numpy:
-  - 1.26
+  - 2.3
+is_freethreading:
+  - false
+is_python_min:
+  - false
 MACOSX_SDK_VERSION:  # [osx and x86_64]
   - 10.14            # [osx and x86_64]
 CONDA_BUILD_SYSROOT:  # [osx and x86_64]
