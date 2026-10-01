@@ -1,7 +1,9 @@
-From 0cf3caf6b1f7d4e7e0e0c8b6a0d9f3b6c9d9b0a1 Mon Sep 17 00:00:00 2001
-From: Isuru Fernando <isuruf@gmail.com>
-Date: Wed, 29 Mar 2023 23:07:10 -0500
-Subject: [PATCH 05/23] Unvendor openssl
+From 6f72185c07381690b0a69aa8c288d5c1dfc6497d Mon Sep 17 00:00:00 2001
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Date: Sat, 24 Nov 2018 20:38:02 -0600
+Subject: [PATCH 05/22] Unvendor openssl
+
+Co-authored-by: Isuru Fernando <isuruf@gmail.com>
 
 ---
  PCbuild/openssl.props   | 14 ++------------

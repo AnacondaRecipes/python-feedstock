@@ -1,7 +1,7 @@
-From 8fae58ad79e23d6b3fe62ab58f06cce1351aa3e6 Mon Sep 17 00:00:00 2001
+From 75803cc325238777a52d05eddddce26132a14a63 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 29 Mar 2023 23:07:10 -0500
-Subject: [PATCH 18/23] Unvendor expat
+Subject: [PATCH 18/22] Unvendor expat
 
 ---
  PCbuild/_elementtree.vcxproj         | 27 +++------------
