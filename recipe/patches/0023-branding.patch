@@ -1,7 +1,7 @@
-From d44d5b3ccc9c8c5edb2099fa02df2f5b1e111b8c Mon Sep 17 00:00:00 2001
+From f49529f596ac97a5264f3deede546f10eb7e9d1f Mon Sep 17 00:00:00 2001
 From: Charles Bousseau <cbousseau@anaconda.com>
 Date: Wed, 14 Jun 2023 22:52:16 -0400
-Subject: [PATCH 22/25] branding
+Subject: [PATCH] branding
 
 ---
  Lib/platform.py     | 2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH 22/25] branding
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/platform.py b/Lib/platform.py
-index 36489d4fdd..56c79ffe54 100644
+index 3727884..6fcb183 100644
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
-@@ -1139,7 +1139,7 @@ def _sys_version(sys_version=None):
+@@ -1144,7 +1144,7 @@ def _sys_version(sys_version=None):
      else:
          # CPython
          cpython_sys_version_parser = re.compile(
@@ -22,7 +22,7 @@ index 36489d4fdd..56c79ffe54 100644
              r'\(#?([^,]+)'  # "(#buildno"
              r'(?:,\s*([\w ]*)'  # ", builddate"
 diff --git a/Python/getversion.c b/Python/getversion.c
-index 8d8bc6ea70..eee07cd5c8 100644
+index 8d8bc6e..eee07cd 100644
 --- a/Python/getversion.c
 +++ b/Python/getversion.c
 @@ -6,7 +6,7 @@
@@ -46,6 +46,3 @@ index 8d8bc6ea70..eee07cd5c8 100644
  #endif
      PyOS_snprintf(version, sizeof(version), buildinfo_format,
                    PY_VERSION, Py_GetBuildInfo(), Py_GetCompiler());
--- 
-2.51.0
-

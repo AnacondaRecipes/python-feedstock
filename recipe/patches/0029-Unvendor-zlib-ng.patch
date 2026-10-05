@@ -10,7 +10,6 @@ Subject: [PATCH 23/25] Unvendor zlib-ng
  3 files changed, 2 insertions(+), 352 deletions(-)
 
 diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
-index 9d077bbd3f..bed07aefa7 100644
 --- a/PCbuild/pcbuild.proj
 +++ b/PCbuild/pcbuild.proj
 @@ -48,7 +48,7 @@
@@ -23,7 +22,6 @@ index 9d077bbd3f..bed07aefa7 100644
      <!--
      Parallel build is explicitly disabled for this project because it
 diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
-index ffe8e70f2d..e3c9b16f6e 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
 @@ -73,9 +73,6 @@
@@ -45,7 +43,7 @@ index ffe8e70f2d..e3c9b16f6e 100644
        <PreprocessorDefinitions>%(PreprocessorDefinitions);ZLIB_COMPAT;WITH_GZFILEOP;NO_FSEEKO;HAVE_BUILTIN_ASSUME_ALIGNED;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Platform) == 'Win32' or $(Platform) == 'x64'">%(PreprocessorDefinitions);X86_FEATURES;X86_HAVE_XSAVE_INTRIN;X86_SSE2;X86_SSSE3;X86_SSE42;X86_PCLMULQDQ_CRC;X86_AVX2;X86_AVX512;X86_AVX512VNNI;X86_VPCLMULQDQ_CRC</PreprocessorDefinitions>
        <PreprocessorDefinitions Condition="$(Configuration) == 'Debug'">%(PreprocessorDefinitions);ZLIB_DEBUG</PreprocessorDefinitions>
-@@ -102,134 +99,15 @@
+@@ -106,134 +103,15 @@
      </ClCompile>
    </ItemDefinitionGroup>
    <ItemGroup>
@@ -181,10 +179,9 @@ index ffe8e70f2d..e3c9b16f6e 100644
 -          DependsOnTargets="_EnsureZlibH;_EnsureZlibNgH" />
  </Project>
 diff --git a/PCbuild/zlib-ng.vcxproj.filters b/PCbuild/zlib-ng.vcxproj.filters
-index addbd45f88..0280369b00 100644
 --- a/PCbuild/zlib-ng.vcxproj.filters
 +++ b/PCbuild/zlib-ng.vcxproj.filters
-@@ -1,242 +1,14 @@
+@@ -1,240 +1,12 @@
  ﻿<?xml version="1.0" encoding="utf-8"?>
  <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
    <ItemGroup>
@@ -419,14 +416,9 @@ index addbd45f88..0280369b00 100644
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
      <ClInclude Include="..\PC\zlib.h">
-       <Filter>Header Files</Filter>
-     </ClInclude>
--    <ClInclude Include="$(zlibNgDir)\zutil.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
+-    <ClInclude Include="$(zlibNgDir)\zutil.h">
+       <Filter>Header Files</Filter>
+     </ClInclude>
    </ItemGroup>
-   <ItemGroup>
-     <Filter Include="Source Files">
--- 
-2.51.0
-

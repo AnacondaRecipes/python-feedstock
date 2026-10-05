@@ -13,13 +13,8 @@ from python/cpython#148912 (gh-148690, Petr Viktorin).
 
 Co-authored-by: Petr Viktorin <encukou@gmail.com>
 ---
- PCbuild/xxlimited.vcxproj      | 4 ++--
- PCbuild/xxlimited_35.vcxproj   | 7 ++++---
- PCbuild/xxlimited_3_13.vcxproj | 6 +++++-
- 3 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/PCbuild/xxlimited.vcxproj b/PCbuild/xxlimited.vcxproj
-index cc906a14cf..75f3873983 100644
 --- a/PCbuild/xxlimited.vcxproj
 +++ b/PCbuild/xxlimited.vcxproj
 @@ -107,10 +107,10 @@
@@ -36,7 +31,6 @@ index cc906a14cf..75f3873983 100644
      </ProjectReference>
    </ItemGroup>
 diff --git a/PCbuild/xxlimited_35.vcxproj b/PCbuild/xxlimited_35.vcxproj
-index 4f8a3b37e3..37deb8efb5 100644
 --- a/PCbuild/xxlimited_35.vcxproj
 +++ b/PCbuild/xxlimited_35.vcxproj
 @@ -107,11 +107,12 @@
@@ -56,24 +50,19 @@ index 4f8a3b37e3..37deb8efb5 100644
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 diff --git a/PCbuild/xxlimited_3_13.vcxproj b/PCbuild/xxlimited_3_13.vcxproj
-index 7a9760fd43..ec31d3e1b3 100644
 --- a/PCbuild/xxlimited_3_13.vcxproj
 +++ b/PCbuild/xxlimited_3_13.vcxproj
-@@ -101,9 +101,13 @@
+@@ -107,8 +107,12 @@
      <ClCompile Include="..\Modules\xxlimited_3_13.c" />
    </ItemGroup>
    <ItemGroup>
 -    <ProjectReference Include="python3dll.vcxproj">
 +    <ProjectReference Include="python3dll.vcxproj" Condition="'$(DisableGil)' != 'true'">
        <Project>{885d4898-d08d-4091-9c40-c700cfe3fc5a}</Project>
-     </ProjectReference>
++    </ProjectReference>
 +    <ProjectReference Include="pythoncore.vcxproj" Condition="'$(DisableGil)' == 'true'">
 +      <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
 +      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-+    </ProjectReference>
+     </ProjectReference>
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-   <ImportGroup Label="ExtensionTargets">
--- 
-2.51.0
-
