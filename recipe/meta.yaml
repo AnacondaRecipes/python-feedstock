@@ -313,6 +313,7 @@ outputs:
   - name: libpython
     script: install_shared.sh   # [unix]
     build:
+      skip: true  # [win]
       number: {{ build_number }}
       activate_in_script: true
       ignore_run_exports:
@@ -331,14 +332,14 @@ outputs:
         - {{ compiler('c') }}
         - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
-      host:
         - {{ pin_subpackage('python', exact=True) }}
-      run:
-        - {{ pin_subpackage('python', exact=True) }}
+      host: []
+      run: []
     test:
       files:
         - tests/prefix-replacement/*
       requires:
+        - {{ pin_subpackage('python', exact=True) }}
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}

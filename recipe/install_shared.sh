@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+cd ${SRC_DIR}
+
 _buildd_shared=build-shared
 if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   DBG=d
@@ -23,6 +25,7 @@ VERABI_NO_DBG=${VER}${THREAD}
 # Linking module extensions to this on Linux is redundant (but harmless).
 # Linking module extensions to this on Darwin is harmful (multiply defined symbols).
 shopt -s extglob
+mkdir -p ${PREFIX}/lib
 cp -pf ${_buildd_shared}/libpython*${SHLIB_EXT}!(.lto) ${PREFIX}/lib/
 shopt -u extglob
 if [[ ${target_platform} =~ .*linux.* ]]; then
