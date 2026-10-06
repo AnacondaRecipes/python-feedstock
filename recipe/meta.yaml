@@ -1,5 +1,5 @@
 {% set version = "3.12.15" %}
-{% set build_number = "0" %}
+{% set build_number = "1" %}
 
 {% set dev = "" %}
 {% set dev_ = "" %}
@@ -91,9 +91,7 @@ requirements:
 {% if from_source_control == 'yes' %}
     - git
 {% else %}
-    - patch  # [not win]
-    - m2-patch  # [win]
-    - m2-gcc-libs  # [win]
+    - msys2-gcc-libs  # [win]
 {% endif %}
 
 outputs:
