@@ -35,24 +35,16 @@ _buildd_shared=build-shared
 _ENABLE_SHARED=--enable-shared
 # We *still* build a shared lib here for non-static embedded use cases
 _DISABLE_SHARED=--disable-shared
-# Hack to allow easily comparing static vs shared interpreter performance
-# .. hack because we just build it shared in both the build-static and
-# build-shared directories.
-# Yes this hack is a bit confusing, sorry about that.
-if [[ ${PY_INTERP_LINKAGE_NATURE} == shared ]]; then
-  _DISABLE_SHARED=--enable-shared
-  _ENABLE_SHARED=--enable-shared
-fi
 
 # For debugging builds, set this to no to disable profile-guided optimization
-if [[ ${DEBUG_C} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes || ${DEBUG_C} == yes ]]; then
   _OPTIMIZED=no
 else
   _OPTIMIZED=yes
 fi
 
 declare -a _dbg_opts
-if [[ ${DEBUG_PY} == yes ]]; then
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
   # This Python will not be usable with non-debug Python modules.
   _dbg_opts+=(--with-pydebug)
   DBG=d
@@ -60,15 +52,16 @@ else
   DBG=
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
   # This Python will not be usable with non-free threading Python modules.
   THREAD=t
 else
   THREAD=
 fi
 
-ABIFLAGS=${DBG}
+ABIFLAGS=${DBG}${THREAD}
 VERABI=${VER}${THREAD}${DBG}
+VERABI_NO_DBG=${VER}${THREAD}
 
 # Make sure the "python" value in conda_build_config.yaml is up to date.
 test "${PY_VER}" = "${VER}"
@@ -105,6 +98,12 @@ if [[ ${_OPTIMIZED} = yes ]]; then
   CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O3/g")
   CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O3/g")
   CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O3/g")
+fi
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  CPPFLAGS=$(echo "${CPPFLAGS}" | sed "s/-O2/-O0/g")
+  CFLAGS=$(echo "${CFLAGS}" | sed "s/-O2/-O0/g")
+  CXXFLAGS=$(echo "${CXXFLAGS}" | sed "s/-O2/-O0/g")
 fi
 
 if [[ "$target_platform" == linux-* ]]; then
@@ -253,14 +252,10 @@ _common_configure_args+=(--with-tzpath=${PREFIX}/share/zoneinfo)
 _common_configure_args+=(--with-computed-gotos)
 _common_configure_args+=(--with-system-expat)
 _common_configure_args+=(--enable-loadable-sqlite-extensions)
-# TODO: Remove this comment in PR#256
-# Dropped dead tcltk configure flags — log-confirmed unused in 3.15.0rc2:
-# configure: WARNING: unrecognized options: --with-tcltk-includes, --with-tcltk-libs
-# _tkinter already comes from pkg-config.
 _common_configure_args+=(--with-platlibdir=lib)
 _common_configure_args+=(--with-system-libmpdec=yes)
 
-if [[ "${DEBUG_PY}" == "yes" || "${target_platform}" != *"64" || ${PY_GIL_DISABLED} == yes ]]; then
+if [[ "${PY_INTERP_DEBUG}" == "yes" || "${target_platform}" != *"64" || ${PY_FREETHREADING} == yes ]]; then
  _common_configure_args+=(--enable-experimental-jit=no)
 else
  _common_configure_args+=(--enable-experimental-jit=yes-off)
@@ -271,7 +266,7 @@ if [[ "${target_platform}" == osx-* ]]; then
     _common_configure_args+=(--with-tail-call-interp)
 fi
 
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     _common_configure_args+=(--disable-gil)
 fi
 
@@ -337,8 +332,8 @@ pushd ${_buildd_static}
 popd
 
 make -j${CPU_COUNT} -C ${_buildd_static} \
-      EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-      ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
+        EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
+        ${_MAKE_TARGET} "${_PROFILE_TASK[@]}" 2>&1 | tee make-static.log
 if rg "Failed to build these modules" make-static.log; then
   echo "(static) :: Failed to build some modules, check the log"
   exit 1
@@ -370,7 +365,7 @@ fi
 # build a static library with PIC objects and without LTO/PGO
 make -j${CPU_COUNT} -C ${_buildd_shared} \
         EXTRA_CFLAGS="${EXTRA_CFLAGS}" \
-        LIBRARY=libpython${VERABI}-pic.a libpython${VERABI}-pic.a
+        LIBRARY=libpython${VERABI_NO_DBG}-pic.a libpython${VERABI_NO_DBG}-pic.a
 
 make -C ${_buildd_static} install
 
@@ -389,13 +384,14 @@ if [[ ${_OPTIMIZED} == yes ]]; then
     _FLAGS_REPLACE+=("")
   done
 fi
-# Use sysconfigdata from the shared build, as we want packages to prefer
-# linking against the shared library. Issue #565.
-SYSCONFIG=$(find ${_buildd_shared}/$(cat ${_buildd_shared}/pybuilddir.txt) -name "_sysconfigdata*.py" -print0)
+BUILD_DIR=$(< ${_buildd_shared}/pybuilddir.txt)
+SYSCONFIG=$(find ${_buildd_shared}/${BUILD_DIR} -name "_sysconfigdata*.py" -print0)
 cat ${SYSCONFIG} | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
-    > ${PREFIX}/lib/python${VERABI}/$(basename ${SYSCONFIG})
-MAKEFILE=$(find ${PREFIX}/lib/python${VERABI}/ -path "*config-*/Makefile" -print0)
+    > ${PREFIX}/lib/python${VERABI_NO_DBG}/$(basename ${SYSCONFIG})
+BUILD_DETAILS=${_buildd_shared}/${BUILD_DIR}/build-details.json
+cp ${BUILD_DETAILS} ${PREFIX}/lib/python${VERABI_NO_DBG}/
+MAKEFILE=$(find ${PREFIX}/lib/python${VERABI_NO_DBG}/ -path "*config-*/Makefile" -print0)
 cp ${MAKEFILE} /tmp/Makefile-$$
 cat /tmp/Makefile-$$ | ${SYS_PYTHON} "${RECIPE_DIR}"/replace-word-pairs.py \
   "${_FLAGS_REPLACE[@]}"  \
@@ -417,7 +413,7 @@ ln -s ${PREFIX}/bin/pydoc${VER} ${PREFIX}/bin/pydoc
 # Remove test data to save space
 # Though keep `support` as some things use that.
 # TODO :: Make a subpackage for this once we implement multi-level testing.
-pushd ${PREFIX}/lib/python${VERABI}
+pushd ${PREFIX}/lib/python${VERABI_NO_DBG}
   mkdir test_keep
   mv test/__init__.py test/support test/test_support* test/test_script_helper* test_keep/
   rm -rf test */test
@@ -430,7 +426,7 @@ pushd ${PREFIX}
     chmod +w lib/libpython${VERABI}.a
     ${STRIP} -S lib/libpython${VERABI}.a
   fi
-  CONFIG_LIBPYTHON=$(find lib/python${VERABI}/config-${VERABI}* -name "libpython${VERABI}.a")
+  CONFIG_LIBPYTHON=$(find lib/python${VERABI_NO_DBG}/config-${VERABI}* -name "libpython${VERABI}.a")
   if [[ -f lib/libpython${VERABI}.a ]] && [[ -f ${CONFIG_LIBPYTHON} ]]; then
     chmod +w ${CONFIG_LIBPYTHON}
     rm ${CONFIG_LIBPYTHON}
@@ -440,7 +436,7 @@ popd
 # Copy sysconfig that gets recorded to a non-default name
 # using the new compilers with python will require setting _PYTHON_SYSCONFIGDATA_NAME
 # to the name of this file (minus the .py extension)
-pushd "${PREFIX}"/lib/python${VERABI}
+pushd "${PREFIX}"/lib/python${VERABI_NO_DBG}
   # On Python 3.5 _sysconfigdata.py was getting copied in here and compiled for some reason.
   # This breaks our attempt to find the right one as recorded_name.
   find lib-dynload -name "_sysconfigdata*.py*" -exec rm {} \;
@@ -505,6 +501,13 @@ fi
 
 python -c "import compileall,os;compileall.compile_dir(os.environ['PREFIX'])"
 rm ${PREFIX}/lib/libpython${VERABI}.a
+
+if [[ ${PY_INTERP_DEBUG} == yes ]]; then
+  rm ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/bin/python${VERABI} ${PREFIX}/bin/python${VER}
+  ln -s ${PREFIX}/include/python${VERABI} ${PREFIX}/include/python${VER}
+fi
+
 if [[ "$target_platform" == linux-* ]]; then
   rm ${PREFIX}/include/uuid.h
 fi
@@ -522,7 +525,7 @@ fi
 # <prefix>/lib/python3.13t/site-packages.
 # Note that these directories are not added to sys.path if they do not exist.
 SP_DIR="${PREFIX}/lib/python${PY_VER}${THREAD}/site-packages"
-if [[ ${PY_GIL_DISABLED} == yes ]]; then
+if [[ ${PY_FREETHREADING} == yes ]]; then
     echo "${PREFIX}/lib/python${PY_VER}/site-packages" >> $SP_DIR/conda-site.pth
 fi
 # Do not add ${PREFIX}/lib/python/site-packages (CF experimental ABI3/noarch
