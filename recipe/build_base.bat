@@ -84,7 +84,7 @@ if errorlevel 1 exit 1
 cd ..
 
 :: Populate the root package directory
-for %%x in (python%VERNODOTS%%THREAD%%_D%.dll python3%THREAD%%_D%.dll python%EXE_T%%_D%.exe pythonw%EXE_T%%_D%.exe) do (
+for %%x in (python%VERNODOTS%%THREAD%%_D%.dll python3%THREAD%%_D%.dll python3t%_D%.dll python%EXE_T%%_D%.exe pythonw%EXE_T%%_D%.exe) do (
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x (
     copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\%%x %PREFIX%
   ) else (
@@ -157,6 +157,8 @@ for %%x in (lib libs) do (
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python%VERNODOTS%%THREAD%%_D%.lib %PREFIX%\%%x\
   if errorlevel 1 exit 1
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3%THREAD%%_D%.lib %PREFIX%\%%x\
+  if errorlevel 1 exit 1
+  if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\python3t%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\python3t%_D%.lib %PREFIX%\%%x\
   if errorlevel 1 exit 1
   if exist %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib copy /Y %SRC_DIR%\PCbuild\%BUILD_PATH%\_tkinter%_D%.lib %PREFIX%\%%x\
   if errorlevel 1 exit 1
