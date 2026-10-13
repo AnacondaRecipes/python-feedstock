@@ -37,12 +37,12 @@ esac
 
 cp -pf ${_buildd_static}/libpython${VERABI}.a ${PREFIX}/lib/libpython${VERABI}.a
 if [[ ${HOST} =~ .*linux.* ]]; then
-  pushd ${PREFIX}/lib/python${VERABI}/config-${VERABI}-${OLD_HOST}
+  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-${OLD_HOST}
 elif [[ ${HOST} =~ .*darwin.* ]]; then
-  pushd ${PREFIX}/lib/python${VERABI}/config-${VERABI}-darwin
+  pushd ${PREFIX}/lib/python${VERABI_NO_DBG}/config-${VERABI}-darwin
 fi
 ln -s ../../libpython${VERABI}.a libpython${VERABI}.a
 popd
 # If the LTO info in the normal lib is problematic (using different compilers for example
 # we also provide a 'nolto' version).
-cp -pf ${_buildd_shared}/libpython${VERABI}-pic.a ${PREFIX}/lib/libpython${VERABI}.nolto.a
+cp -pf ${_buildd_shared}/libpython${VERABI_NO_DBG}-pic.a ${PREFIX}/lib/libpython${VERABI_NO_DBG}.nolto.a

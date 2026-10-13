@@ -7,9 +7,9 @@ upstream_sources:
       from_pattern: ^v(\d+\.\d+\.\d+)$
       to_pattern: \1
     packages:
+      - python
       - libpython
       - libpython-static
-      - python
       - python-freethreading
       - python-gil
       - python-jit
