@@ -286,7 +286,8 @@ outputs:
         - if not exist %PREFIX%\\include\\python\\pyconfig.h exit 1  # [win]
         - pushd tests
         - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} .
+        # requires cmake >=4.3.4 https://github.com/Kitware/CMake/commit/363cba1ae60d89b35f6c29f40d2c279e4cb59110 on win-arm64
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Module" {{ cmake_debug }} . # [not (win and arm64)]
         - popd
         - popd
         - python run_test.py
@@ -348,7 +349,8 @@ outputs:
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
         - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
+        # requires cmake >=4.3.4 https://github.com/Kitware/CMake/commit/363cba1ae60d89b35f6c29f40d2c279e4cb59110 on win-arm64
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} . # [not (win and arm64)]
         - popd
         - popd
 
@@ -405,7 +407,8 @@ outputs:
         - bash build-and-test.sh    # [unix]
         - popd                      # [unix]
         - pushd cmake
-        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} .
+        # requires cmake >=4.3.4 https://github.com/Kitware/CMake/commit/363cba1ae60d89b35f6c29f40d2c279e4cb59110 on win-arm64
+        - cmake -GNinja {{ cmake_test_args }} -DPY_VER={{ version }} -DEXTRA_COMPONENTS="Development.Embed" {{ cmake_debug }} . # [not (win and arm64)]
         - popd
         - popd
 
