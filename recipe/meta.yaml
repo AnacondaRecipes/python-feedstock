@@ -304,8 +304,6 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
-      ignore_run_exports_from:   # [unix]
-        - {{ compiler('cxx') }}  # [unix]
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
@@ -317,7 +315,6 @@ outputs:
       build:
         - {{ compiler('c') }}
         - {{ stdlib('c') }}
-        - {{ compiler('cxx') }}
       host:
         - {{ pin_subpackage('python', exact=True) }}
       run:
@@ -366,8 +363,6 @@ outputs:
       activate_in_script: true
       ignore_run_exports:
         - python_abi
-      ignore_run_exports_from:   # [unix]
-        - {{ compiler('cxx') }}  # [unix]
       script_env:
         - PY_INTERP_DEBUG={{ py_interp_debug }}
         - PY_FREETHREADING={{ freethreading }}
@@ -376,7 +371,6 @@ outputs:
       build:
         - {{ stdlib('c') }}
         - {{ compiler('c') }}
-        - {{ compiler('cxx') }}
       host:
         - {{ pin_subpackage('python', exact=True) }}
       run:
