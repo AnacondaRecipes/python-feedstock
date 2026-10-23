@@ -1,7 +1,7 @@
-From 3c361f8dad5758cd5137d2bacf342ac2bf267834 Mon Sep 17 00:00:00 2001
-From: Anaconda Recipes <recipes@anaconda.com>
-Date: Wed, 17 Jun 2026 12:00:00 +0000
-Subject: [PATCH 22/22] Win32 fallback expat HashSalt16Bytes
+From 0c2f705016c0f33357021a22999416e68dda8956 Mon Sep 17 00:00:00 2001
+From: Steven <scrass@anaconda.com>
+Date: Thu, 22 Oct 2026 12:48:03 -0600
+Subject: [PATCH] Win32 fallback expat HashSalt16Bytes
 
 pkgs/main libexpat 2.8.x on win-64 ships 2.8 headers but does not export
 XML_SetHashSalt16Bytes from expat.lib. Fall back to the 8-byte hash salt API
@@ -11,10 +11,10 @@ until libexpat is rebuilt (gh-149018).
  1 file changed, 11 insertions(+)
 
 diff --git a/Modules/pyexpat.c b/Modules/pyexpat.c
-index 9e5d84eb5e2..73fc763a8da 100644
+index fedfe15..a255e95 100644
 --- a/Modules/pyexpat.c
 +++ b/Modules/pyexpat.c
-@@ -1464,7 +1464,14 @@ newxmlparseobject(pyexpat_state *state, const char *encoding,
+@@ -1470,7 +1470,14 @@ newxmlparseobject(pyexpat_state *state, const char *encoding,
      }
  #if XML_COMBINED_VERSION >= 20800
      /* This feature was added upstream in libexpat 2.8.0. */
@@ -29,7 +29,7 @@ index 9e5d84eb5e2..73fc763a8da 100644
  #elif XML_COMBINED_VERSION >= 20100
      /* This feature was added upstream in libexpat 2.1.0. */
      XML_SetHashSalt(self->itself,
-@@ -2328,7 +2335,11 @@ pyexpat_exec(PyObject *mod)
+@@ -2337,7 +2344,11 @@ _Py_COMP_DIAG_POP
      capi->SetHashSalt = NULL;
  #endif
  #if XML_COMBINED_VERSION >= 20800
@@ -41,6 +41,3 @@ index 9e5d84eb5e2..73fc763a8da 100644
  #else
      capi->SetHashSalt16Bytes = NULL;
  #endif
--- 
-2.51.0
-
