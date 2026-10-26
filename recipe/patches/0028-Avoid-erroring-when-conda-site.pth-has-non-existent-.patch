@@ -1,7 +1,7 @@
-From 4eb2410ece2eaa5a98bbe0b3d7b2128bf89617b5 Mon Sep 17 00:00:00 2001
+From 9062314dd0e9ce6d5f3da437f79b4269c0c8428d Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Tue, 1 Sep 2026 17:23:36 -0700
-Subject: [PATCH 28/28] Avoid erroring when conda-site.pth has non-existent
+Subject: [PATCH] Avoid erroring when conda-site.pth has non-existent
  directories
 
 We add lib/python3.14/site-packages for the freethreading builds
@@ -12,10 +12,10 @@ directories in python conda package.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Lib/site.py b/Lib/site.py
-index 5bc762fdd03..737ab0165fe 100644
+index 5bc762f..737ab01 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -489,7 +489,7 @@ def _extend_syspath(self):
+@@ -489,7 +489,7 @@ class StartupState:
              # do a final anti-duplication check.
              if dir_ in sys.path:
                  continue

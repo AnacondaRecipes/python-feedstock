@@ -1,8 +1,7 @@
-From 2edc4215fd5230ca1537a34d0512d8e2e2ba59e3 Mon Sep 17 00:00:00 2001
+From a5041a15078f1e9ddba58fedf066792e6fb3d776 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 5 Dec 2017 22:47:59 +0000
-Subject: [PATCH 03/28] Fix find_library so that it looks in sys.prefix/lib
- first
+Subject: [PATCH] Fix find_library so that it looks in sys.prefix/lib first
 
 ---
  Lib/ctypes/macholib/dyld.py |  4 ++++
@@ -10,7 +9,7 @@ Subject: [PATCH 03/28] Fix find_library so that it looks in sys.prefix/lib
  2 files changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/ctypes/macholib/dyld.py b/Lib/ctypes/macholib/dyld.py
-index 583c47daff3..ab9b01c87e2 100644
+index 583c47d..ab9b01c 100644
 --- a/Lib/ctypes/macholib/dyld.py
 +++ b/Lib/ctypes/macholib/dyld.py
 @@ -93,6 +93,10 @@ def dyld_executable_path_search(name, executable_path=None):
@@ -25,10 +24,10 @@ index 583c47daff3..ab9b01c87e2 100644
          yield os.path.join(executable_path, name[len('@executable_path/'):])
  
 diff --git a/Lib/ctypes/util.py b/Lib/ctypes/util.py
-index 015c62b31a1..e08c9520576 100644
+index 015c62b..e08c952 100644
 --- a/Lib/ctypes/util.py
 +++ b/Lib/ctypes/util.py
-@@ -136,7 +136,8 @@ def dllist():
+@@ -136,7 +136,8 @@ if os.name == "nt":
  elif os.name == "posix" and sys.platform in {"darwin", "ios", "tvos", "watchos"}:
      from ctypes.macholib.dyld import dyld_find as _dyld_find
      def find_library(name):
@@ -38,7 +37,7 @@ index 015c62b31a1..e08c9520576 100644
                      '%s.dylib' % name,
                      '%s.framework/%s' % (name, name)]
          for name in possible:
-@@ -436,10 +437,30 @@ def _findLib_ld(name):
+@@ -436,10 +437,30 @@ elif os.name == "posix":
                  pass  # result will be None
              return result
  

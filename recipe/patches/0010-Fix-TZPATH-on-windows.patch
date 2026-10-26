@@ -1,17 +1,17 @@
-From f667dd9d5dbdf4a7922aadfe67336eacae185a0f Mon Sep 17 00:00:00 2001
+From 4bbbfa9d283bd54e5d9921c42334b88c4b8ca0bc Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Wed, 7 Oct 2020 10:08:30 -0500
-Subject: [PATCH 10/28] Fix TZPATH on windows
+Subject: [PATCH] Fix TZPATH on windows
 
 ---
  Lib/sysconfig/__init__.py | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
-index b93155131c6..fc99cd14af2 100644
+index b931551..fc99cd1 100644
 --- a/Lib/sysconfig/__init__.py
 +++ b/Lib/sysconfig/__init__.py
-@@ -175,6 +175,7 @@ def joinuser(*args):
+@@ -175,6 +175,7 @@ _SCHEME_KEYS = ('stdlib', 'platstdlib', 'purelib', 'platlib', 'include',
  _PY_VERSION = sys.version.split()[0]
  _PY_VERSION_SHORT = f'{sys.version_info[0]}.{sys.version_info[1]}'
  _PY_VERSION_SHORT_NO_DOT = f'{sys.version_info[0]}{sys.version_info[1]}'
