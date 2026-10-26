@@ -1,4 +1,4 @@
-{% set version = "3.11.17" %}
+{% set version = "3.11.18" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -50,7 +50,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: bfb74ad39efae27cda510f134ab408e00f9992c56851cfc0b1cdb5646da11599
+    sha256: 9120e0a653868f6e3698d36cdd99e5a58903ec9469e448f21d98f7b16d8fa290
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -284,7 +284,8 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        - cmake -GNinja -DPY_VER={{ version }}
+        # requires cmake >=4.3.4 https://github.com/Kitware/CMake/commit/363cba1ae60d89b35f6c29f40d2c279e4cb59110 on win-arm64
+        - cmake -GNinja -DPY_VER={{ version }}  # [not (win and arm64)]
               # --trace --debug-output --debug-trycompile .
         - popd
         - popd
