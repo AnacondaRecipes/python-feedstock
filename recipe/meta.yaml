@@ -80,8 +80,6 @@ source:
       - patches/0021-Override-configure-LIBFFI.patch
       - patches/0022-Allow-linking-ncursesw-panelw-on-macOS-if-available.patch
       - patches/0023-Do-not-define-pid_t-as-it-might-conflict-with-the-ac.patch
-      # pkgs/main libexpat 2.8.x on win-64 does not export XML_SetHashSalt16Bytes (gh-149018).
-      - patches/0024-Win32-fallback-expat-HashSalt16Bytes.patch
 
 build:
   number: {{ build_number }}
