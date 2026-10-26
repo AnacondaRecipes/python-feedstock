@@ -101,8 +101,7 @@ requirements:
     - git
 {% else %}
     - patch  # [not win]
-    - m2-patch  # [win]
-    - m2-gcc-libs  # [win]
+    - msys2-gcc-libs  # [win]
 {% endif %}
 
 outputs:
