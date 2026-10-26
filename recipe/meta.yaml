@@ -101,7 +101,8 @@ requirements:
     - git
 {% else %}
     - patch  # [not win]
-    - msys2-gcc-libs  # [win]
+    - m2-patch  # [win]
+    - m2-gcc-libs  # [win]
 {% endif %}
 
 outputs:
@@ -283,8 +284,7 @@ outputs:
         - bash build-and-test.sh      # [unix]
         - popd    # [unix]
         - pushd cmake
-        # requires cmake >=4.3.4 https://github.com/Kitware/CMake/commit/363cba1ae60d89b35f6c29f40d2c279e4cb59110 on win-arm64
-        - cmake -GNinja -DPY_VER={{ version }}  # [not (win and arm64)]
+        - cmake -GNinja -DPY_VER={{ version }}
               # --trace --debug-output --debug-trycompile .
         - popd
         - popd

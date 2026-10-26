@@ -6,11 +6,7 @@ echo on
 if errorlevel 1 exit 1
 
 :: Compile python, extensions and external libraries
-if "%ARCH%"=="arm64" (
-   set PLATFORM=ARM64
-   set VC_PATH=arm64
-   set BUILD_PATH=arm64
-) else if "%ARCH%"=="64" (
+if "%ARCH%"=="64" (
    set PLATFORM=x64
    set VC_PATH=x64
    set BUILD_PATH=amd64
