@@ -1,4 +1,4 @@
-{% set version = "3.14.9" %}
+{% set version = "3.14.10" %}
 {% set dev = "" %}
 {% set dev_ = "" %}
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
@@ -62,7 +62,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: e02d9ac21cebda6e46435369744a92c65cc7cd8669697694122cf97ffacd1e53
+    sha256: de414a57119abef52784d8993e341d53aed635fc2b05c2607d9f98a2c5b72032
 {% endif %}
     patches:
       - patches/0001-Win32-Change-FD_SETSIZE-from-512-to-2048.patch
@@ -356,11 +356,15 @@ outputs:
         - popd    # [unix]
 {% endif %}
 
+  # Noarch outputs are built by the standard-platform graph; skip them when
+  # building a separate win-arm64 graph so they are not republished.
   - name: python-freethreading
     build:
       noarch: generic
 {% if gil_type == "normal" %}
       skip: True
+{% else %}
+      skip: True  # [win and arm64]
 {% endif %}
     requirements:
       - python {{ version }}{{ dev }}.*
@@ -371,6 +375,8 @@ outputs:
       noarch: generic
 {% if gil_type == "disabled" %}
       skip: True
+{% else %}
+      skip: True  # [win and arm64]
 {% endif %}
     requirements:
       - python {{ version }}{{ dev }}.*
@@ -382,8 +388,9 @@ outputs:
     build:
 {% if gil_type == "disabled" %}
       skip: True
+{% else %}
+      skip: true  # [py<313 or (win and arm64)]
 {% endif %}
-      skip: true  # [py<313]
       noarch: generic
     requirements:
       - python {{ version }}{{ dev }}
