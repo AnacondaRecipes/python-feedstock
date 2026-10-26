@@ -4,17 +4,17 @@ Date: Wed, 29 Mar 2023 23:07:10 -0500
 Subject: [PATCH 18/23] Unvendor expat
 
 ---
- PCbuild/_elementtree.vcxproj         | 27 +++------------
- PCbuild/_elementtree.vcxproj.filters | 64 +-----------------------------------
- PCbuild/pyexpat.vcxproj              | 15 +++------
- PCbuild/pyexpat.vcxproj.filters      | 28 +---------------
- 4 files changed, 10 insertions(+), 124 deletions(-)
+ PCbuild/_elementtree.vcxproj         | 29 ++-------------
+ PCbuild/_elementtree.vcxproj.filters | 72 ------------------------------------
+ PCbuild/pyexpat.vcxproj              | 17 ++-------
+ PCbuild/pyexpat.vcxproj.filters      | 30 ---------------
+ 4 files changed, 8 insertions(+), 140 deletions(-)
 
 diff --git a/PCbuild/_elementtree.vcxproj b/PCbuild/_elementtree.vcxproj
-index 77d1b58..352d073 100644
+index 15c12f9..352d073 100644
 --- a/PCbuild/_elementtree.vcxproj
 +++ b/PCbuild/_elementtree.vcxproj
-@@ -93,38 +93,19 @@
+@@ -93,40 +93,19 @@
    </PropertyGroup>
    <ItemDefinitionGroup>
      <ClCompile>
@@ -46,11 +46,13 @@ index 77d1b58..352d073 100644
 -    <ClInclude Include="..\Modules\expat\pyexpatns.h" />
 -    <ClInclude Include="..\Modules\expat\utf8tab.h" />
 -    <ClInclude Include="..\Modules\expat\winconfig.h" />
+-    <ClInclude Include="..\Modules\expat\xcs.h" />
 -    <ClInclude Include="..\Modules\expat\xmlrole.h" />
 -    <ClInclude Include="..\Modules\expat\xmltok.h" />
 -  </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\_elementtree.c" />
+-    <ClCompile Include="..\Modules\expat\xcs.c" />
 -    <ClCompile Include="..\Modules\expat\xmlparse.c" />
 -    <ClCompile Include="..\Modules\expat\xmlrole.c" />
 -    <ClCompile Include="..\Modules\expat\xmltok.c" />
@@ -58,14 +60,21 @@ index 77d1b58..352d073 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/_elementtree.vcxproj.filters b/PCbuild/_elementtree.vcxproj.filters
-index 36f023c..498c7e6 100644
+index 54ccfbf..cb08bc2 100644
 --- a/PCbuild/_elementtree.vcxproj.filters
 +++ b/PCbuild/_elementtree.vcxproj.filters
-@@ -17,76 +17,14 @@
-       <UniqueIdentifier>{f99990ba-cd06-40cc-8f28-d2d424ec13be}</UniqueIdentifier>
+@@ -10,85 +10,13 @@
+     <Filter Include="Resource Files">
+       <UniqueIdentifier>{37d3ef0a-1ea6-492d-bba7-b83865198caa}</UniqueIdentifier>
      </Filter>
+-    <Filter Include="Header Files\expat">
+-      <UniqueIdentifier>{6099ed72-6668-4779-adb2-a2362e5da3b9}</UniqueIdentifier>
+-    </Filter>
+-    <Filter Include="Source Files\expat">
+-      <UniqueIdentifier>{f99990ba-cd06-40cc-8f28-d2d424ec13be}</UniqueIdentifier>
+-    </Filter>
    </ItemGroup>
--  <ItemGroup>
+   <ItemGroup>
 -    <ClInclude Include="..\Modules\expat\ascii.h">
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
@@ -111,17 +120,23 @@ index 36f023c..498c7e6 100644
 -    <ClInclude Include="..\Modules\expat\winconfig.h">
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
+-    <ClInclude Include="..\Modules\expat\xcs.h">
+-      <Filter>Header Files\expat</Filter>
+-    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\xmlrole.h">
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\xmltok.h">
 -      <Filter>Header Files\expat</Filter>
 -    </ClInclude>
--  </ItemGroup>
+   </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\_elementtree.c">
        <Filter>Source Files</Filter>
      </ClCompile>
+-    <ClCompile Include="..\Modules\expat\xcs.c">
+-      <Filter>Source Files\expat</Filter>
+-    </ClCompile>
 -    <ClCompile Include="..\Modules\expat\xmlparse.c">
 -      <Filter>Source Files\expat</Filter>
 -    </ClCompile>
@@ -134,17 +149,11 @@ index 36f023c..498c7e6 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
-       <Filter>Resource Files</Filter>
-     </ResourceCompile>
-   </ItemGroup>
--</Project>
-\ No newline at end of file
-+</Project>
 diff --git a/PCbuild/pyexpat.vcxproj b/PCbuild/pyexpat.vcxproj
-index bb2ae1a..4b64d30 100644
+index b4c3c54..4b64d30 100644
 --- a/PCbuild/pyexpat.vcxproj
 +++ b/PCbuild/pyexpat.vcxproj
-@@ -90,26 +90,19 @@
+@@ -90,28 +90,19 @@
    <PropertyGroup Label="UserMacros" />
    <ItemDefinitionGroup>
      <ClCompile>
@@ -164,11 +173,13 @@ index bb2ae1a..4b64d30 100644
 -    <ClInclude Include="..\Modules\expat\fallthrough.h" />
 -    <ClInclude Include="..\Modules\expat\hash_table.h" />
 -    <ClInclude Include="..\Modules\expat\memory_sanitizer.h" />
+-    <ClInclude Include="..\Modules\expat\xcs.h" />
 -    <ClInclude Include="..\Modules\expat\xmlrole.h" />
 -    <ClInclude Include="..\Modules\expat\xmltok.h" />
 -  </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\pyexpat.c" />
+-    <ClCompile Include="..\Modules\expat\xcs.c" />
 -    <ClCompile Include="..\Modules\expat\xmlparse.c" />
 -    <ClCompile Include="..\Modules\expat\xmlrole.c" />
 -    <ClCompile Include="..\Modules\expat\xmltok.c" />
@@ -176,14 +187,13 @@ index bb2ae1a..4b64d30 100644
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc" />
 diff --git a/PCbuild/pyexpat.vcxproj.filters b/PCbuild/pyexpat.vcxproj.filters
-index e3a4a64..9bd83cb 100644
+index 6685e91..640fd9f 100644
 --- a/PCbuild/pyexpat.vcxproj.filters
 +++ b/PCbuild/pyexpat.vcxproj.filters
-@@ -11,40 +11,14 @@
-       <UniqueIdentifier>{f1dbbdb5-41e5-4a88-bf8e-13da010c0ce4}</UniqueIdentifier>
+@@ -12,41 +12,11 @@
      </Filter>
    </ItemGroup>
--  <ItemGroup>
+   <ItemGroup>
 -    <ClInclude Include="..\Modules\expat\fallthrough.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
@@ -193,17 +203,23 @@ index e3a4a64..9bd83cb 100644
 -    <ClInclude Include="..\Modules\expat\memory_sanitizer.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
+-    <ClInclude Include="..\Modules\expat\xcs.h">
+-      <Filter>Header Files</Filter>
+-    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\xmlrole.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
 -    <ClInclude Include="..\Modules\expat\xmltok.h">
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
--  </ItemGroup>
+   </ItemGroup>
    <ItemGroup>
      <ClCompile Include="..\Modules\pyexpat.c">
        <Filter>Source Files</Filter>
      </ClCompile>
+-    <ClCompile Include="..\Modules\expat\xcs.c">
+-      <Filter>Source Files</Filter>
+-    </ClCompile>
 -    <ClCompile Include="..\Modules\expat\xmlparse.c">
 -      <Filter>Source Files</Filter>
 -    </ClCompile>
@@ -216,9 +232,3 @@ index e3a4a64..9bd83cb 100644
    </ItemGroup>
    <ItemGroup>
      <ResourceCompile Include="..\PC\python_nt.rc">
-       <Filter>Resource Files</Filter>
-     </ResourceCompile>
-   </ItemGroup>
--</Project>
-\ No newline at end of file
-+</Project>

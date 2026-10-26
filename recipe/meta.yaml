@@ -1,5 +1,5 @@
-{% set version = "3.12.15" %}
-{% set build_number = "1" %}
+{% set version = "3.12.16" %}
+{% set build_number = "0" %}
 
 {% set dev = "" %}
 {% set dev_ = "" %}
@@ -52,7 +52,7 @@ source:
 {% else %}
   - url: https://www.python.org/ftp/python/{{ version }}/Python-{{ version }}{{ dev }}.tar.xz
     # md5 from: https://www.python.org/downloads/release/python-{{ ver3nd }}/
-    sha256: c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a
+    sha256: b5796915dc45ff745cfb4e990a7e7c93d6f546328a102ce31448d69ebc37575c
 {% endif %}
     patches:
       - patches/0000-branding.patch
@@ -80,8 +80,6 @@ source:
       - patches/0021-Override-configure-LIBFFI.patch
       - patches/0022-Allow-linking-ncursesw-panelw-on-macOS-if-available.patch
       - patches/0023-Do-not-define-pid_t-as-it-might-conflict-with-the-ac.patch
-      # pkgs/main libexpat 2.8.x on win-64 does not export XML_SetHashSalt16Bytes (gh-149018).
-      - patches/0024-Win32-fallback-expat-HashSalt16Bytes.patch
 
 build:
   number: {{ build_number }}
