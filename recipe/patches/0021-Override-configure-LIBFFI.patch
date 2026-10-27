@@ -11,13 +11,13 @@ diff --git a/configure b/configure
 index f924a0029fd..94244279fb5 100755
 --- a/configure
 +++ b/configure
-@@ -15421,7 +15421,7 @@ if test "x$ac_cv_lib_ffi_ffi_call" = xyes
+@@ -15450,7 +15450,7 @@ if test "x$ac_cv_lib_ffi_ffi_call" = xyes
  then :
  
                  have_libffi=yes
--        LIBFFI_CFLAGS="-I${SDKROOT}/usr/include/ffi -DUSING_APPLE_OS_LIBFFI=1"
-+        LIBFFI_CFLAGS="-I${PREFIX}/include -DUSING_APPLE_OS_LIBFFI=0"
-         LIBFFI_LIBS="-lffi"
+-        LIBFFI_CFLAGS=${LIBFFI_CFLAGS-"-I${SDKROOT}/usr/include/ffi -DUSING_APPLE_OS_LIBFFI=1"}
++        LIBFFI_CFLAGS=${LIBFFI_CFLAGS-"-I${PREFIX}/include -DUSING_APPLE_OS_LIBFFI=0"}
+         LIBFFI_LIBS=${LIBFFI_LIBS-"-lffi"}
  
  fi
 -- 
