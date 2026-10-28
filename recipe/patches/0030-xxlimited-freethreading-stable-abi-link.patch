@@ -1,8 +1,7 @@
-From 9359aecb37f6ad32a04ff92aeb8d3f2419f46d4f Mon Sep 17 00:00:00 2001
+From 410d185e8191ea059fbe800e2f165bbb7ea23c62 Mon Sep 17 00:00:00 2001
 From: Serhii Kupriienko <skupr@anaconda.com>
 Date: Thu, 6 Aug 2026 14:04:01 +0000
-Subject: [PATCH 25/25] Link xxlimited* to correct stable ABI DLL on
- freethreading
+Subject: [PATCH] Link xxlimited* to correct stable ABI DLL on freethreading
 
 On Windows freethreading builds, upstream ships python3t.dll only (not
 python3.dll). Unconditional ProjectReference to python3dll.vcxproj makes
@@ -13,8 +12,13 @@ from python/cpython#148912 (gh-148690, Petr Viktorin).
 
 Co-authored-by: Petr Viktorin <encukou@gmail.com>
 ---
+ PCbuild/xxlimited.vcxproj      | 4 ++--
+ PCbuild/xxlimited_35.vcxproj   | 7 ++++---
+ PCbuild/xxlimited_3_13.vcxproj | 6 +++++-
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/PCbuild/xxlimited.vcxproj b/PCbuild/xxlimited.vcxproj
+index 6d51e94..d26030c 100644
 --- a/PCbuild/xxlimited.vcxproj
 +++ b/PCbuild/xxlimited.vcxproj
 @@ -107,10 +107,10 @@
@@ -31,6 +35,7 @@ diff --git a/PCbuild/xxlimited.vcxproj b/PCbuild/xxlimited.vcxproj
      </ProjectReference>
    </ItemGroup>
 diff --git a/PCbuild/xxlimited_35.vcxproj b/PCbuild/xxlimited_35.vcxproj
+index 1e90aa5..fce53b5 100644
 --- a/PCbuild/xxlimited_35.vcxproj
 +++ b/PCbuild/xxlimited_35.vcxproj
 @@ -107,11 +107,12 @@
@@ -50,19 +55,21 @@ diff --git a/PCbuild/xxlimited_35.vcxproj b/PCbuild/xxlimited_35.vcxproj
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 diff --git a/PCbuild/xxlimited_3_13.vcxproj b/PCbuild/xxlimited_3_13.vcxproj
+index db3dfd8..9596844 100644
 --- a/PCbuild/xxlimited_3_13.vcxproj
 +++ b/PCbuild/xxlimited_3_13.vcxproj
-@@ -107,8 +107,12 @@
+@@ -107,9 +107,13 @@
      <ClCompile Include="..\Modules\xxlimited_3_13.c" />
    </ItemGroup>
    <ItemGroup>
 -    <ProjectReference Include="python3dll.vcxproj">
 +    <ProjectReference Include="python3dll.vcxproj" Condition="'$(DisableGil)' != 'true'">
        <Project>{885d4898-d08d-4091-9c40-c700cfe3fc5a}</Project>
-+    </ProjectReference>
+     </ProjectReference>
 +    <ProjectReference Include="pythoncore.vcxproj" Condition="'$(DisableGil)' == 'true'">
 +      <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
 +      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-     </ProjectReference>
++    </ProjectReference>
    </ItemGroup>
    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <ImportGroup Label="ExtensionTargets">

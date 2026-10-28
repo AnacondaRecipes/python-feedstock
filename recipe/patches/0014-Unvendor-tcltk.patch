@@ -1,7 +1,7 @@
-From a6b3f9fbd3ff890aaa66daabfa7eb98d7b4be9d9 Mon Sep 17 00:00:00 2001
+From 46fb22508771b4bd18f37d57da62d02618e11a09 Mon Sep 17 00:00:00 2001
 From: Isuru Fernando <isuruf@gmail.com>
 Date: Fri, 20 Aug 2021 10:23:51 -0700
-Subject: [PATCH 14/28] Unvendor tcltk
+Subject: [PATCH] Unvendor tcltk
 
 ---
  PCbuild/_tkinter.vcxproj |  6 ------
@@ -9,7 +9,7 @@ Subject: [PATCH 14/28] Unvendor tcltk
  2 files changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/PCbuild/_tkinter.vcxproj b/PCbuild/_tkinter.vcxproj
-index de9358312ac..3fe2c29c823 100644
+index a6695b7..84eb85e 100644
 --- a/PCbuild/_tkinter.vcxproj
 +++ b/PCbuild/_tkinter.vcxproj
 @@ -128,12 +128,6 @@
@@ -26,7 +26,7 @@ index de9358312ac..3fe2c29c823 100644
      <WriteLinesToFile File="$(OutDir)TCL_LIBRARY.env" Lines="$(tcltkdir)\lib\tcl$(TclMajorVersion).$(TclMinorVersion)" Encoding="utf-8" Overwrite="true" />
    </Target>
 diff --git a/PCbuild/tcltk.props b/PCbuild/tcltk.props
-index 1d6b4f57f09..22a3f0be581 100644
+index 91c11aa..e4445c1 100644
 --- a/PCbuild/tcltk.props
 +++ b/PCbuild/tcltk.props
 @@ -12,15 +12,13 @@

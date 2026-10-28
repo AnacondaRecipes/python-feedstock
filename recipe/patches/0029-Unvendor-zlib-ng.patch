@@ -1,7 +1,7 @@
-From 10a41672dbad7f03816c37832d3e92709f9649e0 Mon Sep 17 00:00:00 2001
+From cbbb6cd72d434f0b1ac000a09db659457a2d3587 Mon Sep 17 00:00:00 2001
 From: Ian Fitchet <ifitchet@anaconda.com>
 Date: Mon, 30 Jun 2025 11:20:05 +0100
-Subject: [PATCH 23/25] Unvendor zlib-ng
+Subject: [PATCH] Unvendor zlib-ng
 
 ---
  PCbuild/pcbuild.proj            |   2 +-
@@ -10,6 +10,7 @@ Subject: [PATCH 23/25] Unvendor zlib-ng
  3 files changed, 2 insertions(+), 352 deletions(-)
 
 diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
+index 7a6c98c..d5eca2c 100644
 --- a/PCbuild/pcbuild.proj
 +++ b/PCbuild/pcbuild.proj
 @@ -48,7 +48,7 @@
@@ -22,6 +23,7 @@ diff --git a/PCbuild/pcbuild.proj b/PCbuild/pcbuild.proj
      <!--
      Parallel build is explicitly disabled for this project because it
 diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
+index 5695318..c20858a 100644
 --- a/PCbuild/zlib-ng.vcxproj
 +++ b/PCbuild/zlib-ng.vcxproj
 @@ -73,9 +73,6 @@
@@ -179,9 +181,10 @@ diff --git a/PCbuild/zlib-ng.vcxproj b/PCbuild/zlib-ng.vcxproj
 -          DependsOnTargets="_EnsureZlibH;_EnsureZlibNgH" />
  </Project>
 diff --git a/PCbuild/zlib-ng.vcxproj.filters b/PCbuild/zlib-ng.vcxproj.filters
+index 95c79f3..1738210 100644
 --- a/PCbuild/zlib-ng.vcxproj.filters
 +++ b/PCbuild/zlib-ng.vcxproj.filters
-@@ -1,240 +1,12 @@
+@@ -1,242 +1,14 @@
  ﻿<?xml version="1.0" encoding="utf-8"?>
  <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
    <ItemGroup>
@@ -416,9 +419,11 @@ diff --git a/PCbuild/zlib-ng.vcxproj.filters b/PCbuild/zlib-ng.vcxproj.filters
 -      <Filter>Header Files</Filter>
 -    </ClInclude>
      <ClInclude Include="..\PC\zlib.h">
--      <Filter>Header Files</Filter>
--    </ClInclude>
--    <ClInclude Include="$(zlibNgDir)\zutil.h">
        <Filter>Header Files</Filter>
      </ClInclude>
+-    <ClInclude Include="$(zlibNgDir)\zutil.h">
+-      <Filter>Header Files</Filter>
+-    </ClInclude>
    </ItemGroup>
+   <ItemGroup>
+     <Filter Include="Source Files">
