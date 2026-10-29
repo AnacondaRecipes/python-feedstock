@@ -104,3 +104,45 @@ pem = Path(__file__).with_name("test-cert.pem").read_text()
 der = ssl.PEM_cert_to_DER_cert(pem)
 ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ctx.load_verify_locations(cadata=der)
+
+# CVE-2026-115557 (gh-160040): a peer chain signed by a compromised eMudhra
+# intermediate must be rejected even though the chain itself is valid.
+import tempfile
+import zipfile
+
+fixtures = Path(__file__).with_name("tests") / "ssl"
+with tempfile.TemporaryDirectory() as tmpdir:
+    # The archive is encrypted only so the test certs are not stored in the
+    # clear; the password is fixed and public.
+    with zipfile.ZipFile(fixtures / "distrusted.zip") as zf:
+        zf.extractall(tmpdir, pwd=b"Brave Sir Robin")
+    distrusted = Path(tmpdir) / "distrusted"
+    client_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    server_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    client_ctx.load_verify_locations(str(distrusted / "distrusted_root.pem"))
+    server_ctx.load_cert_chain(str(distrusted / "distrusted_keycert.pem"))
+
+    c_in, c_out = ssl.MemoryBIO(), ssl.MemoryBIO()
+    s_in, s_out = ssl.MemoryBIO(), ssl.MemoryBIO()
+    client = client_ctx.wrap_bio(c_in, c_out, server_hostname="localhost")
+    server = server_ctx.wrap_bio(s_in, s_out, server_side=True)
+    try:
+        for _ in range(5):
+            try:
+                client.do_handshake()
+            except ssl.SSLWantReadError:
+                pass
+            if c_out.pending:
+                s_in.write(c_out.read())
+            try:
+                server.do_handshake()
+            except ssl.SSLWantReadError:
+                pass
+            if s_out.pending:
+                c_in.write(s_out.read())
+        client.do_handshake()
+    except ssl.SSLCertVerificationError as exc:
+        assert exc.verify_code == 28, exc  # X509_V_ERR_CERT_REJECTED
+    else:
+        raise AssertionError("distrusted eMudhra chain was accepted")
+print("distrusted SPKI check: OK")
