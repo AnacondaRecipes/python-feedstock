@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = "0" %}
+{% set build_number = "1" %}
 {% set channel_targets = ('abc', 'def')  %}
 
 # this makes the linter happy
@@ -90,6 +90,10 @@ source:
       - patches/0027-Unvendor-expat.patch
       # https://github.com/python/cpython/pull/29791
       - patches/0029-Fix-ctypes-fielddesc-init-for-external-libffi.patch
+      # CVE-2026-115557 (gh-160040): distrust compromised eMudhra intermediate
+      # CA keys. Backport of CPython 3.11 commit 7dd8b4736a1419750b94a388e6d158be15836fe6;
+      # 3.10 is EOL, so upstream has no fixed 3.10 release.
+      - patches/0030-Distrust-compromised-eMudhra-intermediate-CA-keys.patch
 
 build:
   number: {{ build_number }}
@@ -236,6 +240,7 @@ outputs:
         - tests/cmake/*
         - tests/cython/*
         - tests/prefix-replacement/*
+        - tests/ssl/*
         - run_test.py
         - test-cert.pem
       commands:
