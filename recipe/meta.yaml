@@ -114,6 +114,8 @@ outputs:
     script: build_base.bat  # [win]
     build:
       number: {{ build_number }}
+      # win-arm64 ships Python >=3.12 only (aggregate CBC)
+      skip: true  # [win and arm64]
       activate_in_script: true
       # Windows has issues updating python if conda is using files itself.
       # Copy rather than link.
@@ -306,6 +308,8 @@ outputs:
     script: build_static.bat  # [win]
     build:
       number: {{ build_number }}
+      # win-arm64 ships Python >=3.12 only (aggregate CBC)
+      skip: true  # [win and arm64]
       activate_in_script: true
 {% if 'conda-forge' in channel_targets %}
       ignore_run_exports:
