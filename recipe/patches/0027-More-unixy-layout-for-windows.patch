@@ -6,10 +6,10 @@ Subject: [PATCH] More unixy layout for windows
 See https://github.com/conda-forge/cfep/pull/65
 ---
  Lib/site.py                |  1 +
- Lib/sysconfig/__init__.py  | 12 +++++++++++-
+ Lib/sysconfig/__init__.py  | 18 ++++++++++++++----
  Modules/getpath.py         |  4 ++--
  PCbuild/pythoncore.vcxproj |  2 +-
- 4 files changed, 15 insertions(+), 4 deletions(-)
+ 4 files changed, 18 insertions(+), 7 deletions(-)
 
 diff --git a/Lib/site.py b/Lib/site.py
 index 89e136d..5bc762f 100644
@@ -44,6 +44,22 @@ index fc99cd1..c26660f 100644
  
      # Downstream distributors can overwrite the default install scheme.
      # This is done to support downstream modifications where distributors change
+@@ -89,12 +99,12 @@ _INSTALL_SCHEMES = {
+         'data': '{base}',
+         },
+     'nt_venv': {
+-        'stdlib': '{installed_base}/Lib',
++        'stdlib': '{installed_base}/{platlibdir}/{implementation_lower}',
+         'platstdlib': '{base}/Lib',
+         'purelib': '{base}/Lib/site-packages',
+         'platlib': '{base}/Lib/site-packages',
+-        'include': '{installed_base}/Include',
+-        'platinclude': '{installed_base}/Include',
++        'include': '{installed_base}/include/{implementation_lower}',
++        'platinclude': '{installed_platbase}/include/{implementation_lower}',
+         'scripts': '{base}/Scripts',
+         'data': '{base}',
+         },
 @@ -279,7 +289,7 @@ def _expand_vars(scheme, vars):
  def _get_preferred_schemes():
      if os.name == 'nt':
