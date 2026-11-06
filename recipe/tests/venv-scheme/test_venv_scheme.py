@@ -3,6 +3,17 @@
 Run twice on Windows: with the base interpreter (scheme contract) and with a
 plain venv created from it (what setuptools, Cython, pybind11 and torch see).
 Stdlib only, so it runs in any test env, including free-threaded builds.
+
+Scheme selection has two names, and both exist in CPython 3.15:
+
+* ``sysconfig.get_preferred_scheme("prefix")`` (singular) is the public API.
+  Inside a venv it returns ``"venv"`` directly. Outside a venv it returns
+  ``_get_preferred_schemes()["prefix"]``.
+* ``sysconfig._get_preferred_schemes()`` (plural) is the private table that
+  CFEP-65 patches from ``"nt"`` to ``"nt_conda"``.
+
+So the patch reaches ``get_preferred_scheme("prefix")`` through the plural
+table, and ``"venv"`` is an alias of the ``nt_venv`` block that this PR fixes.
 """
 
 import os
@@ -57,8 +68,15 @@ class SchemeContract(unittest.TestCase):
         self.assertEqual(sysconfig.get_paths("venv"), self.venv)
 
     def test_prefix_scheme_selection(self):
+        # Public API. Inside a venv it short-circuits to "venv" (the alias of
+        # nt_venv); at base it returns _get_preferred_schemes()["prefix"].
         expected = "venv" if IN_VENV else "nt_conda"
         self.assertEqual(sysconfig.get_preferred_scheme("prefix"), expected)
+
+    def test_preferred_table_is_nt_conda(self):
+        # The CFEP-65 patch edits this private table (plural name), which is
+        # what get_preferred_scheme("prefix") returns outside a venv.
+        self.assertEqual(sysconfig._get_preferred_schemes()["prefix"], "nt_conda")
 
 
 class HeadersInstalled(unittest.TestCase):
