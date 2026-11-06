@@ -4,7 +4,7 @@
 {% set ver2 = '.'.join(version.split('.')[0:2]) %}
 {% set ver2nd = ''.join(version.split('.')[0:2]) %}
 {% set ver3nd = ''.join(version.split('.')[0:3]) %}
-{% set build_number = 0 %}
+{% set build_number = 1 %}
 
 # Sanitize build system env. var tweak parameters
 # (passed to the build scripts via script_env).
@@ -230,6 +230,7 @@ outputs:
       files:
         - tests/cmake/*
         - tests/cython/*
+        - tests/venv-scheme/*
         - run_test.py
       commands:
         - echo on  # [win]
@@ -248,6 +249,11 @@ outputs:
         - python -Im ensurepip --upgrade --default-pip  # [win]
         # tzdata/zoneinfo test that will need the tzdata package to pass
         - python -c "from zoneinfo import ZoneInfo; from datetime import datetime; dt = datetime(2020, 10, 31, 12, tzinfo=ZoneInfo('America/Los_Angeles')); print(dt.tzname())"
+        # PKG-19380: nt_venv must describe the base install; get_preferred_scheme("prefix")
+        # resolves via _get_preferred_schemes() to nt_conda, or to "venv" inside a venv
+        - python tests/venv-scheme/test_venv_scheme.py  # [win]
+        - python -m venv test-venv-scheme  # [win]
+        - test-venv-scheme\\Scripts\\python.exe tests/venv-scheme/test_venv_scheme.py  # [win]
         - python -m venv test-venv
         - test-venv\\Scripts\\python.exe -c "import ctypes"  # [win]
         - test-venv/bin/python -c "import ctypes"            # [unix]
